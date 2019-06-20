@@ -1,0 +1,284 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 99.2beta6 (1.42)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<html><head>
+<title>Operation of the Enigma machine with an example</title>
+<meta name="description" content="Operation of the Enigma machine with an example">
+<meta name="keywords" content="enigma-referat">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="Generator" content="LaTeX2HTML v99.2beta6">
+<meta http-equiv="Content-Style-Type" content="text/css">
+
+<link rel="STYLESHEET" href="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/enigma-referat.css">
+
+<link rel="next" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node5.html">
+<link rel="previous" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node3.html">
+<link rel="up" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/enigma-referat.html">
+<link rel="next" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node5.html">
+</head>
+
+<body>
+<!--Navigation Panel-->
+<a name="tex2html115" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node5.html">
+<img alt="next" src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/next.png" width="37" height="24" border="0" align="BOTTOM"></a> 
+<a name="tex2html111" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/enigma-referat.html">
+<img alt="up" src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/up.png" width="26" height="24" border="0" align="BOTTOM"></a> 
+<a name="tex2html105" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node3.html">
+<img alt="previous" src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/prev.png" width="63" height="24" border="0" align="BOTTOM"></a> 
+<a name="tex2html113" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node2.html">
+<img alt="contents" src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/contents.png" width="65" height="24" border="0" align="BOTTOM"></a>  
+<br>
+<b> Next:</b> <a name="tex2html116" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node5.html">How secure is the</a>
+<b> Up:</b> <a name="tex2html112" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/enigma-referat.html">Enigma - a very</a>
+<b> Previous:</b> <a name="tex2html106" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node3.html">What is the Enigma</a>
+ &nbsp; <b>  <a name="tex2html114" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node2.html">Contents</a></b> 
+<br>
+<br>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul>
+<li><a name="tex2html117" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node4.html#SECTION00041000000000000000">Basic handling</a>
+</li><li><a name="tex2html118" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node4.html#SECTION00042000000000000000">Basic functionality</a>
+<ul>
+<li><a name="tex2html119" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node4.html#SECTION00042100000000000000">Rotors</a>
+</li><li><a name="tex2html120" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node4.html#SECTION00042200000000000000">Electrical diagram</a>
+</li></ul>
+</li><li><a name="tex2html121" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node4.html#SECTION00043000000000000000">Example</a>
+</li><li><a name="tex2html122" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node4.html#SECTION00044000000000000000">Types of Machines</a>
+<ul>
+<li><a name="tex2html123" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node4.html#SECTION00044100000000000000">Enigma D, for non-military use</a>
+</li><li><a name="tex2html124" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node4.html#SECTION00044200000000000000">Model M3</a>
+</li><li><a name="tex2html125" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node4.html#SECTION00044300000000000000">Model M4</a>
+</li></ul></li></ul>
+<!--End of Table of Child-Links-->
+<hr>
+
+<h1><a name="SECTION00040000000000000000">
+Operation of the Enigma machine with an example</a>
+</h1>
+
+<p>
+
+</p><h2><a name="SECTION00041000000000000000">
+Basic handling</a>
+</h2>
+
+<p>
+After preparing the setup for the machine (wheel numbers, wheel order, ground
+setting, ring setting, plug) scrambling messages is very simple: You press a
+letter of your plain text and a lamp indicates the enciphered letter. You write
+down this scrambled letter and press the next one.....
+
+</p><p>
+The Enigma machine is symmetrical, the enciphering and deciphering method is
+the same. For decoding of the message the setup must be equal. The ciphered
+text is typed in and the plain text comes out.
+
+</p><p>
+
+</p><h2><a name="SECTION00042000000000000000">
+Basic functionality</a>
+</h2>
+
+<p>
+
+</p><h3><a name="SECTION00042100000000000000">
+Rotors</a>
+</h3>
+
+<p>
+<br>
+<br>
+</p><div align="CENTER"><!-- MATH
+ $\includegraphics{rotor1.ps}$
+ -->
+<img src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/img5.jpg" alt="\includegraphics{rotor1.ps}" width="376" height="645" border="0" align="BOTTOM"> </div>
+<p>
+</p><div align="CENTER"></div>
+<br>
+<br>
+
+<p>
+<br>
+<br>
+</p><div align="CENTER"><!-- MATH
+ $\includegraphics{rotor-contacts.ps}$
+ -->
+<img src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/img6.jpg" alt="\includegraphics{rotor-contacts.ps}" width="606" height="559" border="0" align="BOTTOM"> </div>
+<p>
+</p><div align="CENTER"></div>
+<br>
+<br>
+
+<p>
+The heart of the Enigma is the <b>rotor wiring</b>. Each rotor has 26 spring
+loaded terminals on its right side and 26 flat circular terminals on its left
+side. The terminals are arranged in circular mode. Each rotor has different
+fixed internal random fashioned wiring from the left side to the right side
+of the wheel. Each terminal carries the name of a letter from A to Z (sometimes
+also numbered from 1 to 26). These letters are arranged on a ring outside and
+can be seen through the windows of the machine. But the Position of the ring
+can also be moved in relation to the rotor wiring (<b>ring setting</b>). Each
+time a letter is pressed, the right wheel moves on one of its 26 places. Once
+during 26 moves, at the <b>turnover</b> <b>position</b> on right wheel,
+the middle wheel also moves one place. If the middle wheel reaches turnover
+position, the last wheel moves, too. The turnover is done by mechanical mechanism
+using a 'T' shaped pushrod ( ) and notches. 
+
+</p><p>
+This diagram shows how that works:
+
+</p><p>
+<!-- MATH
+ $\resizebox*{1\textwidth}{!}{\includegraphics{java2.eps}}$
+ -->
+<img src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/img7.png" alt="\resizebox*{1\textwidth}{!}{\includegraphics{java2.eps}}" width="554" height="290" border="0" align="BOTTOM"> 
+
+</p><p>
+
+</p><h3><a name="SECTION00042200000000000000">
+Electrical diagram</a>
+</h3>
+
+<p>
+<br>
+<br>
+</p><div align="CENTER"><!-- MATH
+ $\resizebox*{1\textwidth}{!}{\includegraphics{electrical-diagram.eps}}$
+ -->
+<img src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/img8.png" alt="\resizebox*{1\textwidth}{!}{\includegraphics{electrical-diagram.eps}}" width="552" height="657" border="0" align="BOTTOM"> </div>
+<p>
+</p><div align="CENTER"></div>
+<br>
+<br>
+
+<p>
+If a key is pressed, the current flows from the battery through the pressed
+key contact to the corresponding plug, to the entry wheel and passes the three
+wheels from right to left. After passing the <b>reversing wheel</b> (<b>reflector</b>),
+the current flows back through the rotor wiring from left to right, back to
+the <b>entry wheel</b>, <b>plugboard</b>, <b>keyboard</b> to the <b>lamps</b>.
+And one lamp lids. Then the current goes back to the battery.
+
+</p><p>
+If no cable is connected to the socket of a letter, the two sockets of the letter
+are connected by a hidden spring. This is called ``<b>self steckered</b>''.
+If a plug is plugged in, the springs are forced away and new connections are
+made through the socket and the cable (see electrical wiring diagram).
+
+</p><p>
+This wiring does not allow that a letter enciphers to it's self. A D will never
+become a D. And this was one of the main weak sides of the Enigma machine.
+
+</p><p>
+
+</p><h2><a name="SECTION00043000000000000000">
+Example</a>
+</h2>
+
+<p>
+This a ciphered text:
+
+</p><p>
+<tt>215 AAA FRA "ABIRUXKP" PCDAONONEBCJBOGLYMEEYGSHRYUBUJHMJOQZLEX</tt>
+</p><p>
+
+
+</p><p>
+The first line is the setup. 
+
+</p><p>
+215 rotor order (Walzenlage) means left wheel number 2, middle wheel number
+one and right wheel number 5. 
+
+</p><p>
+<tt>AAA</tt> is the corresponding ring setting (Ringstellung).
+
+</p><p>
+<tt>FRA</tt> is the corresponding starting position (Grundstellung).
+
+</p><p>
+<tt>AB IR UX KP</tt> Plugboard connections (Steckerverbindungen).
+
+</p><p>
+And this is the enciphered plain text.
+
+</p><p>
+<tt>ANBULMEGRAZGOESTINGSTRENGGEHEIMEMELDUNG</tt>
+
+</p><p>
+
+</p><h2><a name="SECTION00044000000000000000">
+Types of Machines</a>
+</h2>
+
+<p>
+There are different types of Enigma machines.
+
+</p><p>
+
+</p><h3><a name="SECTION00044100000000000000">
+Enigma D, for non-military use</a>
+</h3>
+
+<p>
+Has four wheels and no plugboard.
+
+</p><p>
+
+</p><h3><a name="SECTION00044200000000000000">
+Model M3</a>
+</h3>
+
+<p>
+It has three wheels from five possible wheels (I-V).
+
+</p><p>
+It was used by the german Airforce (Luftwaffe) and Forces (Wehrmacht).
+
+</p><p>
+
+</p><h3><a name="SECTION00044300000000000000">
+Model M4</a>
+</h3>
+
+<p>
+It has three wheels of eight (I-VIII) and two fourth wheels (called <img src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/img9.png" alt="\( \beta \)" width="14" height="30" border="0" align="MIDDLE">,
+<img src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/img10.png" alt="\( \gamma \)" width="13" height="30" border="0" align="MIDDLE">) and two reflectors (B, C). The fourth wheel does not change
+position during enciphering and had a fix position on the left side in the Enigma.
+
+</p><p>
+M4 was used by the German Navy after 1943 (before they also used Model M3)
+
+</p><p>
+</p><hr>
+<!--Navigation Panel-->
+<a name="tex2html115" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node5.html">
+<img alt="next" src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/next.png" width="37" height="24" border="0" align="BOTTOM"></a> 
+<a name="tex2html111" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/enigma-referat.html">
+<img alt="up" src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/up.png" width="26" height="24" border="0" align="BOTTOM"></a> 
+<a name="tex2html105" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node3.html">
+<img alt="previous" src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/prev.png" width="63" height="24" border="0" align="BOTTOM"></a> 
+<a name="tex2html113" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node2.html">
+<img alt="contents" src="Operation%20of%20the%20Enigma%20machine%20with%20an%20example_files/contents.png" width="65" height="24" border="0" align="BOTTOM"></a>  
+<br>
+<b> Next:</b> <a name="tex2html116" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node5.html">How secure is the</a>
+<b> Up:</b> <a name="tex2html112" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/enigma-referat.html">Enigma - a very</a>
+<b> Previous:</b> <a name="tex2html106" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node3.html">What is the Enigma</a>
+ &nbsp; <b>  <a name="tex2html114" href="http://www.mlb.co.jp/linux/science/genigma/enigma-referat/node2.html">Contents</a></b> 
+<!--End of Navigation Panel-->
+<address>
+Martin Oberzalek
+2000-04-04
+</address>
+
+
+</body></html>
