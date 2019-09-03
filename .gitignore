@@ -6,3 +6,4 @@ menu_transfer\.pickle
 .gitignore
 
 research/*
+images/*
