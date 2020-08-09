@@ -1,0 +1,20 @@
+name: enigma
+channels:
+  - conda-forge
+  - nodefaults
+  - plotly
+dependencies:
+  - python=3.7
+  - jupyterlab
+  - plotly
+  - dash_cytoscape
+  - dill
+  - networkx
+  - openblas
+  - numpy
+  - pandas
+  - matplotlib
+  - seaborn
+  - jupyterlab-dash
+prefix: /opt/miniconda3/envs/enigma
+
