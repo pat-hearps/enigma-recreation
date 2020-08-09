@@ -7,3 +7,6 @@ menu_transfer\.pickle
 
 research/*
 images/*
+
+*/_pycache_
+*.pyc
