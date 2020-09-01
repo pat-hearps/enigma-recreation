@@ -12,9 +12,11 @@ from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches
 
 class Enigma3:
     
-    def __init__(self,left_rotor,middle_rotor,right_rotor,reflector,menu_link='ZZZ'):
+    def __init__(self,left_rotor: str,middle_rotor: str,right_rotor: str,reflector: str,menu_link: str = 'ZZZ'):
         """rotors must be strings referring to either ['I','II','III','IV','V']
         reflector must be string, one of either ['B','C']"""
+        assert all([r in raw_rotors.keys() for r in (left_rotor, middle_rotor, right_rotor)])
+        assert reflector in reflectors.keys()
         
         self.right_rotor = right_rotor
         self.middle_rotor = middle_rotor
@@ -61,10 +63,10 @@ class Enigma3:
         thd_out = usedict[third_rotor][thd_in]
         ch3o = entry[thd_out]
 
-#         if direction == 'forward':
-#             print(f"{start_character} -> (RR out) {ch1o} -> (MR in) {ch2i} -> (MR out) {ch2o} -> (LR in) {ch3i} -> (LR out) {ch3o}")
-#         elif direction == 'back':
-#             print(f"{start_character} -> (LR out) {ch1o} -> (MR in) {ch2i} -> (MR out) {ch2o} -> (RR in) {ch3i} -> (RR out) {ch3o}")
+        if direction == 'forward':
+            print(f"{start_character} -> (RR out) {ch1o} -> (MR in) {ch2i} -> (MR out) {ch2o} -> (LR in) {ch3i} -> (LR out) {ch3o}")
+        elif direction == 'back':
+            print(f"{start_character} -> (LR out) {ch1o} -> (MR in) {ch2i} -> (MR out) {ch2o} -> (RR in) {ch3i} -> (RR out) {ch3o}")
 
         return ch3o
     
