@@ -42,7 +42,8 @@ class Enigma3:
         else:
             print('only forward or back for direction')
             return 'wtf'
-
+        # problem is confusion around left/middle/right rotors vs first/second/third rotors and forward/back
+        # this currently works as if first = left, middle=second, third = right. If in 'forward'. Is this desired?
         start_character = start_character.upper()
         entry_pos = entry.index(start_character)
         fst_pos_modifier = (26 + pos1 - 0) % 26
