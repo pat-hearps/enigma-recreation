@@ -1,9 +1,6 @@
-import random
 from string import ascii_uppercase, ascii_letters
-from pprint import pprint
 from copy import deepcopy
 
-import dill
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -64,7 +61,6 @@ class Enigma3:
         ch3i = entry[thd_in]
         thd_out = usedict[third_rotor][thd_in]
         ch3o = entry[thd_out]
-
         if direction == 'forward':
             print(
                 f"{start_character} -> (RR out) {ch1o} -> (MR in) {ch2i} -> (MR out) {ch2o} -> (LR in) {ch3i} -> (LR out) {ch3o}")
