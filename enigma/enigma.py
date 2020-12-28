@@ -1,10 +1,23 @@
 from string import ascii_uppercase, ascii_letters
 from copy import deepcopy
+from typing import List
 
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, reflectors
+from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, reflectors, ROTOR_INDEX, ROTORS, \
+    NOTCHES
+
+
+class Rotor:
+
+    def __init__(self, rotor_type: str):
+        assert rotor_type in ROTOR_INDEX
+        self.rotor_type: str = rotor_type
+        self.cypher: str = ROTORS.MAP[rotor_type]
+        self.notch: str = NOTCHES.MAP[rotor_type]
+        self.index_cypher_forward: List[int] = forward_rotors[rotor_type]
+        self.index_cypher_reverse: List[int] = rev_rotors[rotor_type]
 
 
 class Enigma3:

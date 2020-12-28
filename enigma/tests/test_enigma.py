@@ -1,5 +1,5 @@
 import pytest
-from enigma.enigma import Enigma3
+from enigma.enigma import Enigma3, Rotor, once_through_scramble
 from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, reflectors, i, ii, iii, iv, v, ROTORS, NOTCHES
 
 
@@ -8,7 +8,16 @@ def eg() -> Enigma3:
     return Enigma3(left_rotor=iii, middle_rotor=ii, right_rotor=i, reflector='B', menu_link='AAA')
 
 
-def test_basic_setup(eg) -> None:
+def test_rotor() -> None:
+    rotor = Rotor(iv)
+    assert rotor.rotor_type == iv
+    assert rotor.cypher == 'ESOVPZJAYQUIRHXLNFTGKDCMWB'
+    assert rotor.notch == 'J'
+    assert rotor.index_cypher_forward == [4, 18, 14, 21, 15, 25, 9, 0, 24, 16, 20, 8, 17, 7, 23, 11, 13, 5, 19, 6, 10, 3, 2, 12, 22, 1]
+    assert rotor.index_cypher_reverse == [7, 25, 22, 21, 0, 17, 19, 13, 11, 6, 20, 15, 23, 16, 2, 4, 9, 12, 1, 18, 10, 3, 24, 14, 8, 5]
+
+
+def test_basic_enigma_setup(eg) -> None:
     assert eg.left_rotor == iii
     assert eg.middle_rotor == ii
     assert eg.right_rotor == i
