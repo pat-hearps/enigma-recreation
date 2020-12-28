@@ -11,7 +11,8 @@ class Enigma3:
 
     def __init__(self, left_rotor: str, middle_rotor: str, right_rotor: str, reflector: str, menu_link: str = 'ZZZ'):
         """rotors must be strings referring to either ['I','II','III','IV','V']
-        reflector must be string, one of either ['B','C']"""
+        reflector must be string, one of either ['B','C'],
+        menu_link = initial position of the 3 rotors as defined by the letter visible in the window for each"""
         assert all([r in raw_rotors.keys() for r in (left_rotor, middle_rotor, right_rotor)])
         assert reflector in reflectors.keys()
 
@@ -20,10 +21,10 @@ class Enigma3:
         self.left_rotor = left_rotor
         self.reflector = reflectors[reflector]
         self.menu_link = menu_link
-        self.middle_notch = entry.index(
-            notches[self.middle_rotor])  ## point if right rotor reaches will trigger middle rotor to step
-        self.left_notch = entry.index(
-            notches[self.left_rotor])  ## point if middle rotor reaches will trigger left rotor to step
+        ## point if right rotor reaches will trigger middle rotor to step
+        self.middle_notch = entry.index(notches[self.middle_rotor])
+        ## point if middle rotor reaches will trigger left rotor to step
+        self.left_notch = entry.index(notches[self.left_rotor])
         self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor = (ascii_uppercase.index(m) for m in
                                                                        menu_link.upper())
         self.in_status = {char: 0 for char in entry}
