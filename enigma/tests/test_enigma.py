@@ -1,17 +1,17 @@
 import pytest
 from enigma.enigma import Enigma3
-from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, reflectors, I, II, III, IV, V, ROTORS, NOTCHES
+from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, reflectors, i, ii, iii, iv, v, ROTORS, NOTCHES
 
 
 @pytest.fixture
 def eg() -> Enigma3:
-    return Enigma3(left_rotor=III, middle_rotor=II, right_rotor=I, reflector='B', menu_link='AAA')
+    return Enigma3(left_rotor=iii, middle_rotor=ii, right_rotor=i, reflector='B', menu_link='AAA')
 
 
 def test_basic_setup(eg) -> None:
-    assert eg.left_rotor == III
-    assert eg.middle_rotor == II
-    assert eg.right_rotor == I
+    assert eg.left_rotor == iii
+    assert eg.middle_rotor == ii
+    assert eg.right_rotor == i
     assert eg.reflector == reflectors['B']
     assert eg.current_position == 'AAA'
     assert (eg.pos_left_rotor, eg.pos_mid_rotor, eg.pos_rgt_rotor) == (0, 0, 0)

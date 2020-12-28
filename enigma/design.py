@@ -2,18 +2,19 @@ from string import ascii_uppercase
 from dataclasses import dataclass
 import matplotlib.colors as mclr
 
-
-I = 'I'
-II = 'II'
-III = 'III'
-IV = 'IV'
-V = 'V'
-ALL = (I,II,III,IV,V)
-
+i = 'I'
+ii = 'II'
+iii = 'III'
+iv = 'IV'
+v = 'V'
+ROTOR_INDEX = (i, ii, iii, iv, v)
 
 entry = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-raw_rotors = {'I': 'EKMFLGDQVZNTOWYHXUSPAIBRCJ', 'II': 'AJDKSIRUXBLHWTMCQGZNPYFVOE', 'III': 'BDFHJLCPRTXVZNYEIWGAKMUSQO', 'IV': 'ESOVPZJAYQUIRHXLNFTGKDCMWB', 'V': 'VZBRGITYUPSDNHLXAWMJQOFECK'}
-notches = {'I':'Q','II':'E','III':'V','IV':'J','V':'Z'}
+raw_rotors = {'I': 'EKMFLGDQVZNTOWYHXUSPAIBRCJ', 'II': 'AJDKSIRUXBLHWTMCQGZNPYFVOE',
+              'III': 'BDFHJLCPRTXVZNYEIWGAKMUSQO', 'IV': 'ESOVPZJAYQUIRHXLNFTGKDCMWB',
+              'V': 'VZBRGITYUPSDNHLXAWMJQOFECK'}
+notches = {'I': 'Q', 'II': 'E', 'III': 'V', 'IV': 'J', 'V': 'Z'}
+
 
 @dataclass
 class ROTORS:
@@ -22,7 +23,7 @@ class ROTORS:
     III = 'BDFHJLCPRTXVZNYEIWGAKMUSQO'
     IV = 'ESOVPZJAYQUIRHXLNFTGKDCMWB'
     V = 'VZBRGITYUPSDNHLXAWMJQOFECK'
-    ALL = (I,II,III,IV,V)
+    ALL = (I, II, III, IV, V)
 
 
 @dataclass
@@ -32,7 +33,7 @@ class NOTCHES:
     III = "V"
     IV = "J"
     V = "Z"
-    ALL = (I,II,III,IV,V)
+    ALL = (I, II, III, IV, V)
 
 
 ## forward rotors is the forward in:out pairings of each rotor as the character index of the A-Z ascii alphabet stored in 'entry'
@@ -54,15 +55,19 @@ rev_rotors = {'I': [20, 22, 24, 6, 0, 3, 5, 15, 21, 25, 1, 4, 2, 10, 12, 19, 7, 
               'IV': [7, 25, 22, 21, 0, 17, 19, 13, 11, 6, 20, 15, 23, 16, 2, 4, 9, 12, 1, 18, 10, 3, 24, 14, 8, 5],
               'V': [16, 2, 24, 11, 23, 22, 4, 13, 5, 19, 25, 14, 18, 12, 21, 9, 20, 3, 10, 6, 8, 0, 17, 15, 7, 1]}
 
-
 ## in:out pairings for reflectors
-reflectors = {'B': {'A': 'Y', 'B': 'R', 'C': 'U', 'D': 'H', 'E': 'Q', 'F': 'S', 'G': 'L', 'H': 'D', 'I': 'P', 'J': 'X', 'K': 'N', 'L': 'G', 'M': 'O', 'N': 'K', 'O': 'M', 'P': 'I', 'Q': 'E', 'R': 'B', 'S': 'F', 'T': 'Z', 'U': 'C', 'V': 'W', 'W': 'V', 'X': 'J', 'Y': 'A', 'Z': 'T'}, 
-              'C': {'A': 'F', 'B': 'V', 'C': 'P', 'D': 'J', 'E': 'I', 'F': 'A', 'G': 'O', 'H': 'Y', 'I': 'E', 'J': 'D', 'K': 'R', 'L': 'Z', 'M': 'X', 'N': 'W', 'O': 'G', 'P': 'C', 'Q': 'T', 'R': 'K', 'S': 'U', 'T': 'Q', 'U': 'S', 'V': 'B', 'W': 'N', 'X': 'M', 'Y': 'H', 'Z': 'L'}}
+reflectors = {
+    'B': {'A': 'Y', 'B': 'R', 'C': 'U', 'D': 'H', 'E': 'Q', 'F': 'S', 'G': 'L', 'H': 'D', 'I': 'P', 'J': 'X', 'K': 'N',
+          'L': 'G', 'M': 'O', 'N': 'K', 'O': 'M', 'P': 'I', 'Q': 'E', 'R': 'B', 'S': 'F', 'T': 'Z', 'U': 'C', 'V': 'W',
+          'W': 'V', 'X': 'J', 'Y': 'A', 'Z': 'T'},
+    'C': {'A': 'F', 'B': 'V', 'C': 'P', 'D': 'J', 'E': 'I', 'F': 'A', 'G': 'O', 'H': 'Y', 'I': 'E', 'J': 'D', 'K': 'R',
+          'L': 'Z', 'M': 'X', 'N': 'W', 'O': 'G', 'P': 'C', 'Q': 'T', 'R': 'K', 'S': 'U', 'T': 'Q', 'U': 'S', 'V': 'B',
+          'W': 'N', 'X': 'M', 'Y': 'H', 'Z': 'L'}}
 
-blank_status = {char:0 for char in entry}
-iomap = {'in':'I', 'out':'O', 'conx_in':'I', 'conx_out':'O'}
-invsoutmap = {'in':'O','out':'I'}
-grey = mclr.to_rgba('gainsboro',0.2)
-red = mclr.to_rgba('firebrick',0.9)
-orange = mclr.to_rgba('lightsalmon',0.8)
-transparent = mclr.to_rgba('white',alpha=0)
+blank_status = {char: 0 for char in entry}
+iomap = {'in': 'I', 'out': 'O', 'conx_in': 'I', 'conx_out': 'O'}
+invsoutmap = {'in': 'O', 'out': 'I'}
+grey = mclr.to_rgba('gainsboro', 0.2)
+red = mclr.to_rgba('firebrick', 0.9)
+orange = mclr.to_rgba('lightsalmon', 0.8)
+transparent = mclr.to_rgba('white', alpha=0)
