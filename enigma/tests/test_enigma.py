@@ -60,6 +60,24 @@ def test_once_thru_scramble_no_ring_settings(menu_link, exp_forward, exp_reverse
         assert ans == expected
 
 
+@pytest.mark.parametrize("menu_link, exp_forward, exp_reverse", once_thru_dat_no_ring)
+def test_once_through_scramble_no_ring_settings(menu_link, exp_forward, exp_reverse, eg) -> None:
+    eg.set_current_position(menu_link=menu_link)
+    # forward direction
+    for in_char, expected in zip(entry, exp_forward):
+        ans = once_through_scramble(in_char, direction='forward', first_rotor=eg.right_rotor, pos1=eg.pos_rgt_rotor,
+                                    second_rotor=eg.middle_rotor, pos2=eg.pos_mid_rotor,
+                                    third_rotor=eg.left_rotor, pos3=eg.pos_left_rotor)
+        assert ans == expected
+
+    # reverse direction
+    for in_char, expected in zip(entry, exp_reverse):
+        ans = once_through_scramble(in_char, direction='back', first_rotor=eg.left_rotor, pos1=eg.pos_left_rotor,
+                                    second_rotor=eg.middle_rotor, pos2=eg.pos_mid_rotor,
+                                    third_rotor=eg.right_rotor, pos3=eg.pos_rgt_rotor)
+        assert ans == expected
+
+
 full_data_no_ring = [
     ("AAA", "NFXUHBJERGOPWAKLSIQVDTMCZY"),
     ("AAB", "FWPOVAYMLRNIHKDCUJXZQEBSGT"),
