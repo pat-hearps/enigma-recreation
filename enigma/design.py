@@ -1,9 +1,39 @@
 from string import ascii_uppercase
+from dataclasses import dataclass
 import matplotlib.colors as mclr
+
+
+I = 'I'
+II = 'II'
+III = 'III'
+IV = 'IV'
+V = 'V'
+ALL = (I,II,III,IV,V)
+
 
 entry = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 raw_rotors = {'I': 'EKMFLGDQVZNTOWYHXUSPAIBRCJ', 'II': 'AJDKSIRUXBLHWTMCQGZNPYFVOE', 'III': 'BDFHJLCPRTXVZNYEIWGAKMUSQO', 'IV': 'ESOVPZJAYQUIRHXLNFTGKDCMWB', 'V': 'VZBRGITYUPSDNHLXAWMJQOFECK'}
 notches = {'I':'Q','II':'E','III':'V','IV':'J','V':'Z'}
+
+@dataclass
+class ROTORS:
+    I = 'EKMFLGDQVZNTOWYHXUSPAIBRCJ'
+    II = 'AJDKSIRUXBLHWTMCQGZNPYFVOE'
+    III = 'BDFHJLCPRTXVZNYEIWGAKMUSQO'
+    IV = 'ESOVPZJAYQUIRHXLNFTGKDCMWB'
+    V = 'VZBRGITYUPSDNHLXAWMJQOFECK'
+    ALL = (I,II,III,IV,V)
+
+
+@dataclass
+class NOTCHES:
+    I = "Q"
+    II = "E"
+    III = "V"
+    IV = "J"
+    V = "Z"
+    ALL = (I,II,III,IV,V)
+
 
 ## forward rotors is the forward in:out pairings of each rotor as the character index of the A-Z ascii alphabet stored in 'entry'
 # forward_rotors = {k:[ascii_uppercase.index(c) for c in raw_rotors[k]] for k in raw_rotors.keys()}
