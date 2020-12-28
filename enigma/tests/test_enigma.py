@@ -17,6 +17,15 @@ def test_basic_setup(eg) -> None:
     assert (eg.pos_left_rotor, eg.pos_mid_rotor, eg.pos_rgt_rotor) == (0, 0, 0)
 
 
+def test_set_current_position(eg) -> None:
+    menu_link = "HJP"
+    eg.set_current_position(menu_link=menu_link)
+    assert eg.current_position == menu_link
+    assert eg.pos_left_rotor == entry.index(menu_link[0])
+    assert eg.pos_mid_rotor == entry.index(menu_link[1])
+    assert eg.pos_rgt_rotor == entry.index(menu_link[2])
+
+
 def test_once_thru_scramble(eg) -> None:
     # forward direction
     for in_char, expected in zip(entry, "GVURPWXIQJANZLYKMEOFBSTCHD"):

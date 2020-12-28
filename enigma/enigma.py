@@ -115,6 +115,14 @@ class Enigma3:
             rotor_position += 1
         return rotor_position
 
+    def set_current_position(self, menu_link):
+        """Given a three-letter menu link (e.g. 'ZAB'), set the current positions of the enigma to correspond to the menu link"""
+        assert all([m in ascii_uppercase for m in menu_link])
+        assert len(menu_link) == 3
+        self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor = (ascii_uppercase.index(m) for m in
+                                                                       menu_link.upper())
+        self.current_position = menu_link
+
     def translate_current_position(self):
         self.current_position = ''
         for pos in self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor:
