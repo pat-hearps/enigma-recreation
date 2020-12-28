@@ -52,13 +52,24 @@ def once_through_scramble(start_character: str, direction: str, first_rotor: str
 
 class Rotor:
 
-    def __init__(self, rotor_type: str):
+    def __init__(self, rotor_type: str, window_letter: str = "A", ring_setting: str = "A"):
         assert rotor_type in ROTOR_INDEX
         self.rotor_type: str = rotor_type
         self.cypher: str = ROTORS.MAP[rotor_type]
         self.notch: str = NOTCHES.MAP[rotor_type]
         self.index_cypher_forward: List[int] = forward_rotors[rotor_type]
         self.index_cypher_reverse: List[int] = rev_rotors[rotor_type]
+        # these given letters are how the settings would be set physically
+        self.window_letter = window_letter
+        self.ring_setting = ring_setting
+        # and are converted into numerical indexes
+        self.window_position = entry.index(self.window_letter)
+        self.ring_position = entry.index(self.ring_setting)
+        self.actual_cypher_position = (26 + self.window_position - self.ring_position) % 26
+
+
+# def encode_thru_rotor(rotor: Rotor, entry_position: int):
+
 
 
 class Enigma3:

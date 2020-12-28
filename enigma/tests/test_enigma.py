@@ -8,13 +8,35 @@ def eg() -> Enigma3:
     return Enigma3(left_rotor=iii, middle_rotor=ii, right_rotor=i, reflector='B', menu_link='AAA')
 
 
-def test_rotor() -> None:
+def test_rotor_basic() -> None:
     rotor = Rotor(iv)
     assert rotor.rotor_type == iv
     assert rotor.cypher == 'ESOVPZJAYQUIRHXLNFTGKDCMWB'
     assert rotor.notch == 'J'
     assert rotor.index_cypher_forward == [4, 18, 14, 21, 15, 25, 9, 0, 24, 16, 20, 8, 17, 7, 23, 11, 13, 5, 19, 6, 10, 3, 2, 12, 22, 1]
     assert rotor.index_cypher_reverse == [7, 25, 22, 21, 0, 17, 19, 13, 11, 6, 20, 15, 23, 16, 2, 4, 9, 12, 1, 18, 10, 3, 24, 14, 8, 5]
+    assert rotor.window_position == 0
+    assert rotor.ring_position == 0
+    assert rotor.actual_cypher_position == 0
+
+
+rotor_offset_data = [
+    ('A', 'A', 0, 0, 0),
+    ('B', 'A', 1, 0, 1),
+    ('A', 'B', 0, 1, 25),
+    ('B', 'B', 1, 1, 0),
+    ('C', 'F', 2, 5, 23),
+    ('J', 'C', 9, 2, 7)
+]
+
+
+@pytest.mark.parametrize("wl_in, rs_in, exp_wp, exp_rp, exp_acp", rotor_offset_data)
+def test_rotor_offset(wl_in, rs_in, exp_wp, exp_rp, exp_acp) -> None:
+    rotor = Rotor(i, window_letter=wl_in, ring_setting=rs_in)
+    assert rotor.window_position == exp_wp
+    assert rotor.ring_position == exp_rp
+    print(entry[rotor.actual_cypher_position], entry[exp_acp])
+    assert rotor.actual_cypher_position == exp_acp
 
 
 def test_basic_enigma_setup(eg) -> None:
