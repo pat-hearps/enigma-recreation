@@ -1,5 +1,5 @@
 import pytest
-from enigma.enigma import Enigma3, Rotor, once_through_scramble
+from enigma.enigma import Enigma3, Rotor, once_through_scramble, encode_thru_rotor
 from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, reflectors, i, ii, iii, iv, v, ROTORS, NOTCHES
 
 
@@ -37,6 +37,20 @@ def test_rotor_offset(wl_in, rs_in, exp_wp, exp_rp, exp_acp) -> None:
     assert rotor.ring_position == exp_rp
     print(entry[rotor.actual_cypher_position], entry[exp_acp])
     assert rotor.actual_cypher_position == exp_acp
+
+# rotor type I,
+rotor_encode_data = [
+    ("A", "A", "EKMFLGDQVZNTOWYHXUSPAIBRCJ"),
+    ("C", "A", "KDJEBOTXLRMUWFVSQNYGZPAHCI"),
+    ("A", "D", "UFMHNPIOJGTYCQWRZBKAXVSDLE")
+]
+@pytest.mark.parametrize("window_letter, ring_setting, expected_data", rotor_encode_data)
+def test_rotor_encoding(window_letter, ring_setting, expected_data):
+    rotor = Rotor(rotor_type=i, window_letter=window_letter, ring_setting=ring_setting)
+    for in_pos, exp_letter in enumerate(expected_data):
+        ans_pos = encode_thru_rotor(rotor=rotor, entry_position=in_pos, forward=True)
+        ans_letter = entry[ans_pos]
+        assert exp_letter == ans_letter
 
 
 def test_basic_enigma_setup(eg) -> None:
