@@ -17,47 +17,6 @@ def vprint(message: str, msg_level: int, v_level: int = None):
         print(message)
 
 
-def once_through_scramble(start_character: str, direction: str, first_rotor: str, pos1: int, second_rotor: str, pos2: int,
-                           third_rotor: str, pos3: int):
-    """ start_character must be single ASCII character A-Z
-            direction is either 'forward' or 'back' """
-    if direction == 'forward':
-        usedict = {k: v for k, v in forward_rotors.items()}
-    elif direction == 'back':
-        usedict = {k: v for k, v in rev_rotors.items()}
-    else:
-        print('only forward or back for direction')
-        assert False
-    # problem is confusion around left/middle/right rotors vs first/second/third rotors and forward/back
-    # this currently works as if first = left, middle=second, third = right. If in 'forward'. Is this desired?
-    start_character = start_character.upper()
-    entry_pos = entry.index(start_character)
-    fst_pos_modifier = (26 + pos1 - 0) % 26
-    fst_in = (entry_pos + fst_pos_modifier) % 26
-    fst_out = usedict[first_rotor][fst_in]
-    ch1o = entry[fst_out]
-
-    scd_pos_modifier = (26 + pos2 - pos1) % 26
-    scd_in = (fst_out + scd_pos_modifier) % 26
-    ch2i = entry[scd_in]
-    scd_out = usedict[second_rotor][scd_in]
-    ch2o = entry[scd_out]
-
-    thd_pos_modifier = (26 + pos3 - pos2) % 26
-    thd_in = (scd_out + thd_pos_modifier) % 26
-    ch3i = entry[thd_in]
-    thd_out = usedict[third_rotor][thd_in]
-    ch3o = entry[thd_out]
-    if direction == 'forward':
-        print(
-            f"{start_character} -> (RR out) {ch1o} -> (MR in) {ch2i} -> (MR out) {ch2o} -> (LR in) {ch3i} -> (LR out) {ch3o}")
-    elif direction == 'back':
-        print(
-            f"{start_character} -> (LR out) {ch1o} -> (MR in) {ch2i} -> (MR out) {ch2o} -> (RR in) {ch3i} -> (RR out) {ch3o}")
-
-    return ch3o
-
-
 class Rotor:
 
     def __init__(self, rotor_type: str, window_letter: str = "A", ring_setting: str = "A"):
@@ -74,6 +33,23 @@ class Rotor:
         self.window_position = entry.index(self.window_letter)
         self.ring_position = entry.index(self.ring_setting)
         self.actual_cypher_position = (26 + self.window_position - self.ring_position) % 26
+
+
+def once_through_scramble(start_character: str, forward: bool, left_rotor: Rotor, middle_rotor: Rotor,
+                          right_rotor: Rotor):
+    """ start_character must be single ASCII character A-Z"""
+    entry_pos = entry.index(start_character.upper())
+
+    if forward:
+        first_rotor, third_rotor = right_rotor, left_rotor
+    else:
+        first_rotor, third_rotor = left_rotor, right_rotor
+
+    rotor_1_out = encode_thru_rotor(first_rotor, entry_position=entry_pos, forward=forward)
+    rotor_2_out = encode_thru_rotor(middle_rotor, entry_position=rotor_1_out, forward=forward)
+    rotor_3_out = encode_thru_rotor(third_rotor, entry_position=rotor_2_out, forward=forward)
+
+    return rotor_3_out
 
 
 def encode_thru_rotor(rotor: Rotor, entry_position: int, forward: bool = True):
@@ -211,6 +187,7 @@ class Enigma3:
         self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor = (ascii_uppercase.index(m) for m in
                                                                        menu_link.upper())
         self.current_position = menu_link
+        self.menu_link = menu_link
 
     def translate_current_position(self):
         self.current_position = ''

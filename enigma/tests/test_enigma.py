@@ -81,11 +81,12 @@ def test_set_current_position(eg) -> None:
     assert eg.pos_rgt_rotor == entry.index(menu_link[2])
 
 
+# LR=III, MR=II, RR=I
 once_thru_dat_no_ring = [
     ("AAA", "GVURPWXIQJANZLYKMEOFBSTCHD", "KUXZRTAYHJPNQLSEIDVWCBFGOM"),
-    # ("AAB", "DPGVRHFEYUOAQMWLNCZJKBITSX", "LVRAHGCFWTUPNQKBMEYXJDOZIS"), # depends if we define end as RRo or Entry
+    ("AAB", "DPGVRHFEYUOAQMWLNCZJKBITSX", "LVRAHGCFWTUPNQKBMEYXJDOZIS"), # depends if we define end as RRo or Entry
     ("AKA", "FLMGYCTIQWVBJPNUXRAKDESOZH", "SLFUVADZHMTBCOXNIRWGPKJQEY"),
-    ("NAA", "LQTMKJSHVWCBOGDPRFZENXUAIY", "UMPBQGCWIJVZSXLKOTRNHYFEAD")
+    ("NAA", "YDGZXWFUIJPOBTQCESMRAKHNVL", "UMPBQGCWIJVZSXLKOTRNHYFEAD")
 ]
 
 @pytest.mark.parametrize("menu_link, exp_forward, exp_reverse", once_thru_dat_no_ring)
@@ -109,19 +110,20 @@ def test_once_thru_scramble_no_ring_settings(menu_link, exp_forward, exp_reverse
 @pytest.mark.parametrize("menu_link, exp_forward, exp_reverse", once_thru_dat_no_ring)
 def test_once_through_scramble_no_ring_settings(menu_link, exp_forward, exp_reverse, eg) -> None:
     eg.set_current_position(menu_link=menu_link)
+    left_rotor = Rotor(rotor_type=eg.left_rotor, window_letter=eg.menu_link[0])
+    middle_rotor = Rotor(rotor_type=eg.middle_rotor, window_letter=eg.menu_link[1])
+    right_rotor = Rotor(rotor_type=eg.right_rotor, window_letter=eg.menu_link[2])
     # forward direction
     for in_char, expected in zip(entry, exp_forward):
-        ans = once_through_scramble(in_char, direction='forward', first_rotor=eg.right_rotor, pos1=eg.pos_rgt_rotor,
-                                    second_rotor=eg.middle_rotor, pos2=eg.pos_mid_rotor,
-                                    third_rotor=eg.left_rotor, pos3=eg.pos_left_rotor)
-        assert ans == expected
+        ans_pos = once_through_scramble(in_char, forward=True, left_rotor=left_rotor,
+                                        middle_rotor=middle_rotor, right_rotor=right_rotor)
+        assert entry[ans_pos] == expected
 
     # reverse direction
     for in_char, expected in zip(entry, exp_reverse):
-        ans = once_through_scramble(in_char, direction='back', first_rotor=eg.left_rotor, pos1=eg.pos_left_rotor,
-                                    second_rotor=eg.middle_rotor, pos2=eg.pos_mid_rotor,
-                                    third_rotor=eg.right_rotor, pos3=eg.pos_rgt_rotor)
-        assert ans == expected
+        ans_pos = once_through_scramble(in_char, forward=False, left_rotor=left_rotor,
+                                        middle_rotor=middle_rotor, right_rotor=right_rotor)
+        assert entry[ans_pos] == expected
 
 
 full_data_no_ring = [
