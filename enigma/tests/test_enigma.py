@@ -38,17 +38,24 @@ def test_rotor_offset(wl_in, rs_in, exp_wp, exp_rp, exp_acp) -> None:
     print(entry[rotor.actual_cypher_position], entry[exp_acp])
     assert rotor.actual_cypher_position == exp_acp
 
-# rotor type I,
+# all test data for rotor type I
 rotor_encode_data = [
-    ("A", "A", "EKMFLGDQVZNTOWYHXUSPAIBRCJ"),
-    ("C", "A", "KDJEBOTXLRMUWFVSQNYGZPAHCI"),
-    ("A", "D", "UFMHNPIOJGTYCQWRZBKAXVSDLE")
+    ("A", "A", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", True),
+    ("C", "A", "KDJEBOTXLRMUWFVSQNYGZPAHCI", True),
+    ("A", "D", "UFMHNPIOJGTYCQWRZBKAXVSDLE", True),
+    ("Q", "W", "GOHXIPKQSLRMJWBFTZUCENDAYV", True),
+    ("S", "M", "XKPTHNIQSBROMJUCVLWDYEGZFA", True),
+    ("A", "A", "UWYGADFPVZBECKMTHXSLRINQOJ", False),
+    ("C", "A", "WEYBDNTXZCAIKRFVQJPGLOMHSU", False),
+    ("A", "D", "TRMXZBJDGISYCEHFNPWKAVOULQ", False),
+    ("Q", "W", "XOTWUPACEMGJLVBFHKIQSZNDYR", False),
+    ("S", "M", "ZJPTVYWEGNBRMFLCHKIDOQSAUX", False),
 ]
-@pytest.mark.parametrize("window_letter, ring_setting, expected_data", rotor_encode_data)
-def test_rotor_encoding(window_letter, ring_setting, expected_data):
+@pytest.mark.parametrize("window_letter, ring_setting, expected_data, forward", rotor_encode_data)
+def test_rotor_encoding(window_letter, ring_setting, expected_data, forward):
     rotor = Rotor(rotor_type=i, window_letter=window_letter, ring_setting=ring_setting)
     for in_pos, exp_letter in enumerate(expected_data):
-        ans_pos = encode_thru_rotor(rotor=rotor, entry_position=in_pos, forward=True)
+        ans_pos = encode_thru_rotor(rotor=rotor, entry_position=in_pos, forward=forward)
         ans_letter = entry[ans_pos]
         assert exp_letter == ans_letter
 

@@ -73,10 +73,10 @@ def encode_thru_rotor(rotor: Rotor, entry_position: int, forward: bool = True):
     state of given Rotor class instance should define the current settings / position etc.
     - entry_position = 0-25 index at which signal is entering, relative to the 'A' position of
     the fixed 'entry' or 'reflector' where signal would be coming from"""
+    index_cypher = rotor.index_cypher_forward if forward else rotor.index_cypher_reverse
     # which letter on the cypher rotor the signal is entering at - offset based on rotor step and ring setting
     cypher_in = (entry_position + rotor.actual_cypher_position) % 26
-    index_cypher = rotor.index_cypher_forward if forward else rotor.index_cypher_reverse
-    # this is the actual enigma encoding
+    # cypher_out from cypher_in is the actual enigma internal wiring encoding
     cypher_out = index_cypher[cypher_in]
     # where the signal will exit at, offset due same reasons as cypher_in
     position_out = (26 + cypher_out - rotor.actual_cypher_position) % 26
