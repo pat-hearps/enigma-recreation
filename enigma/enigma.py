@@ -74,10 +74,10 @@ def encode_thru_rotor(rotor: Rotor, entry_position: int, forward: bool = True):
 
 class Enigma3:
 
-    def __init__(self, left_rotor: str, middle_rotor: str, right_rotor: str, reflector: str, menu_link: str = 'ZZZ'):
+    def __init__(self, left_rotor: str, middle_rotor: str, right_rotor: str, reflector: str, current_window_3: str = 'ZZZ'):
         """rotors must be strings referring to either ['I','II','III','IV','V']
         reflector must be string, one of either ['B','C'],
-        menu_link = initial position of the 3 rotors as defined by the letter visible in the window for each"""
+        current_window_3 = initial position of the 3 rotors as defined by the letter visible in the window for each"""
         assert all([r in raw_rotors.keys() for r in (left_rotor, middle_rotor, right_rotor)])
         assert reflector in reflectors.keys()
 
@@ -85,16 +85,16 @@ class Enigma3:
         self.middle_rotor = middle_rotor
         self.left_rotor = left_rotor
         self.reflector = reflectors[reflector]
-        self.menu_link = menu_link
+        self.current_window_3 = current_window_3
         ## point if right rotor reaches will trigger middle rotor to step
         self.middle_notch = entry.index(notches[self.middle_rotor])
         ## point if middle rotor reaches will trigger left rotor to step
         self.left_notch = entry.index(notches[self.left_rotor])
         self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor = (ascii_uppercase.index(m) for m in
-                                                                       menu_link.upper())
+                                                                       current_window_3.upper())
         self.in_status = {char: 0 for char in entry}
         self.out_status = {char: 0 for char in entry}
-        self.current_position = menu_link
+        self.current_position = current_window_3
         self.record = {}
 
     def once_thru_scramble(self, start_character, direction, first_rotor, pos1, second_rotor, pos2,
@@ -180,14 +180,14 @@ class Enigma3:
             rotor_position += 1
         return rotor_position
 
-    def set_current_position(self, menu_link):
+    def set_current_position(self, current_window_3):
         """Given a three-letter menu link (e.g. 'ZAB'), set the current positions of the enigma to correspond to the menu link"""
-        assert all([m in ascii_uppercase for m in menu_link])
-        assert len(menu_link) == 3
+        assert all([m in ascii_uppercase for m in current_window_3])
+        assert len(current_window_3) == 3
         self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor = (ascii_uppercase.index(m) for m in
-                                                                       menu_link.upper())
-        self.current_position = menu_link
-        self.menu_link = menu_link
+                                                                       current_window_3.upper())
+        self.current_position = current_window_3
+        self.current_window_3 = current_window_3
 
     def translate_current_position(self):
         self.current_position = ''

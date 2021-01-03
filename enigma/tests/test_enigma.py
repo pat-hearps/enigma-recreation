@@ -7,7 +7,7 @@ from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches
 
 @pytest.fixture
 def eg() -> Enigma3:
-    return Enigma3(left_rotor=iii, middle_rotor=ii, right_rotor=i, reflector='B', menu_link='AAA')
+    return Enigma3(left_rotor=iii, middle_rotor=ii, right_rotor=i, reflector='B', current_window_3='AAA')
 
 
 def test_rotor_basic() -> None:
@@ -73,12 +73,12 @@ def test_basic_enigma_setup(eg) -> None:
 
 
 def test_set_current_position(eg) -> None:
-    menu_link = "HJP"
-    eg.set_current_position(menu_link=menu_link)
-    assert eg.current_position == menu_link
-    assert eg.pos_left_rotor == entry.index(menu_link[0])
-    assert eg.pos_mid_rotor == entry.index(menu_link[1])
-    assert eg.pos_rgt_rotor == entry.index(menu_link[2])
+    current_window_3 = "HJP"
+    eg.set_current_position(current_window_3=current_window_3)
+    assert eg.current_position == current_window_3
+    assert eg.pos_left_rotor == entry.index(current_window_3[0])
+    assert eg.pos_mid_rotor == entry.index(current_window_3[1])
+    assert eg.pos_rgt_rotor == entry.index(current_window_3[2])
 
 
 # LR=III, MR=II, RR=I
@@ -89,9 +89,9 @@ once_thru_dat_no_ring = [
     ("NAA", "YDGZXWFUIJPOBTQCESMRAKHNVL", "UMPBQGCWIJVZSXLKOTRNHYFEAD")
 ]
 
-@pytest.mark.parametrize("menu_link, exp_forward, exp_reverse", once_thru_dat_no_ring)
-def test_once_thru_scramble_no_ring_settings(menu_link, exp_forward, exp_reverse, eg) -> None:
-    eg.set_current_position(menu_link=menu_link)
+@pytest.mark.parametrize("current_window_3, exp_forward, exp_reverse", once_thru_dat_no_ring)
+def test_once_thru_scramble_no_ring_settings(current_window_3, exp_forward, exp_reverse, eg) -> None:
+    eg.set_current_position(current_window_3=current_window_3)
     # forward direction
     for in_char, expected in zip(entry, exp_forward):
         ans = eg.once_thru_scramble(in_char, direction='forward', first_rotor=eg.right_rotor, pos1=eg.pos_rgt_rotor,
@@ -107,12 +107,12 @@ def test_once_thru_scramble_no_ring_settings(menu_link, exp_forward, exp_reverse
         assert ans == expected
 
 
-@pytest.mark.parametrize("menu_link, exp_forward, exp_reverse", once_thru_dat_no_ring)
-def test_once_through_scramble_no_ring_settings(menu_link, exp_forward, exp_reverse, eg) -> None:
-    eg.set_current_position(menu_link=menu_link)
-    left_rotor = Rotor(rotor_type=eg.left_rotor, window_letter=eg.menu_link[0])
-    middle_rotor = Rotor(rotor_type=eg.middle_rotor, window_letter=eg.menu_link[1])
-    right_rotor = Rotor(rotor_type=eg.right_rotor, window_letter=eg.menu_link[2])
+@pytest.mark.parametrize("current_window_3, exp_forward, exp_reverse", once_thru_dat_no_ring)
+def test_once_through_scramble_no_ring_settings(current_window_3, exp_forward, exp_reverse, eg) -> None:
+    eg.set_current_position(current_window_3=current_window_3)
+    left_rotor = Rotor(rotor_type=eg.left_rotor, window_letter=eg.current_window_3[0])
+    middle_rotor = Rotor(rotor_type=eg.middle_rotor, window_letter=eg.current_window_3[1])
+    right_rotor = Rotor(rotor_type=eg.right_rotor, window_letter=eg.current_window_3[2])
     # forward direction
     for in_char, expected in zip(entry, exp_forward):
         ans_pos = once_through_scramble(in_char, forward=True, left_rotor=left_rotor,
@@ -134,9 +134,9 @@ full_data_no_ring = [
 ]
 
 
-@pytest.mark.parametrize("menu_link, exp_out", full_data_no_ring)
-def test_full_scramble_no_ring_settings(menu_link, exp_out, eg):
-    eg.set_current_position(menu_link=menu_link)
+@pytest.mark.parametrize("current_window_3, exp_out", full_data_no_ring)
+def test_full_scramble_no_ring_settings(current_window_3, exp_out, eg):
+    eg.set_current_position(current_window_3=current_window_3)
 
     for in_char, expected in zip(entry, exp_out):
         ans = eg.full_scramble(in_char)
