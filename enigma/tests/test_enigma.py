@@ -1,3 +1,5 @@
+import os
+
 import pytest
 from enigma.enigma import Enigma3, Rotor, once_through_scramble, encode_thru_rotor
 from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, reflectors, i, ii, iii, iv, v, ROTORS, NOTCHES
@@ -53,6 +55,7 @@ rotor_encode_data = [
 ]
 @pytest.mark.parametrize("window_letter, ring_setting, expected_data, forward", rotor_encode_data)
 def test_rotor_encoding(window_letter, ring_setting, expected_data, forward):
+    print(os.getenv("verbosity"))
     rotor = Rotor(rotor_type=i, window_letter=window_letter, ring_setting=ring_setting)
     for in_pos, exp_letter in enumerate(expected_data):
         ans_pos = encode_thru_rotor(rotor=rotor, entry_position=in_pos, forward=forward)

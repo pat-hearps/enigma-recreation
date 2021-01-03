@@ -1,12 +1,20 @@
 from string import ascii_uppercase, ascii_letters
 from copy import deepcopy
 from typing import List
+import os
 
 import networkx as nx
 import matplotlib.pyplot as plt
 
 from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, reflectors, ROTOR_INDEX, ROTORS, \
     NOTCHES
+
+
+def vprint(message: str, msg_level: int, v_level: int = None):
+    if v_level is None:
+        v_level = int(os.getenv("verbosity", default="0"))
+    if msg_level <= v_level:
+        print(message)
 
 
 def once_through_scramble(start_character: str, direction: str, first_rotor: str, pos1: int, second_rotor: str, pos2: int,
@@ -73,13 +81,18 @@ def encode_thru_rotor(rotor: Rotor, entry_position: int, forward: bool = True):
     state of given Rotor class instance should define the current settings / position etc.
     - entry_position = 0-25 index at which signal is entering, relative to the 'A' position of
     the fixed 'entry' or 'reflector' where signal would be coming from"""
+    vprint(f"---- Rotor type {rotor.rotor_type} / window {rotor.window_letter} / ring {rotor.ring_setting} ----", 2)
+    vprint(f"signal into rotor at position {entry_position} =       {entry[entry_position]}", 1)
     index_cypher = rotor.index_cypher_forward if forward else rotor.index_cypher_reverse
     # which letter on the cypher rotor the signal is entering at - offset based on rotor step and ring setting
     cypher_in = (entry_position + rotor.actual_cypher_position) % 26
+    vprint(f"signal into cypher wiring at letter =    {entry[cypher_in]}", 1)
     # cypher_out from cypher_in is the actual enigma internal wiring encoding
     cypher_out = index_cypher[cypher_in]
+    vprint(f"signal encoded out of cypher at letter = {entry[cypher_out]}", 1)
     # where the signal will exit at, offset due same reasons as cypher_in
     position_out = (26 + cypher_out - rotor.actual_cypher_position) % 26
+    vprint(f"signal out of rotor at position {position_out} =      {entry[position_out]}", 1)
     return position_out
 
 
