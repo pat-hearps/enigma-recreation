@@ -72,6 +72,29 @@ def encode_thru_rotor(rotor: Rotor, entry_position: int, forward: bool = True):
     return position_out
 
 
+class Enigma:
+    def __init__(self, left_rotor_type: str, middle_rotor_type: str, right_rotor_type: str, reflector_type: str,
+                 current_window_3: str = "AAA", ring_settings_3: str = "AAA"):
+        """rotors must be strings referring to either ['I','II','III','IV','V']
+        reflector must be string, one of either ['B','C'],
+        current_window_3 = initial position of the 3 rotors as defined by the letter visible in the window for each
+        ring_settings_3 = display-vs-cypher offset of the rotor, does not change during an operation"""
+        assert all([r in raw_rotors.keys() for r in (left_rotor_type, middle_rotor_type, right_rotor_type)])
+        assert reflector_type in reflectors.keys()
+
+        self.left_rotor = Rotor(rotor_type=left_rotor_type, window_letter=current_window_3[0], ring_setting=ring_settings_3[0])
+        self.middle_rotor = Rotor(rotor_type=middle_rotor_type, window_letter=current_window_3[1], ring_setting=ring_settings_3[1])
+        self.right_rotor = Rotor(rotor_type=right_rotor_type, window_letter=current_window_3[2], ring_setting=ring_settings_3[2])
+        ## point if right rotor reaches will trigger middle rotor to step
+        self.middle_notch = self.middle_rotor.notch
+        ## point if middle rotor reaches will trigger left rotor to step
+        self.left_notch = self.left_rotor.notch
+
+        self.current_position = current_window_3
+        self.in_status = {char: 0 for char in entry}
+        self.out_status = {char: 0 for char in entry}
+        self.record = {}
+
 class Enigma3:
 
     def __init__(self, left_rotor: str, middle_rotor: str, right_rotor: str, reflector: str, current_window_3: str = 'ZZZ'):

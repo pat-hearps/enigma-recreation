@@ -1,13 +1,8 @@
 import os
 
 import pytest
-from enigma.enigma import Enigma3, Rotor, once_through_scramble, encode_thru_rotor
+from enigma.enigma import Enigma3, Rotor, once_through_scramble, encode_thru_rotor, Enigma
 from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, reflectors, i, ii, iii, iv, v, ROTORS, NOTCHES
-
-
-@pytest.fixture
-def eg() -> Enigma3:
-    return Enigma3(left_rotor=iii, middle_rotor=ii, right_rotor=i, reflector='B', current_window_3='AAA')
 
 
 def test_rotor_basic() -> None:
@@ -63,22 +58,47 @@ def test_rotor_encoding(window_letter, ring_setting, expected_data, forward):
         assert exp_letter == ans_letter
 
 
+# TODO delete, once old Enigma3 no longer used
+@pytest.fixture
+def eg3() -> Enigma3:
+    return Enigma3(left_rotor=iii, middle_rotor=ii, right_rotor=i, reflector='B', current_window_3='AAA')
+
+
+@pytest.fixture
+def eg() -> Enigma:
+    return Enigma(left_rotor_type=iii, middle_rotor_type=ii, right_rotor_type=i, reflector_type='B',
+                  current_window_3="AAA", ring_settings_3="AAA")
+
+
+# TODO delete, once old Enigma3 no longer used
+def test_basic_enigma3_setup(eg3) -> None:
+    assert eg3.left_rotor == iii
+    assert eg3.middle_rotor == ii
+    assert eg3.right_rotor == i
+    assert eg3.reflector == reflectors['B']
+    assert eg3.current_position == 'AAA'
+    assert (eg3.pos_left_rotor, eg3.pos_mid_rotor, eg3.pos_rgt_rotor) == (0, 0, 0)
+
+
 def test_basic_enigma_setup(eg) -> None:
-    assert eg.left_rotor == iii
-    assert eg.middle_rotor == ii
-    assert eg.right_rotor == i
-    assert eg.reflector == reflectors['B']
+    assert eg.left_rotor.rotor_type == iii
+    assert eg.middle_rotor.rotor_type == ii
+    assert eg.right_rotor.rotor_type == i
+    # assert eg.reflector == reflectors['B']
     assert eg.current_position == 'AAA'
-    assert (eg.pos_left_rotor, eg.pos_mid_rotor, eg.pos_rgt_rotor) == (0, 0, 0)
+    assert eg.left_rotor.actual_cypher_position == 0
+    assert eg.middle_rotor.actual_cypher_position == 0
+    assert eg.right_rotor.actual_cypher_position == 0
 
 
-def test_set_current_position(eg) -> None:
+# TODO delete, once old Enigma3 no longer used
+def test_set_current_position(eg3) -> None:
     current_window_3 = "HJP"
-    eg.set_current_position(current_window_3=current_window_3)
-    assert eg.current_position == current_window_3
-    assert eg.pos_left_rotor == entry.index(current_window_3[0])
-    assert eg.pos_mid_rotor == entry.index(current_window_3[1])
-    assert eg.pos_rgt_rotor == entry.index(current_window_3[2])
+    eg3.set_current_position(current_window_3=current_window_3)
+    assert eg3.current_position == current_window_3
+    assert eg3.pos_left_rotor == entry.index(current_window_3[0])
+    assert eg3.pos_mid_rotor == entry.index(current_window_3[1])
+    assert eg3.pos_rgt_rotor == entry.index(current_window_3[2])
 
 
 # LR=III, MR=II, RR=I
@@ -89,30 +109,31 @@ once_thru_dat_no_ring = [
     ("NAA", "YDGZXWFUIJPOBTQCESMRAKHNVL", "UMPBQGCWIJVZSXLKOTRNHYFEAD")
 ]
 
+# TODO delete, once old Enigma3 no longer used
 @pytest.mark.parametrize("current_window_3, exp_forward, exp_reverse", once_thru_dat_no_ring)
-def test_once_thru_scramble_no_ring_settings(current_window_3, exp_forward, exp_reverse, eg) -> None:
-    eg.set_current_position(current_window_3=current_window_3)
+def test_once_thru_scramble_no_ring_settings(current_window_3, exp_forward, exp_reverse, eg3) -> None:
+    eg3.set_current_position(current_window_3=current_window_3)
     # forward direction
     for in_char, expected in zip(entry, exp_forward):
-        ans = eg.once_thru_scramble(in_char, direction='forward', first_rotor=eg.right_rotor, pos1=eg.pos_rgt_rotor,
-                                    second_rotor=eg.middle_rotor, pos2=eg.pos_mid_rotor,
-                                    third_rotor=eg.left_rotor, pos3=eg.pos_left_rotor)
+        ans = eg3.once_thru_scramble(in_char, direction='forward', first_rotor=eg3.right_rotor, pos1=eg3.pos_rgt_rotor,
+                                     second_rotor=eg3.middle_rotor, pos2=eg3.pos_mid_rotor,
+                                     third_rotor=eg3.left_rotor, pos3=eg3.pos_left_rotor)
         assert ans == expected
 
     # reverse direction
     for in_char, expected in zip(entry, exp_reverse):
-        ans = eg.once_thru_scramble(in_char, direction='back', first_rotor=eg.left_rotor, pos1=eg.pos_left_rotor,
-                                    second_rotor=eg.middle_rotor, pos2=eg.pos_mid_rotor,
-                                    third_rotor=eg.right_rotor, pos3=eg.pos_rgt_rotor)
+        ans = eg3.once_thru_scramble(in_char, direction='back', first_rotor=eg3.left_rotor, pos1=eg3.pos_left_rotor,
+                                     second_rotor=eg3.middle_rotor, pos2=eg3.pos_mid_rotor,
+                                     third_rotor=eg3.right_rotor, pos3=eg3.pos_rgt_rotor)
         assert ans == expected
 
 
 @pytest.mark.parametrize("current_window_3, exp_forward, exp_reverse", once_thru_dat_no_ring)
-def test_once_through_scramble_no_ring_settings(current_window_3, exp_forward, exp_reverse, eg) -> None:
-    eg.set_current_position(current_window_3=current_window_3)
-    left_rotor = Rotor(rotor_type=eg.left_rotor, window_letter=eg.current_window_3[0])
-    middle_rotor = Rotor(rotor_type=eg.middle_rotor, window_letter=eg.current_window_3[1])
-    right_rotor = Rotor(rotor_type=eg.right_rotor, window_letter=eg.current_window_3[2])
+def test_once_through_scramble_no_ring_settings(current_window_3, exp_forward, exp_reverse, eg3) -> None:
+    eg3.set_current_position(current_window_3=current_window_3)
+    left_rotor = Rotor(rotor_type=eg3.left_rotor, window_letter=eg3.current_window_3[0])
+    middle_rotor = Rotor(rotor_type=eg3.middle_rotor, window_letter=eg3.current_window_3[1])
+    right_rotor = Rotor(rotor_type=eg3.right_rotor, window_letter=eg3.current_window_3[2])
     # forward direction
     for in_char, expected in zip(entry, exp_forward):
         ans_pos = once_through_scramble(in_char, forward=True, left_rotor=left_rotor,
@@ -134,10 +155,11 @@ full_data_no_ring = [
 ]
 
 
+# TODO delete, once old Enigma3 no longer used
 @pytest.mark.parametrize("current_window_3, exp_out", full_data_no_ring)
-def test_full_scramble_no_ring_settings(current_window_3, exp_out, eg):
-    eg.set_current_position(current_window_3=current_window_3)
+def test_full_scramble_no_ring_settings(current_window_3, exp_out, eg3):
+    eg3.set_current_position(current_window_3=current_window_3)
 
     for in_char, expected in zip(entry, exp_out):
-        ans = eg.full_scramble(in_char)
+        ans = eg3.full_scramble(in_char)
         assert ans == expected
