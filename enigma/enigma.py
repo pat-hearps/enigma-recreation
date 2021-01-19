@@ -60,7 +60,15 @@ def once_through_scramble(start_character: str, forward: bool, left_rotor: Rotor
     return rotor_3_out
 
 
-def encode_thru_rotor(rotor: Rotor, entry_position: int, forward: bool = True):
+def encode_thru_reflector(reflector: Reflector, entry_position: int):
+    vprint(f"---- Rotor type {reflector.reflector_type} ----", 2)
+    vprint(f"signal into reflector at position {entry_position}   = {entry[entry_position]}", 1)
+    position_out = reflector.index_cypher_forward[entry_position]
+    vprint(f"signal out of reflector at position {position_out} = {entry[position_out]}", 1)
+    return position_out
+
+
+def encode_thru_rotor(rotor: Rotor, entry_position: int, forward: bool = True) -> int:
     """Encode signal through a given rotor in either direction.
     state of given Rotor class instance should define the current settings / position etc.
     - entry_position = 0-25 index at which signal is entering, relative to the 'A' position of

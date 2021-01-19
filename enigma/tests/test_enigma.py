@@ -1,7 +1,8 @@
 import os
 
 import pytest
-from enigma.enigma import Enigma3, Rotor, once_through_scramble, encode_thru_rotor, Enigma, Reflector
+from enigma.enigma import Enigma3, Rotor, once_through_scramble, encode_thru_rotor, Enigma, Reflector, \
+    encode_thru_reflector
 from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, REFLECTORS_CYPHER, i, ii, iii, iv, v, ROTORS, NOTCHES
 
 
@@ -66,6 +67,15 @@ def test_reflector_setup() -> None:
           'W': 'V', 'X': 'J', 'Y': 'A', 'Z': 'T'}
     assert reflector.index_cypher_forward == {0: 24, 1: 17, 2: 20, 3: 7, 4: 16, 5: 18, 6: 11, 7: 3, 8: 15, 9: 23, 10: 13, 11: 6, 12: 14, 13: 10, 14: 12,
           15: 8, 16: 4, 17: 1, 18: 5, 19: 25, 20: 2, 21: 22, 22: 21, 23: 9, 24: 0, 25: 19}
+
+
+def test_encode_thru_reflector() -> None:
+    reflector = Reflector(reflector_type='B')
+    exp = 'YRUHQSLDPXNGOKMIEBFZCWVJAT'
+    for in_letter, exp_letter in zip(entry, exp):
+        in_pos = entry.index(in_letter)
+        res = encode_thru_reflector(reflector=reflector, entry_position=in_pos)
+        assert exp_letter == entry[res]
 
 
 # TODO delete, once old Enigma3 no longer used
