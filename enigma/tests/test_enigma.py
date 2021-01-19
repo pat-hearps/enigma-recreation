@@ -1,8 +1,8 @@
 import os
 
 import pytest
-from enigma.enigma import Enigma3, Rotor, once_through_scramble, encode_thru_rotor, Enigma
-from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, reflectors, i, ii, iii, iv, v, ROTORS, NOTCHES
+from enigma.enigma import Enigma3, Rotor, once_through_scramble, encode_thru_rotor, Enigma, Reflector
+from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, REFLECTORS_CYPHER, i, ii, iii, iv, v, ROTORS, NOTCHES
 
 
 def test_rotor_basic() -> None:
@@ -58,6 +58,16 @@ def test_rotor_encoding(window_letter, ring_setting, expected_data, forward):
         assert exp_letter == ans_letter
 
 
+def test_reflector_setup() -> None:
+    reflector = Reflector(reflector_type='B')
+    assert reflector.reflector_type == 'B'
+    assert reflector.cypher == {'A': 'Y', 'B': 'R', 'C': 'U', 'D': 'H', 'E': 'Q', 'F': 'S', 'G': 'L', 'H': 'D', 'I': 'P', 'J': 'X', 'K': 'N',
+          'L': 'G', 'M': 'O', 'N': 'K', 'O': 'M', 'P': 'I', 'Q': 'E', 'R': 'B', 'S': 'F', 'T': 'Z', 'U': 'C', 'V': 'W',
+          'W': 'V', 'X': 'J', 'Y': 'A', 'Z': 'T'}
+    assert reflector.index_cypher_forward == {0: 24, 1: 17, 2: 20, 3: 7, 4: 16, 5: 18, 6: 11, 7: 3, 8: 15, 9: 23, 10: 13, 11: 6, 12: 14, 13: 10, 14: 12,
+          15: 8, 16: 4, 17: 1, 18: 5, 19: 25, 20: 2, 21: 22, 22: 21, 23: 9, 24: 0, 25: 19}
+
+
 # TODO delete, once old Enigma3 no longer used
 @pytest.fixture
 def eg3() -> Enigma3:
@@ -75,7 +85,7 @@ def test_basic_enigma3_setup(eg3) -> None:
     assert eg3.left_rotor == iii
     assert eg3.middle_rotor == ii
     assert eg3.right_rotor == i
-    assert eg3.reflector == reflectors['B']
+    assert eg3.reflector == REFLECTORS_CYPHER['B']
     assert eg3.current_position == 'AAA'
     assert (eg3.pos_left_rotor, eg3.pos_mid_rotor, eg3.pos_rgt_rotor) == (0, 0, 0)
 

@@ -8,7 +8,7 @@ import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.colors as mclr
-from enigma.design import entry, reflectors, notches
+from enigma.design import entry, REFLECTORS_CYPHER, notches
 
 class Bombe:
     
@@ -304,7 +304,7 @@ class Scrambler:
         self.right_rotor = right_rotor
         self.middle_rotor = middle_rotor
         self.left_rotor = left_rotor
-        self.reflector = reflectors[reflector]
+        self.reflector = REFLECTORS_CYPHER[reflector]
         self.menu_link = menu_link
         self.middle_notch = entry.index(notches[self.middle_rotor])   ## point if right rotor reaches will trigger middle rotor to step
         self.left_notch = entry.index(notches[self.left_rotor])  ## point if middle rotor reaches will trigger left rotor to step

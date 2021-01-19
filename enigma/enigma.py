@@ -6,8 +6,8 @@ import os
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, reflectors, ROTOR_INDEX, ROTORS, \
-    NOTCHES
+from enigma.design import (entry, raw_rotors, forward_rotors, rev_rotors, notches, REFLECTORS_CYPHER, ROTOR_INDEX, ROTORS,
+                           NOTCHES, REFLECTORS_INDEX)
 
 
 def vprint(message: str, msg_level: int, v_level: int = None):
@@ -15,6 +15,14 @@ def vprint(message: str, msg_level: int, v_level: int = None):
         v_level = int(os.getenv("verbosity", default="0"))
     if msg_level <= v_level:
         print(message)
+
+
+class Reflector:
+    def __init__(self, reflector_type: str):
+        assert reflector_type in REFLECTORS_INDEX.keys()
+        self.reflector_type: str = reflector_type
+        self.cypher: str = REFLECTORS_CYPHER[reflector_type]
+        self.index_cypher_forward = REFLECTORS_INDEX[reflector_type]
 
 
 class Rotor:
@@ -80,7 +88,7 @@ class Enigma:
         current_window_3 = initial position of the 3 rotors as defined by the letter visible in the window for each
         ring_settings_3 = display-vs-cypher offset of the rotor, does not change during an operation"""
         assert all([r in raw_rotors.keys() for r in (left_rotor_type, middle_rotor_type, right_rotor_type)])
-        assert reflector_type in reflectors.keys()
+        assert reflector_type in REFLECTORS_CYPHER.keys()
 
         self.left_rotor = Rotor(rotor_type=left_rotor_type, window_letter=current_window_3[0], ring_setting=ring_settings_3[0])
         self.middle_rotor = Rotor(rotor_type=middle_rotor_type, window_letter=current_window_3[1], ring_setting=ring_settings_3[1])
@@ -102,12 +110,12 @@ class Enigma3:
         reflector must be string, one of either ['B','C'],
         current_window_3 = initial position of the 3 rotors as defined by the letter visible in the window for each"""
         assert all([r in raw_rotors.keys() for r in (left_rotor, middle_rotor, right_rotor)])
-        assert reflector in reflectors.keys()
+        assert reflector in REFLECTORS_CYPHER.keys()
 
         self.right_rotor = right_rotor
         self.middle_rotor = middle_rotor
         self.left_rotor = left_rotor
-        self.reflector = reflectors[reflector]
+        self.reflector = REFLECTORS_CYPHER[reflector]
         self.current_window_3 = current_window_3
         ## point if right rotor reaches will trigger middle rotor to step
         self.middle_notch = entry.index(notches[self.middle_rotor])

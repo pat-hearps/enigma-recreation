@@ -58,13 +58,26 @@ rev_rotors = {i: [20, 22, 24, 6, 0, 3, 5, 15, 21, 25, 1, 4, 2, 10, 12, 19, 7, 23
               v: [16, 2, 24, 11, 23, 22, 4, 13, 5, 19, 25, 14, 18, 12, 21, 9, 20, 3, 10, 6, 8, 0, 17, 15, 7, 1]}
 
 ## in:out pairings for reflectors
-reflectors = {
+REFLECTORS_CYPHER = {
     'B': {'A': 'Y', 'B': 'R', 'C': 'U', 'D': 'H', 'E': 'Q', 'F': 'S', 'G': 'L', 'H': 'D', 'I': 'P', 'J': 'X', 'K': 'N',
           'L': 'G', 'M': 'O', 'N': 'K', 'O': 'M', 'P': 'I', 'Q': 'E', 'R': 'B', 'S': 'F', 'T': 'Z', 'U': 'C', 'V': 'W',
           'W': 'V', 'X': 'J', 'Y': 'A', 'Z': 'T'},
     'C': {'A': 'F', 'B': 'V', 'C': 'P', 'D': 'J', 'E': 'I', 'F': 'A', 'G': 'O', 'H': 'Y', 'I': 'E', 'J': 'D', 'K': 'R',
           'L': 'Z', 'M': 'X', 'N': 'W', 'O': 'G', 'P': 'C', 'Q': 'T', 'R': 'K', 'S': 'U', 'T': 'Q', 'U': 'S', 'V': 'B',
           'W': 'N', 'X': 'M', 'Y': 'H', 'Z': 'L'}}
+
+# REFLECTORS = {
+#     'B': {entry.index(k):entry.index(v) for k,v in reflectors['B'].items()},
+#     'C': {entry.index(k):entry.index(v) for k,v in reflectors['C'].items()}
+# }
+# reflectors already turned into integer index positions from letters
+REFLECTORS_INDEX = {
+    'B': {0: 24, 1: 17, 2: 20, 3: 7, 4: 16, 5: 18, 6: 11, 7: 3, 8: 15, 9: 23, 10: 13, 11: 6, 12: 14, 13: 10, 14: 12,
+          15: 8, 16: 4, 17: 1, 18: 5, 19: 25, 20: 2, 21: 22, 22: 21, 23: 9, 24: 0, 25: 19},
+    'C': {0: 5, 1: 21, 2: 15, 3: 9, 4: 8, 5: 0, 6: 14, 7: 24, 8: 4, 9: 3, 10: 17, 11: 25, 12: 23, 13: 22, 14: 6, 15: 2,
+          16: 19, 17: 10, 18: 20, 19: 16, 20: 18, 21: 1, 22: 13, 23: 12, 24: 7, 25: 11}
+}
+
 
 blank_status = {char: 0 for char in entry}
 iomap = {'in': 'I', 'out': 'O', 'conx_in': 'I', 'conx_out': 'O'}
