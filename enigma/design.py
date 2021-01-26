@@ -67,8 +67,8 @@ REFLECTORS_CYPHER = {
           'W': 'N', 'X': 'M', 'Y': 'H', 'Z': 'L'}}
 
 # REFLECTORS = {
-#     'B': {entry.index(k):entry.index(v) for k,v in reflectors['B'].items()},
-#     'C': {entry.index(k):entry.index(v) for k,v in reflectors['C'].items()}
+#     'B': {entry.index(k):entry.index(v) for k,v in REFLECTORS_CYPHER['B'].items()},
+#     'C': {entry.index(k):entry.index(v) for k,v in REFLECTORS_CYPHER['C'].items()}
 # }
 # reflectors already turned into integer index positions from letters
 REFLECTORS_INDEX = {

@@ -69,9 +69,15 @@ def test_reflector_setup() -> None:
           15: 8, 16: 4, 17: 1, 18: 5, 19: 25, 20: 2, 21: 22, 22: 21, 23: 9, 24: 0, 25: 19}
 
 
-def test_encode_thru_reflector() -> None:
-    reflector = Reflector(reflector_type='B')
-    exp = 'YRUHQSLDPXNGOKMIEBFZCWVJAT'
+dat_reflector = [
+    ('B', 'YRUHQSLDPXNGOKMIEBFZCWVJAT'),
+    ('C', 'FVPJIAOYEDRZXWGCTKUQSBNMHL')
+]
+
+
+@pytest.mark.parametrize("ref_type, exp", dat_reflector)
+def test_encode_thru_reflector(ref_type: str, exp: str) -> None:
+    reflector = Reflector(reflector_type=ref_type)
     for in_letter, exp_letter in zip(entry, exp):
         in_pos = entry.index(in_letter)
         res = encode_thru_reflector(reflector=reflector, entry_position=in_pos)
