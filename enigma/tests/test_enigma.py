@@ -192,5 +192,5 @@ def test_full_scramble_no_ring_settings(current_window_3, exp_out, eg3):
     eg3.set_current_position(current_window_3=current_window_3)
 
     for in_char, expected in zip(entry, exp_out):
-        ans = eg3.full_scramble(in_char)
+        ans = eg3.full_scramble_old(in_char)
         assert ans == expected

@@ -43,6 +43,31 @@ class Rotor:
         self.actual_cypher_position = (26 + self.window_position - self.ring_position) % 26
 
 
+class Enigma:
+    def __init__(self, left_rotor_type: str, middle_rotor_type: str, right_rotor_type: str, reflector_type: str,
+                 current_window_3: str = "AAA", ring_settings_3: str = "AAA"):
+        """rotors must be strings referring to either ['I','II','III','IV','V']
+        reflector must be string, one of either ['B','C'],
+        current_window_3 = initial position of the 3 rotors as defined by the letter visible in the window for each
+        ring_settings_3 = display-vs-cypher offset of the rotor, does not change during an operation"""
+        assert all([r in raw_rotors.keys() for r in (left_rotor_type, middle_rotor_type, right_rotor_type)])
+        assert reflector_type in REFLECTORS_CYPHER.keys()
+
+        self.reflector = Reflector(reflector_type=reflector_type)
+        self.left_rotor = Rotor(rotor_type=left_rotor_type, window_letter=current_window_3[0], ring_setting=ring_settings_3[0])
+        self.middle_rotor = Rotor(rotor_type=middle_rotor_type, window_letter=current_window_3[1], ring_setting=ring_settings_3[1])
+        self.right_rotor = Rotor(rotor_type=right_rotor_type, window_letter=current_window_3[2], ring_setting=ring_settings_3[2])
+        ## point if right rotor reaches will trigger middle rotor to step
+        self.middle_notch = self.middle_rotor.notch
+        ## point if middle rotor reaches will trigger left rotor to step
+        self.left_notch = self.left_rotor.notch
+
+        self.current_position = current_window_3
+        self.in_status = {char: 0 for char in entry}
+        self.out_status = {char: 0 for char in entry}
+        self.record = {}
+
+
 def once_through_scramble(start_character: str, forward: bool, left_rotor: Rotor, middle_rotor: Rotor,
                           right_rotor: Rotor):
     """ start_character must be single ASCII character A-Z"""
@@ -87,30 +112,6 @@ def encode_thru_rotor(rotor: Rotor, entry_position: int, forward: bool = True) -
     vprint(f"signal out of rotor at position {position_out} =      {entry[position_out]}", 1)
     return position_out
 
-
-class Enigma:
-    def __init__(self, left_rotor_type: str, middle_rotor_type: str, right_rotor_type: str, reflector_type: str,
-                 current_window_3: str = "AAA", ring_settings_3: str = "AAA"):
-        """rotors must be strings referring to either ['I','II','III','IV','V']
-        reflector must be string, one of either ['B','C'],
-        current_window_3 = initial position of the 3 rotors as defined by the letter visible in the window for each
-        ring_settings_3 = display-vs-cypher offset of the rotor, does not change during an operation"""
-        assert all([r in raw_rotors.keys() for r in (left_rotor_type, middle_rotor_type, right_rotor_type)])
-        assert reflector_type in REFLECTORS_CYPHER.keys()
-
-        self.reflector = Reflector(reflector_type=reflector_type)
-        self.left_rotor = Rotor(rotor_type=left_rotor_type, window_letter=current_window_3[0], ring_setting=ring_settings_3[0])
-        self.middle_rotor = Rotor(rotor_type=middle_rotor_type, window_letter=current_window_3[1], ring_setting=ring_settings_3[1])
-        self.right_rotor = Rotor(rotor_type=right_rotor_type, window_letter=current_window_3[2], ring_setting=ring_settings_3[2])
-        ## point if right rotor reaches will trigger middle rotor to step
-        self.middle_notch = self.middle_rotor.notch
-        ## point if middle rotor reaches will trigger left rotor to step
-        self.left_notch = self.left_rotor.notch
-
-        self.current_position = current_window_3
-        self.in_status = {char: 0 for char in entry}
-        self.out_status = {char: 0 for char in entry}
-        self.record = {}
 
 class Enigma3:
 
@@ -177,7 +178,7 @@ class Enigma3:
 
         return ch3o
 
-    def full_scramble(self, in_ch):
+    def full_scramble_old(self, in_ch):
         in_ch = in_ch.upper()
         left_rotor = self.left_rotor
         middle_rotor = self.middle_rotor
@@ -275,7 +276,7 @@ class Enigma3:
 
             #             print('rp = ', self.pos_rgt_rotor, 'mp = ', self.pos_mid_rotor, 'lp = ', self.pos_left_rotor)
 
-            out = self.full_scramble(c)
+            out = self.full_scramble_old(c)
             #             print('out:   ', out,'\n')
 
             encoded += out
