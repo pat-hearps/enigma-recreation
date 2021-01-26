@@ -112,9 +112,14 @@ def test_basic_enigma_setup(eg) -> None:
     assert eg.right_rotor.rotor_type == i
     # assert eg.reflector == reflectors['B']
     assert eg.current_position == 'AAA'
+    assert type(eg.left_rotor) == Rotor
+    assert type(eg.middle_rotor) == Rotor
+    assert type(eg.right_rotor) == Rotor
     assert eg.left_rotor.actual_cypher_position == 0
     assert eg.middle_rotor.actual_cypher_position == 0
     assert eg.right_rotor.actual_cypher_position == 0
+    assert type(eg.reflector) == Reflector
+    assert eg.reflector.reflector_type == 'B'
 
 
 # TODO delete, once old Enigma3 no longer used

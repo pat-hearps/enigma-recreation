@@ -98,6 +98,7 @@ class Enigma:
         assert all([r in raw_rotors.keys() for r in (left_rotor_type, middle_rotor_type, right_rotor_type)])
         assert reflector_type in REFLECTORS_CYPHER.keys()
 
+        self.reflector = Reflector(reflector_type=reflector_type)
         self.left_rotor = Rotor(rotor_type=left_rotor_type, window_letter=current_window_3[0], ring_setting=ring_settings_3[0])
         self.middle_rotor = Rotor(rotor_type=middle_rotor_type, window_letter=current_window_3[1], ring_setting=ring_settings_3[1])
         self.right_rotor = Rotor(rotor_type=right_rotor_type, window_letter=current_window_3[2], ring_setting=ring_settings_3[2])
