@@ -68,8 +68,28 @@ class Enigma:
         self.record = {}
 
 
+def full_scramble(enigma: Enigma, letter_in: str) -> str:
+
+    letter_forward_scrambled = once_through_scramble(start_character=letter_in,
+                                                     forward=True,
+                                                     left_rotor=enigma.left_rotor,
+                                                     middle_rotor=enigma.middle_rotor,
+                                                     right_rotor=enigma.right_rotor)
+
+    position_into_reflector = entry.index(letter_forward_scrambled)
+    position_reflected = encode_thru_reflector(reflector=enigma.reflector, entry_position=position_into_reflector)
+    letter_reflected = entry[position_reflected]
+
+    letter_reverse_scrambled = once_through_scramble(start_character=letter_reflected,
+                                                     forward=False,
+                                                     left_rotor=enigma.left_rotor,
+                                                     middle_rotor=enigma.middle_rotor,
+                                                     right_rotor=enigma.right_rotor)
+    return letter_reverse_scrambled
+
+
 def once_through_scramble(start_character: str, forward: bool, left_rotor: Rotor, middle_rotor: Rotor,
-                          right_rotor: Rotor):
+                          right_rotor: Rotor) -> str:
     """ start_character must be single ASCII character A-Z"""
     entry_pos = entry.index(start_character.upper())
 
@@ -82,10 +102,10 @@ def once_through_scramble(start_character: str, forward: bool, left_rotor: Rotor
     rotor_2_out = encode_thru_rotor(middle_rotor, entry_position=rotor_1_out, forward=forward)
     rotor_3_out = encode_thru_rotor(third_rotor, entry_position=rotor_2_out, forward=forward)
 
-    return rotor_3_out
+    return entry[rotor_3_out]
 
 
-def encode_thru_reflector(reflector: Reflector, entry_position: int):
+def encode_thru_reflector(reflector: Reflector, entry_position: int) -> int:
     vprint(f"---- Rotor type {reflector.reflector_type} ----", 2)
     vprint(f"signal into reflector at position {entry_position}   = {entry[entry_position]}", 1)
     position_out = reflector.index_cypher_forward[entry_position]

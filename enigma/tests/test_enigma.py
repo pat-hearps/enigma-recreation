@@ -2,7 +2,7 @@ import os
 
 import pytest
 from enigma.enigma import Enigma3, Rotor, once_through_scramble, encode_thru_rotor, Enigma, Reflector, \
-    encode_thru_reflector
+    encode_thru_reflector, full_scramble
 from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, REFLECTORS_CYPHER, i, ii, iii, iv, v, ROTORS, NOTCHES
 
 
@@ -186,11 +186,10 @@ full_data_no_ring = [
 ]
 
 
-# TODO delete, once old Enigma3 no longer used
 @pytest.mark.parametrize("current_window_3, exp_out", full_data_no_ring)
-def test_full_scramble_no_ring_settings(current_window_3, exp_out, eg3):
-    eg3.set_current_position(current_window_3=current_window_3)
+def test_full_scramble_no_ring_settings(current_window_3, exp_out, eg):
+    # eg.set_current_position(current_window_3=current_window_3)
 
     for in_char, expected in zip(entry, exp_out):
-        ans = eg3.full_scramble_old(in_char)
+        ans = full_scramble(eg, in_char)
         assert ans == expected
