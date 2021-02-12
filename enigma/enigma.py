@@ -42,6 +42,12 @@ class Rotor:
         self.ring_position = entry.index(self.ring_setting)
         self.actual_cypher_position = (26 + self.window_position - self.ring_position) % 26
 
+    def set_window_letter(self, window_letter: str):
+        self.window_letter = window_letter
+        self.window_position = entry.index(self.window_letter)
+        self.actual_cypher_position = (26 + self.window_position - self.ring_position) % 26
+
+
 
 class Enigma:
     def __init__(self, left_rotor_type: str, middle_rotor_type: str, right_rotor_type: str, reflector_type: str,
@@ -66,6 +72,17 @@ class Enigma:
         self.in_status = {char: 0 for char in entry}
         self.out_status = {char: 0 for char in entry}
         self.record = {}
+
+    def set_current_position(self, current_window_3):
+        """Given a three-letter menu link (e.g. 'ZAB'), set the current positions of the enigma to correspond to the menu link"""
+        assert all([m in ascii_uppercase for m in current_window_3])
+        assert len(current_window_3) == 3
+        current_window_3 = current_window_3.upper()
+        self.left_rotor.set_window_letter(current_window_3[0])
+        self.middle_rotor.set_window_letter(current_window_3[1])
+        self.right_rotor.set_window_letter(current_window_3[2])
+
+        self.current_position = current_window_3
 
 
 def full_scramble(enigma: Enigma, letter_in: str) -> str:

@@ -188,7 +188,7 @@ full_data_no_ring = [
 
 @pytest.mark.parametrize("current_window_3, exp_out", full_data_no_ring)
 def test_full_scramble_no_ring_settings(current_window_3, exp_out, eg):
-    # eg.set_current_position(current_window_3=current_window_3)
+    eg.set_current_position(current_window_3=current_window_3)
 
     for in_char, expected in zip(entry, exp_out):
         ans = full_scramble(eg, in_char)
