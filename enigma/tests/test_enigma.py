@@ -60,6 +60,17 @@ def test_rotor_encoding(window_letter, ring_setting, expected_data, forward):
         assert exp_letter == ans_letter
 
 
+def test_rotor_step():
+    rotor = Rotor(rotor_type=i, window_letter="A", ring_setting="A")
+    expected = "BCDEFGHIJKLMNOPQRSTUVWXYZA"
+    positions = list(range(1,26)) + [0]
+    for exp, pos in zip(expected, positions):
+        rotor.step_rotor()
+        assert rotor.window_letter == exp
+        assert rotor.actual_cypher_position == pos
+
+
+
 def test_reflector_setup() -> None:
     reflector = Reflector(reflector_type='B')
     assert reflector.reflector_type == 'B'
