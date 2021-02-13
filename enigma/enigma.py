@@ -40,13 +40,23 @@ class Rotor:
         # and are converted into numerical indexes
         self.window_position = entry.index(self.window_letter)
         self.ring_position = entry.index(self.ring_setting)
+        self.update_cypher_position()
+
+    def update_cypher_position(self):
         self.actual_cypher_position = (26 + self.window_position - self.ring_position) % 26
 
     def set_window_letter(self, window_letter: str):
         self.window_letter = window_letter
         self.window_position = entry.index(self.window_letter)
-        self.actual_cypher_position = (26 + self.window_position - self.ring_position) % 26
+        self.update_cypher_position()
 
+    def step_rotor(self):
+        if self.window_position == 25:
+            self.window_position = 0
+        else:
+            self.window_position += 1
+        self.window_letter = entry[self.window_position]
+        self.update_cypher_position()
 
 
 class Enigma:
