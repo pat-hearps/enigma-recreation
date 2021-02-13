@@ -7,5 +7,5 @@ class Window3:
     letter1: str
     letter2: str
 
-    def __str__(self):
+    def window(self):
         return f"{self.letter0}{self.letter1}{self.letter2}".upper()

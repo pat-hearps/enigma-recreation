@@ -123,16 +123,13 @@ def test_basic_enigma_setup(eg) -> None:
     assert eg.reflector.reflector_type == 'B'
 
 
-# TODO delete, once old Enigma3 no longer used
 def test_set_current_position(eg) -> None:
-    current_window_3 = str(WindowFactory())
-
-    eg.set_current_position(current_window_3=current_window_3)
-    assert eg.current_position == current_window_3
-    assert eg.left_rotor.window_letter == current_window_3[0]
-    assert eg.middle_rotor.window_letter == current_window_3[1]
-    assert eg.right_rotor.window_letter == current_window_3[2]
-    # assert 0
+    window = WindowFactory()
+    eg.set_current_position(current_window_3=window.window())
+    assert eg.current_position == window.window()
+    assert eg.left_rotor.window_letter == window.letter0
+    assert eg.middle_rotor.window_letter == window.letter1
+    assert eg.right_rotor.window_letter == window.letter2
 
 
 # LR=III, MR=II, RR=I
