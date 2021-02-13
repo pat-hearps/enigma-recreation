@@ -169,13 +169,13 @@ def test_once_through_scramble_no_ring_settings(current_window_3, exp_forward, e
     for in_char, expected in zip(entry, exp_forward):
         ans_pos = once_through_scramble(in_char, forward=True, left_rotor=left_rotor,
                                         middle_rotor=middle_rotor, right_rotor=right_rotor)
-        assert entry[ans_pos] == expected
+        assert ans_pos == expected
 
     # reverse direction
     for in_char, expected in zip(entry, exp_reverse):
         ans_pos = once_through_scramble(in_char, forward=False, left_rotor=left_rotor,
                                         middle_rotor=middle_rotor, right_rotor=right_rotor)
-        assert entry[ans_pos] == expected
+        assert ans_pos == expected
 
 
 full_data_no_ring = [
