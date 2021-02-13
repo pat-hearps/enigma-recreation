@@ -140,24 +140,6 @@ once_thru_dat_no_ring = [
     ("NAA", "YDGZXWFUIJPOBTQCESMRAKHNVL", "UMPBQGCWIJVZSXLKOTRNHYFEAD")
 ]
 
-# TODO delete, once old Enigma3 no longer used
-@pytest.mark.parametrize("current_window_3, exp_forward, exp_reverse", once_thru_dat_no_ring)
-def test_once_thru_scramble_no_ring_settings(current_window_3, exp_forward, exp_reverse, eg3) -> None:
-    eg3.set_current_position(current_window_3=current_window_3)
-    # forward direction
-    for in_char, expected in zip(entry, exp_forward):
-        ans = eg3.once_thru_scramble(in_char, direction='forward', first_rotor=eg3.right_rotor, pos1=eg3.pos_rgt_rotor,
-                                     second_rotor=eg3.middle_rotor, pos2=eg3.pos_mid_rotor,
-                                     third_rotor=eg3.left_rotor, pos3=eg3.pos_left_rotor)
-        assert ans == expected
-
-    # reverse direction
-    for in_char, expected in zip(entry, exp_reverse):
-        ans = eg3.once_thru_scramble(in_char, direction='back', first_rotor=eg3.left_rotor, pos1=eg3.pos_left_rotor,
-                                     second_rotor=eg3.middle_rotor, pos2=eg3.pos_mid_rotor,
-                                     third_rotor=eg3.right_rotor, pos3=eg3.pos_rgt_rotor)
-        assert ans == expected
-
 
 @pytest.mark.parametrize("current_window_3, exp_forward, exp_reverse", once_thru_dat_no_ring)
 def test_once_through_scramble_no_ring_settings(current_window_3, exp_forward, exp_reverse, eg3) -> None:
