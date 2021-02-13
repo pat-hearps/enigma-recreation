@@ -4,6 +4,7 @@ import pytest
 from enigma.enigma import Enigma3, Rotor, once_through_scramble, encode_thru_rotor, Enigma, Reflector, \
     encode_thru_reflector, full_scramble
 from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, REFLECTORS_CYPHER, i, ii, iii, iv, v, ROTORS, NOTCHES
+from enigma.tests.factories import WindowFactory
 
 
 def test_rotor_basic() -> None:
@@ -124,12 +125,14 @@ def test_basic_enigma_setup(eg) -> None:
 
 # TODO delete, once old Enigma3 no longer used
 def test_set_current_position(eg) -> None:
-    current_window_3 = "HJP"
+    current_window_3 = str(WindowFactory())
+
     eg.set_current_position(current_window_3=current_window_3)
     assert eg.current_position == current_window_3
     assert eg.left_rotor.window_letter == current_window_3[0]
     assert eg.middle_rotor.window_letter == current_window_3[1]
     assert eg.right_rotor.window_letter == current_window_3[2]
+    # assert 0
 
 
 # LR=III, MR=II, RR=I
