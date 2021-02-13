@@ -94,26 +94,26 @@ class Enigma:
 
 def full_scramble(enigma: Enigma, letter_in: str) -> str:
 
-    letter_forward_scrambled = once_through_scramble(start_character=letter_in,
-                                                     forward=True,
-                                                     left_rotor=enigma.left_rotor,
-                                                     middle_rotor=enigma.middle_rotor,
-                                                     right_rotor=enigma.right_rotor)
+    letter_forward_scrambled = once_thru_scramble(start_character=letter_in,
+                                                  forward=True,
+                                                  left_rotor=enigma.left_rotor,
+                                                  middle_rotor=enigma.middle_rotor,
+                                                  right_rotor=enigma.right_rotor)
 
     position_into_reflector = entry.index(letter_forward_scrambled)
     position_reflected = encode_thru_reflector(reflector=enigma.reflector, entry_position=position_into_reflector)
     letter_reflected = entry[position_reflected]
 
-    letter_reverse_scrambled = once_through_scramble(start_character=letter_reflected,
-                                                     forward=False,
-                                                     left_rotor=enigma.left_rotor,
-                                                     middle_rotor=enigma.middle_rotor,
-                                                     right_rotor=enigma.right_rotor)
+    letter_reverse_scrambled = once_thru_scramble(start_character=letter_reflected,
+                                                  forward=False,
+                                                  left_rotor=enigma.left_rotor,
+                                                  middle_rotor=enigma.middle_rotor,
+                                                  right_rotor=enigma.right_rotor)
     return letter_reverse_scrambled
 
 
-def once_through_scramble(start_character: str, forward: bool, left_rotor: Rotor, middle_rotor: Rotor,
-                          right_rotor: Rotor) -> str:
+def once_thru_scramble(start_character: str, forward: bool, left_rotor: Rotor, middle_rotor: Rotor,
+                       right_rotor: Rotor) -> str:
     """ start_character must be single ASCII character A-Z"""
     entry_pos = entry.index(start_character.upper())
 
@@ -182,8 +182,8 @@ class Enigma3:
         self.current_position = current_window_3
         self.record = {}
 
-    def once_thru_scramble(self, start_character, direction, first_rotor, pos1, second_rotor, pos2,
-                           third_rotor, pos3):
+    def once_thru_scramble_old(self, start_character, direction, first_rotor, pos1, second_rotor, pos2,
+                               third_rotor, pos3):
         """ start_character must be single ASCII character A-Z
         direction is either 'forward' or 'back' """
         if direction == 'forward':
@@ -229,10 +229,10 @@ class Enigma3:
         right_rotor = self.right_rotor
         rflector = self.reflector
         # # first run right to left through scrambler
-        forward_run = self.once_thru_scramble(in_ch, direction='forward', first_rotor=right_rotor,
-                                              pos1=self.pos_rgt_rotor,
-                                              second_rotor=middle_rotor, pos2=self.pos_mid_rotor,
-                                              third_rotor=left_rotor, pos3=self.pos_left_rotor)
+        forward_run = self.once_thru_scramble_old(in_ch, direction='forward', first_rotor=right_rotor,
+                                                  pos1=self.pos_rgt_rotor,
+                                                  second_rotor=middle_rotor, pos2=self.pos_mid_rotor,
+                                                  third_rotor=left_rotor, pos3=self.pos_left_rotor)
 
         # # reflector back around for return
         rfi_pos_mod = (
@@ -244,9 +244,9 @@ class Enigma3:
         #         print(f"{forward_run} -> {chri} (into reflector) -> {mirrored} (reflected out)")
 
         # # second run back left to right thru scrambler
-        back_run = self.once_thru_scramble(mirrored, direction='back', first_rotor=left_rotor, pos1=self.pos_left_rotor,
-                                           second_rotor=middle_rotor, pos2=self.pos_mid_rotor, third_rotor=right_rotor,
-                                           pos3=self.pos_rgt_rotor)
+        back_run = self.once_thru_scramble_old(mirrored, direction='back', first_rotor=left_rotor, pos1=self.pos_left_rotor,
+                                               second_rotor=middle_rotor, pos2=self.pos_mid_rotor, third_rotor=right_rotor,
+                                               pos3=self.pos_rgt_rotor)
 
         bk_out = entry.index(back_run)
         bko_pos_mod = (

@@ -1,7 +1,7 @@
 import os
 
 import pytest
-from enigma.enigma import Enigma3, Rotor, once_through_scramble, encode_thru_rotor, Enigma, Reflector, \
+from enigma.enigma import Enigma3, Rotor, once_thru_scramble, encode_thru_rotor, Enigma, Reflector, \
     encode_thru_reflector, full_scramble
 from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, REFLECTORS_CYPHER, i, ii, iii, iv, v, ROTORS, NOTCHES
 from enigma.tests.factories import WindowFactory
@@ -161,14 +161,14 @@ def test_once_through_scramble_no_ring_settings(current_window_3, exp_forward, e
     right_rotor = Rotor(rotor_type=eg3.right_rotor, window_letter=eg3.current_window_3[2])
     # forward direction
     for in_char, expected in zip(entry, exp_forward):
-        ans_pos = once_through_scramble(in_char, forward=True, left_rotor=left_rotor,
-                                        middle_rotor=middle_rotor, right_rotor=right_rotor)
+        ans_pos = once_thru_scramble(in_char, forward=True, left_rotor=left_rotor,
+                                     middle_rotor=middle_rotor, right_rotor=right_rotor)
         assert ans_pos == expected
 
     # reverse direction
     for in_char, expected in zip(entry, exp_reverse):
-        ans_pos = once_through_scramble(in_char, forward=False, left_rotor=left_rotor,
-                                        middle_rotor=middle_rotor, right_rotor=right_rotor)
+        ans_pos = once_thru_scramble(in_char, forward=False, left_rotor=left_rotor,
+                                     middle_rotor=middle_rotor, right_rotor=right_rotor)
         assert ans_pos == expected
 
 
