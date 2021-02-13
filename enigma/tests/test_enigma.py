@@ -123,13 +123,13 @@ def test_basic_enigma_setup(eg) -> None:
 
 
 # TODO delete, once old Enigma3 no longer used
-def test_set_current_position(eg3) -> None:
+def test_set_current_position(eg) -> None:
     current_window_3 = "HJP"
-    eg3.set_current_position(current_window_3=current_window_3)
-    assert eg3.current_position == current_window_3
-    assert eg3.pos_left_rotor == entry.index(current_window_3[0])
-    assert eg3.pos_mid_rotor == entry.index(current_window_3[1])
-    assert eg3.pos_rgt_rotor == entry.index(current_window_3[2])
+    eg.set_current_position(current_window_3=current_window_3)
+    assert eg.current_position == current_window_3
+    assert eg.left_rotor.window_letter == current_window_3[0]
+    assert eg.middle_rotor.window_letter == current_window_3[1]
+    assert eg.right_rotor.window_letter == current_window_3[2]
 
 
 # LR=III, MR=II, RR=I

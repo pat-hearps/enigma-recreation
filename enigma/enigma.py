@@ -60,20 +60,20 @@ class Enigma:
         assert reflector_type in REFLECTORS_CYPHER.keys()
 
         self.reflector = Reflector(reflector_type=reflector_type)
-        self.left_rotor = Rotor(rotor_type=left_rotor_type, window_letter=current_window_3[0], ring_setting=ring_settings_3[0])
-        self.middle_rotor = Rotor(rotor_type=middle_rotor_type, window_letter=current_window_3[1], ring_setting=ring_settings_3[1])
-        self.right_rotor = Rotor(rotor_type=right_rotor_type, window_letter=current_window_3[2], ring_setting=ring_settings_3[2])
+        self.left_rotor = Rotor(rotor_type=left_rotor_type, ring_setting=ring_settings_3[0])
+        self.middle_rotor = Rotor(rotor_type=middle_rotor_type, ring_setting=ring_settings_3[1])
+        self.right_rotor = Rotor(rotor_type=right_rotor_type, ring_setting=ring_settings_3[2])
         ## point if right rotor reaches will trigger middle rotor to step
         self.middle_notch = self.middle_rotor.notch
         ## point if middle rotor reaches will trigger left rotor to step
         self.left_notch = self.left_rotor.notch
 
-        self.current_position = current_window_3
+        self.set_current_position(current_window_3=current_window_3)
         self.in_status = {char: 0 for char in entry}
         self.out_status = {char: 0 for char in entry}
         self.record = {}
 
-    def set_current_position(self, current_window_3):
+    def set_current_position(self, current_window_3: str):
         """Given a three-letter menu link (e.g. 'ZAB'), set the current positions of the enigma to correspond to the menu link"""
         assert all([m in ascii_uppercase for m in current_window_3])
         assert len(current_window_3) == 3
