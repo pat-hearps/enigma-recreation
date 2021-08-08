@@ -124,7 +124,7 @@ def test_basic_enigma_setup(eg) -> None:
     assert eg.middle_rotor.rotor_type == ii
     assert eg.right_rotor.rotor_type == i
     # assert eg.reflector == reflectors['B']
-    assert eg.current_position == 'AAA'
+    assert eg.window_letters == 'AAA'
     assert type(eg.left_rotor) == Rotor
     assert type(eg.middle_rotor) == Rotor
     assert type(eg.right_rotor) == Rotor
@@ -137,8 +137,8 @@ def test_basic_enigma_setup(eg) -> None:
 
 def test_set_current_position(eg) -> None:
     window = WindowFactory()
-    eg.set_current_position(current_window_3=window.window())
-    assert eg.current_position == window.window()
+    eg.set_window_letters(current_window_3=window.window())
+    assert eg.window_letters == window.window()
     assert eg.left_rotor.window_letter == window.letter0
     assert eg.middle_rotor.window_letter == window.letter1
     assert eg.right_rotor.window_letter == window.letter2
@@ -182,7 +182,7 @@ full_data_no_ring = [
 
 @pytest.mark.parametrize("current_window_3, exp_out", full_data_no_ring)
 def test_full_scramble_no_ring_settings(current_window_3, exp_out, eg):
-    eg.set_current_position(current_window_3=current_window_3)
+    eg.set_window_letters(current_window_3=current_window_3)
 
     for in_char, expected in zip(entry, exp_out):
         ans = full_scramble(eg, in_char)
@@ -191,22 +191,22 @@ def test_full_scramble_no_ring_settings(current_window_3, exp_out, eg):
 
 def test_step_enigma_1(eg):
     start_pos = 'AAP'
-    eg.set_current_position(current_window_3=start_pos)
+    eg.set_window_letters(current_window_3=start_pos)
 
     eg.step_enigma()
-    assert eg.current_position == 'AAQ'
+    assert eg.window_letters == 'AAQ'
 
     eg.step_enigma()
-    assert eg.current_position == 'ABR'
+    assert eg.window_letters == 'ABR'
 
 
 def test_step_enigma_2(eg):
     """Double step of middle rotor"""
     start_pos = 'KDO'
-    eg.set_current_position(current_window_3=start_pos)
+    eg.set_window_letters(current_window_3=start_pos)
 
     expected_windows = ['KDP', 'KDQ', 'KER', 'LFS', 'LFT', 'LFU']
     for exp in expected_windows:
         eg.step_enigma()
-        assert eg.current_position == exp
+        assert eg.window_letters == exp
 

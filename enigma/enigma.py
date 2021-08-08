@@ -71,12 +71,12 @@ class Enigma:
         self.middle_rotor: Rotor = Rotor(rotor_type=middle_rotor_type, ring_setting=ring_settings_3[1])
         self.right_rotor: Rotor = Rotor(rotor_type=right_rotor_type, ring_setting=ring_settings_3[2])
 
-        self.set_current_position(current_window_3=current_window_3)
+        self.set_window_letters(current_window_3=current_window_3)
         self.in_status: Dict = {char: 0 for char in entry}
         self.out_status: Dict = {char: 0 for char in entry}
         self.record: Dict = {}
 
-    def set_current_position(self, current_window_3: str):
+    def set_window_letters(self, current_window_3: str):
         """Given a three-letter menu link (e.g. 'ZAB'), set the current positions of the enigma to correspond to the menu link"""
         assert all([m in ascii_uppercase for m in current_window_3])
         assert len(current_window_3) == 3
@@ -85,15 +85,15 @@ class Enigma:
         self.middle_rotor.set_window_letter(current_window_3[1])
         self.right_rotor.set_window_letter(current_window_3[2])
 
-        self.current_position: str = current_window_3
+        self.window_letters: str = current_window_3
 
-    def update_current_position(self):
+    def update_window_letters(self):
         """Update the enigma's class attribute 'current_position' to reflect the positions of the rotors"""
-        self.current_position = "".join([self.left_rotor.window_letter, self.middle_rotor.window_letter, self.right_rotor.window_letter])
+        self.window_letters = "".join([self.left_rotor.window_letter, self.middle_rotor.window_letter, self.right_rotor.window_letter])
 
     def step_enigma(self):
         # TODO effect of ring settings, how to test
-        vprint(f"current enigma position={self.current_position}", 1)
+        vprint(f"current enigma position={self.window_letters}", 1)
 
         vprint(f"middle rotor notch={self.middle_rotor.notch}", 2)
         if self.middle_rotor.notch == self.middle_rotor.window_letter:
@@ -109,8 +109,8 @@ class Enigma:
 
         vprint("stepping right rotor", 2)
         self.right_rotor.step_rotor()
-        self.update_current_position()
-        vprint(f"new enigma position={self.current_position}", 1)
+        self.update_window_letters()
+        vprint(f"new enigma position={self.window_letters}", 1)
 
 
 def full_scramble(enigma: Enigma, letter_in: str) -> str:
