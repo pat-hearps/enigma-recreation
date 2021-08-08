@@ -91,10 +91,6 @@ class Enigma:
 
         self.current_position = current_window_3
 
-    def translate_current_position(self) -> str:
-        """without changing current state of class and rotor subclasses, return the current window setting"""
-        return "".join([self.left_rotor.window_letter, self.middle_rotor.window_letter, self.right_rotor.window_letter])
-
     def update_current_position(self):
         """Update the enigma's class attribute 'current_position' to reflect the positions of the rotors"""
         self.current_position = "".join([self.left_rotor.window_letter, self.middle_rotor.window_letter, self.right_rotor.window_letter])
