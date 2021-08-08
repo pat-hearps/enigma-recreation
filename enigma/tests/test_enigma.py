@@ -3,7 +3,7 @@ from typing import Tuple
 
 import pytest
 
-from enigma.enigma import Enigma3, Rotor, once_thru_scramble, encode_thru_rotor, Enigma, Reflector, \
+from enigma.enigma import Rotor, once_thru_scramble, encode_thru_rotor, Enigma, Reflector, \
     encode_thru_reflector, full_scramble
 from enigma.design import ENTRY, raw_rotors, FORWARD_ROTORS, REVERSE_ROTORS, notches, REFLECTORS_CYPHER, i, ii, iii, iv, v, ROTORS, NOTCHES
 from enigma.tests.factories import WindowFactory
@@ -99,26 +99,10 @@ def test_encode_thru_reflector(ref_type: str, exp: str) -> None:
         assert exp_letter == ENTRY[res]
 
 
-# TODO delete, once old Enigma3 no longer used
-@pytest.fixture
-def eg3() -> Enigma3:
-    return Enigma3(left_rotor=iii, middle_rotor=ii, right_rotor=i, reflector='B', current_window_3='AAA')
-
-
 @pytest.fixture
 def eg() -> Enigma:
     return Enigma(left_rotor_type=iii, middle_rotor_type=ii, right_rotor_type=i, reflector_type='B',
                   current_window_3="AAA", ring_settings_3="AAA")
-
-
-# TODO delete, once old Enigma3 no longer used
-def test_basic_enigma3_setup(eg3) -> None:
-    assert eg3.left_rotor == iii
-    assert eg3.middle_rotor == ii
-    assert eg3.right_rotor == i
-    assert eg3.reflector == REFLECTORS_CYPHER['B']
-    assert eg3.current_position == 'AAA'
-    assert (eg3.pos_left_rotor, eg3.pos_mid_rotor, eg3.pos_rgt_rotor) == (0, 0, 0)
 
 
 def test_basic_enigma_setup(eg) -> None:
