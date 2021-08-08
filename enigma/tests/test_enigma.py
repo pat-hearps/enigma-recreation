@@ -190,18 +190,28 @@ def test_full_scramble_no_ring_settings(current_window_3, exp_out, eg):
 
 
 def test_step_enigma_1(eg):
-    start_pos = 'AAP'
+    """Just step right rotor"""
+    start_pos = 'AAA'
     eg.set_window_letters(current_window_3=start_pos)
 
     eg.step_enigma()
-    assert eg.window_letters == 'AAQ'
+    assert eg.window_letters == 'AAB'
 
     eg.step_enigma()
-    assert eg.window_letters == 'ABR'
-
+    assert eg.window_letters == 'AAC'
 
 def test_step_enigma_2(eg):
-    """Double step of middle rotor"""
+    """Step right and middle rotor"""
+    start_pos = 'KAO'
+    eg.set_window_letters(current_window_3=start_pos)
+
+    expected_windows = ['KAP', 'KAQ', 'KBR', 'KBS', 'KBT']
+    for exp in expected_windows:
+        eg.step_enigma()
+        assert eg.window_letters == exp
+
+def test_step_enigma_3(eg):
+    """Step all 3, with double step of middle rotor"""
     start_pos = 'KDO'
     eg.set_window_letters(current_window_3=start_pos)
 
