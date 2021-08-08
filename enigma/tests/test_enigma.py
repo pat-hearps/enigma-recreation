@@ -135,7 +135,7 @@ def test_basic_enigma_setup(eg) -> None:
     assert eg.reflector.reflector_type == 'B'
 
 
-def test_set_current_position(eg) -> None:
+def test_set_window_letters(eg) -> None:
     window = WindowFactory()
     eg.set_window_letters(current_window_3=window.window())
     assert eg.window_letters == window.window()
