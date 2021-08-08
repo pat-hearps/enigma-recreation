@@ -5,7 +5,7 @@ import pytest
 
 from enigma.enigma import Rotor, once_thru_scramble, encode_thru_rotor, Enigma, Reflector, \
     encode_thru_reflector, full_scramble
-from enigma.design import ENTRY, raw_rotors, FORWARD_ROTORS, REVERSE_ROTORS, notches, REFLECTORS_CYPHER, i, ii, iii, iv, v, ROTORS, NOTCHES
+from enigma.design import ENTRY, i, ii, iii, iv, v
 from enigma.tests.factories import WindowFactory
 
 
