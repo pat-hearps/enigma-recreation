@@ -259,9 +259,3 @@ def test_full_sentence_parametrised(rotors: Tuple[str], reflector: str, window: 
     enigma.set_window_letters(window)
     decoded = enigma.cypher(cyphertext)
     assert decoded == SENTENCE
-
-
-def test_upper():
-    x = 'knslv qkqnc zfikf jfxix kwrqv ofbli vkamx wgzxc ohzii xgtkl rgjkn tlozj ygpxc px'
-    print(x.upper().replace(' ', ''))
-    # assert 0
