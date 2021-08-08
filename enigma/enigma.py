@@ -132,7 +132,10 @@ class Enigma:
 
 
 def full_scramble(enigma: Enigma, letter_in: str) -> str:
-
+    """Encode a character through the full Enigma, from keyboard to cypher board.
+    1. Forwards through the 3 Rotors
+    2. Through the Reflector
+    3. Reverse back through the 3 Rotors"""
     letter_forward_scrambled = once_thru_scramble(start_character=letter_in,
                                                   forward=True,
                                                   left_rotor=enigma.left_rotor,
@@ -153,7 +156,9 @@ def full_scramble(enigma: Enigma, letter_in: str) -> str:
 
 def once_thru_scramble(start_character: str, forward: bool, left_rotor: Rotor, middle_rotor: Rotor,
                        right_rotor: Rotor) -> str:
-    """ start_character must be single ASCII character A-Z"""
+    """Encode a character through 3 consecutive Rotors, either forwards (from Entry to Reflector) or reverse (Reflector
+    to Entry).
+    start_character must be single ASCII character A-Z"""
     entry_pos = ENTRY.index(start_character.upper())
 
     if forward:
