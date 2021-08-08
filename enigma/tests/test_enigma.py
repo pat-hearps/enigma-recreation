@@ -156,21 +156,18 @@ once_thru_dat_no_ring = [
 
 
 @pytest.mark.parametrize("current_window_3, exp_forward, exp_reverse", once_thru_dat_no_ring)
-def test_once_through_scramble_no_ring_settings(current_window_3, exp_forward, exp_reverse, eg3) -> None:
-    eg3.set_current_position(current_window_3=current_window_3)
-    left_rotor = Rotor(rotor_type=eg3.left_rotor, window_letter=eg3.current_window_3[0])
-    middle_rotor = Rotor(rotor_type=eg3.middle_rotor, window_letter=eg3.current_window_3[1])
-    right_rotor = Rotor(rotor_type=eg3.right_rotor, window_letter=eg3.current_window_3[2])
+def test_once_through_scramble_no_ring_settings(current_window_3, exp_forward, exp_reverse, eg) -> None:
+    eg.set_window_letters(current_window_3)
     # forward direction
     for in_char, expected in zip(ENTRY, exp_forward):
-        ans_pos = once_thru_scramble(in_char, forward=True, left_rotor=left_rotor,
-                                     middle_rotor=middle_rotor, right_rotor=right_rotor)
+        ans_pos = once_thru_scramble(in_char, forward=True, left_rotor=eg.left_rotor,
+                                     middle_rotor=eg.middle_rotor, right_rotor=eg.right_rotor)
         assert ans_pos == expected
 
     # reverse direction
     for in_char, expected in zip(ENTRY, exp_reverse):
-        ans_pos = once_thru_scramble(in_char, forward=False, left_rotor=left_rotor,
-                                     middle_rotor=middle_rotor, right_rotor=right_rotor)
+        ans_pos = once_thru_scramble(in_char, forward=False, left_rotor=eg.left_rotor,
+                                     middle_rotor=eg.middle_rotor, right_rotor=eg.right_rotor)
         assert ans_pos == expected
 
 
