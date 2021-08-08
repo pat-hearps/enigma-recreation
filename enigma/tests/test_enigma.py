@@ -2,6 +2,7 @@ import os
 from typing import Tuple
 
 import pytest
+
 from enigma.enigma import Enigma3, Rotor, once_thru_scramble, encode_thru_rotor, Enigma, Reflector, \
     encode_thru_reflector, full_scramble
 from enigma.design import ENTRY, raw_rotors, FORWARD_ROTORS, REVERSE_ROTORS, notches, REFLECTORS_CYPHER, i, ii, iii, iv, v, ROTORS, NOTCHES
@@ -201,6 +202,7 @@ def test_step_enigma_1(eg):
     eg.step_enigma()
     assert eg.window_letters == 'AAC'
 
+
 def test_step_enigma_2(eg):
     """Step right and middle rotor"""
     start_pos = 'KAO'
@@ -210,6 +212,7 @@ def test_step_enigma_2(eg):
     for exp in expected_windows:
         eg.step_enigma()
         assert eg.window_letters == exp
+
 
 def test_step_enigma_3(eg):
     """Step all 3, with double step of middle rotor"""
