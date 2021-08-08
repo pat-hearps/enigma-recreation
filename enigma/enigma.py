@@ -93,7 +93,7 @@ class Enigma:
 
     def step_enigma(self):
         # TODO effect of ring settings, how to test
-        vprint(f"current enigma position={self.window_letters}", 1)
+        vprint(f"enigma position before stepping={self.window_letters}", 1)
 
         vprint(f"middle rotor notch={self.middle_rotor.notch}", 2)
         if self.middle_rotor.notch == self.middle_rotor.window_letter:
@@ -110,7 +110,7 @@ class Enigma:
         vprint("stepping right rotor", 2)
         self.right_rotor.step_rotor()
         self.update_window_letters()
-        vprint(f"new enigma position={self.window_letters}", 1)
+        vprint(f"enigma position after stepping={self.window_letters}", 1)
 
 
 def full_scramble(enigma: Enigma, letter_in: str) -> str:
