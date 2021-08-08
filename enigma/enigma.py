@@ -22,7 +22,7 @@ class Reflector:
         assert reflector_type in REFLECTORS_INDEX.keys()
         self.reflector_type: str = reflector_type
         self.cypher: str = REFLECTORS_CYPHER[reflector_type]
-        self.index_cypher_forward = REFLECTORS_INDEX[reflector_type]
+        self.index_cypher_forward: int = REFLECTORS_INDEX[reflector_type]
 
 
 class Rotor:
@@ -35,15 +35,15 @@ class Rotor:
         self.index_cypher_forward: List[int] = FORWARD_ROTORS[rotor_type]
         self.index_cypher_reverse: List[int] = REVERSE_ROTORS[rotor_type]
         # these given letters are how the settings would be set physically
-        self.window_letter = window_letter
-        self.ring_setting = ring_setting
+        self.window_letter: str = window_letter
+        self.ring_setting: str = ring_setting
         # and are converted into numerical indexes
-        self.window_position = ENTRY.index(self.window_letter)
-        self.ring_position = ENTRY.index(self.ring_setting)
+        self.window_position: int = ENTRY.index(self.window_letter)
+        self.ring_position: int = ENTRY.index(self.ring_setting)
         self.update_cypher_position()
 
     def update_cypher_position(self):
-        self.actual_cypher_position = (26 + self.window_position - self.ring_position) % 26
+        self.actual_cypher_position: int = (26 + self.window_position - self.ring_position) % 26
 
     def set_window_letter(self, window_letter: str):
         self.window_letter = window_letter
@@ -129,7 +129,6 @@ class Enigma:
             self.step_enigma()
             cypher += full_scramble(self, letter)
         return cypher
-
 
 
 def full_scramble(enigma: Enigma, letter_in: str) -> str:
