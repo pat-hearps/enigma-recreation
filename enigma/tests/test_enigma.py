@@ -220,3 +220,15 @@ def test_step_enigma_3(eg):
         eg.step_enigma()
         assert eg.window_letters == exp
 
+def test_full_sentence(eg):
+    """Test for full enigma cypher operation. Confirmed expected cypher for
+    LRotor=III, MRotor=II, RRotor=I, no ring setting or plugboard, from
+    https://www.101computing.net/enigma-machine-emulator/ and
+    https://cryptii.com/pipes/enigma-machine"""
+    start_window = "BCG"
+    plaintext = "THEQUICKBROWNFOXJUMPEDOVERTHELAZYREDDOGTHENRANAWAYTOGRABASNEAKYPINT"
+    cyphertext = "QNZKVVTEIDUCHTDAGJYAQXTMLBBGJMMVVHPPGCERBTLUHPHVVPJNIFGQCAYAMHJJBMB"
+
+    eg.set_window_letters(start_window)
+    res = eg.cypher(plaintext)
+    assert res == cyphertext

@@ -118,6 +118,19 @@ class Enigma:
         self.update_window_letters()
         vprint(f"enigma position after stepping={self.window_letters}", 1)
 
+    def cypher(self, letters: str):
+        """
+        Cypher (encode or decode) a sequence of characters through the Enigma.
+        Loops through what occurs as one letter on the enigma keyboard is pressed:
+        1. Enigma rotors are stepped *first*
+        2. Signal is sent from the depressed key through the enigma to encode its cypher letter"""
+        cypher = ""
+        for letter in letters:
+            self.step_enigma()
+            cypher += full_scramble(self, letter)
+        return cypher
+
+
 
 def full_scramble(enigma: Enigma, letter_in: str) -> str:
 
