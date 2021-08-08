@@ -1,4 +1,5 @@
 import os
+from typing import Tuple
 
 import pytest
 from enigma.enigma import Enigma3, Rotor, once_thru_scramble, encode_thru_rotor, Enigma, Reflector, \
@@ -220,15 +221,44 @@ def test_step_enigma_3(eg):
         eg.step_enigma()
         assert eg.window_letters == exp
 
+
+SENTENCE = "THEQUICKBROWNFOXJUMPEDOVERTHELAZYREDDOGTHENRANAWAYTOGRABASNEAKYPINT"
+
+
 def test_full_sentence(eg):
     """Test for full enigma cypher operation. Confirmed expected cypher for
     LRotor=III, MRotor=II, RRotor=I, no ring setting or plugboard, from
     https://www.101computing.net/enigma-machine-emulator/ and
     https://cryptii.com/pipes/enigma-machine"""
     start_window = "BCG"
-    plaintext = "THEQUICKBROWNFOXJUMPEDOVERTHELAZYREDDOGTHENRANAWAYTOGRABASNEAKYPINT"
     cyphertext = "QNZKVVTEIDUCHTDAGJYAQXTMLBBGJMMVVHPPGCERBTLUHPHVVPJNIFGQCAYAMHJJBMB"
 
     eg.set_window_letters(start_window)
-    res = eg.cypher(plaintext)
+    res = eg.cypher(SENTENCE)
     assert res == cyphertext
+    assert eg.window_letters == 'CGV'
+
+
+cypher_data = [
+    ((iii, ii, i), 'B', 'BCG', 'JOT', 'JBMKGOOMTDDHXHTJYHHSYMIAYLHOJZRVFIQTLCTXIITZRQGIZOQBTVBQKRAQOSSZDRP'),
+    ((ii, v, iv), 'C', 'UME', 'EVP', 'KNSLVQKQNCZFIKFJFXIXKWRQVOFBLIVKAMXWGZXCOHZIIXGTKLRGJKNTLOZJYGPXCPX')
+]
+
+
+@pytest.mark.parametrize("rotors, reflector, window, ring, cyphertext", cypher_data)
+def test_full_sentence_parametrised(rotors: Tuple[str], reflector: str, window: str, ring: str, cyphertext: str):
+    enigma = Enigma(left_rotor_type=rotors[0], middle_rotor_type=rotors[1], right_rotor_type=rotors[2],
+                    reflector_type=reflector, current_window_3=window, ring_settings_3=ring)
+    res = enigma.cypher(SENTENCE)
+    assert res == cyphertext
+
+    # test for reverse decoding
+    enigma.set_window_letters(window)
+    decoded = enigma.cypher(cyphertext)
+    assert decoded == SENTENCE
+
+
+def test_upper():
+    x = 'knslv qkqnc zfikf jfxix kwrqv ofbli vkamx wgzxc ohzii xgtkl rgjkn tlozj ygpxc px'
+    print(x.upper().replace(' ', ''))
+    # assert 0
