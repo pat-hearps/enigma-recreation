@@ -1,7 +1,9 @@
 name: enigma
 channels:
+  - conda-forge
   - defaults
 dependencies:
+  - factory_boy
   - seaborn
   - numpy
   - pandas
