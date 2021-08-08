@@ -8,7 +8,7 @@ import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.colors as mclr
-from enigma.design import entry, REFLECTORS_CYPHER, notches
+from enigma.design import ENTRY, REFLECTORS_CYPHER, notches
 
 class Bombe:
     
@@ -20,7 +20,7 @@ class Bombe:
         self.right_rotor = right_rotor
         self.reflector = reflector
         self.scramblers = {}
-        self.register = {'status':{char:0 for char in entry}}
+        self.register = {'status':{char:0 for char in ENTRY}}
         self.current_sum = sum(self.register['status'].values())
         self.run_record = {}
 
@@ -113,7 +113,7 @@ class Bombe:
         """ resets all scrambler statuses and test register to 0 for all alphabet characters"""
         for scrambler in self.scramblers.values():
             scrambler.reset_status()
-        self.register['status'] = {char:0 for char in entry}
+        self.register['status'] = {char:0 for char in ENTRY}
     
     def check_this_lineup(self):
         """For running to exhaustion on a particular bombe scrambler lineup. 
@@ -185,7 +185,7 @@ class Bombe:
         self.TG = nx.Graph()
         ## this for-loop adds all nodes to the graph
         for scr_id in scramblers_in_menu:           ## for each scrambler in the menu
-            for ch in entry:         ## for each letter A-Z
+            for ch in ENTRY:         ## for each letter A-Z
                 for i in ['I','O']:  ## for each end (in/out) of the double-ended scrambler
                     if scr_id == 'REG': ## i = X (not I or O) if it's the register
                         i = 'X'
@@ -203,7 +203,7 @@ class Bombe:
                     first_node = f"{scr_id}-{iomap[inorout]}-"           # label the start of the 1st node, with either I/O
                 for connected_scrambler,ior in descriptor_dict['conxns'][inorout].items():          # go thru the in/out connections
                     second_node = f"{connected_scrambler}-{iomap[ior]}-"        # label the start of the 2nd node
-                    for ch in entry:                                                    # for each letter A-Z
+                    for ch in ENTRY:                                                    # for each letter A-Z
                         self.inter_scr_edges.add(frozenset([first_node+ch,second_node+ch])) # create 26 nodes with each of 1st/2nd node plus letter
         
         ## bit of data reformatting for the edges
@@ -230,7 +230,7 @@ class Bombe:
             else:
                 y += 0.5 * height_of_scrambler  ## 'out' (O) is above
 
-            x += wrange_of_letters[entry.index(ch)]
+            x += wrange_of_letters[ENTRY.index(ch)]
             self.manual_pos[node] = np.array([x,y])
             
         self.colors = [self.TG[u][v]['color'] for u,v in self.TG.edges()]
@@ -306,13 +306,13 @@ class Scrambler:
         self.left_rotor = left_rotor
         self.reflector = REFLECTORS_CYPHER[reflector]
         self.menu_link = menu_link
-        self.middle_notch = entry.index(notches[self.middle_rotor])   ## point if right rotor reaches will trigger middle rotor to step
-        self.left_notch = entry.index(notches[self.left_rotor])  ## point if middle rotor reaches will trigger left rotor to step
+        self.middle_notch = ENTRY.index(notches[self.middle_rotor])   ## point if right rotor reaches will trigger middle rotor to step
+        self.left_notch = ENTRY.index(notches[self.left_rotor])  ## point if middle rotor reaches will trigger left rotor to step
         self.current_position = menu_link
         self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor = (ascii_uppercase.index(m) for m in menu_link.upper())
         self.status = {}
-        self.status['in'] = {char:0 for char in entry}
-        self.status['out'] = {char:0 for char in entry}
+        self.status['in'] = {char:0 for char in ENTRY}
+        self.status['out'] = {char:0 for char in ENTRY}
         self.conxns = {'in':conx_in, 'out':conx_out}
         
     def once_thru_scramble(self,start_character, direction, first_rotor, pos1, second_rotor, pos2, 
@@ -328,23 +328,23 @@ class Scrambler:
             return 'wtf'
 
         start_character = start_character.upper()
-        entry_pos = entry.index(start_character)
+        entry_pos = ENTRY.index(start_character)
         fst_pos_modifier = (26 + pos1 - 0)%26
         fst_in = (entry_pos + fst_pos_modifier)%26
         fst_out = usedict[first_rotor][fst_in]
-        ch1o = entry[fst_out]
+        ch1o = ENTRY[fst_out]
 
         scd_pos_modifier = (26 + pos2 - pos1)%26
         scd_in = (fst_out + scd_pos_modifier)%26
-        ch2i = entry[scd_in]
+        ch2i = ENTRY[scd_in]
         scd_out = usedict[second_rotor][scd_in]
-        ch2o = entry[scd_out]
+        ch2o = ENTRY[scd_out]
 
         thd_pos_modifier = (26 + pos3 - pos2)%26
         thd_in = (scd_out + thd_pos_modifier)%26
-        ch3i = entry[thd_in]
+        ch3i = ENTRY[thd_in]
         thd_out = usedict[third_rotor][thd_in]
-        ch3o = entry[thd_out]
+        ch3o = ENTRY[thd_out]
         return ch3o
     
     def full_scramble(self,in_ch):
@@ -359,17 +359,17 @@ class Scrambler:
                                               third_rotor=left_rotor, pos3=self.pos_left_rotor)
         ## reflector back around for return
         rfi_pos_mod = (26 + 0 - self.pos_left_rotor)%26    ## the '0' is there to matching formatting of other position modifiers - reflector is not moved so it will always be 0
-        rf_in = (entry.index(forward_run) + rfi_pos_mod)%26
-        chri = entry[rf_in]
+        rf_in = (ENTRY.index(forward_run) + rfi_pos_mod) % 26
+        chri = ENTRY[rf_in]
         mirrored = rflector[chri]
 
         ## second run back left to right thru scrambler
         back_run = self.once_thru_scramble(mirrored, direction='back', first_rotor=left_rotor, pos1=self.pos_left_rotor, 
                                       second_rotor=middle_rotor, pos2=self.pos_mid_rotor, third_rotor=right_rotor, pos3=self.pos_rgt_rotor)
-        bk_out = entry.index(back_run)
+        bk_out = ENTRY.index(back_run)
         bko_pos_mod = (26 + 0 - self.pos_rgt_rotor)%26  ## as above, '0' just reflects that the entry interface doesn't move
         bk_final = (bk_out + bko_pos_mod)%26
-        final = entry[bk_final]
+        final = ENTRY[bk_final]
         return final
     
     def rotor_step(self,rotor_position):
@@ -387,7 +387,7 @@ class Scrambler:
         do anything to alter the actual rotor position, which is stored as the numerical variable"""
         self.current_position = ''
         for pos in self.pos_left_rotor,self.pos_mid_rotor,self.pos_rgt_rotor:
-            self.current_position += entry[pos]
+            self.current_position += ENTRY[pos]
     
     def step_enigma(self):
         """Just acts on itself, steps all three rotors, stepping either 1,2 or 3 rotors based on the 
@@ -416,5 +416,5 @@ class Scrambler:
                     
     def reset_status(self):
         """As it says on box, resets the status (dictionary of A-Z and 1/0 for each) all back to 0"""
-        self.status['in'] = {char:0 for char in entry}
-        self.status['out'] = {char:0 for char in entry}
+        self.status['in'] = {char:0 for char in ENTRY}
+        self.status['out'] = {char:0 for char in ENTRY}

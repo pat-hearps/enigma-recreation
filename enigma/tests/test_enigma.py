@@ -4,7 +4,7 @@ from typing import Tuple
 import pytest
 from enigma.enigma import Enigma3, Rotor, once_thru_scramble, encode_thru_rotor, Enigma, Reflector, \
     encode_thru_reflector, full_scramble
-from enigma.design import entry, raw_rotors, forward_rotors, rev_rotors, notches, REFLECTORS_CYPHER, i, ii, iii, iv, v, ROTORS, NOTCHES
+from enigma.design import ENTRY, raw_rotors, FORWARD_ROTORS, REVERSE_ROTORS, notches, REFLECTORS_CYPHER, i, ii, iii, iv, v, ROTORS, NOTCHES
 from enigma.tests.factories import WindowFactory
 
 
@@ -35,7 +35,7 @@ def test_rotor_offset(wl_in, rs_in, exp_wp, exp_rp, exp_acp) -> None:
     rotor = Rotor(i, window_letter=wl_in, ring_setting=rs_in)
     assert rotor.window_position == exp_wp
     assert rotor.ring_position == exp_rp
-    print(entry[rotor.actual_cypher_position], entry[exp_acp])
+    print(ENTRY[rotor.actual_cypher_position], ENTRY[exp_acp])
     assert rotor.actual_cypher_position == exp_acp
 
 # all test data for rotor type I
@@ -57,7 +57,7 @@ def test_rotor_encoding(window_letter, ring_setting, expected_data, forward):
     rotor = Rotor(rotor_type=i, window_letter=window_letter, ring_setting=ring_setting)
     for in_pos, exp_letter in enumerate(expected_data):
         ans_pos = encode_thru_rotor(rotor=rotor, entry_position=in_pos, forward=forward)
-        ans_letter = entry[ans_pos]
+        ans_letter = ENTRY[ans_pos]
         assert exp_letter == ans_letter
 
 
@@ -70,7 +70,7 @@ def test_rotor_step():
         rotor.step_rotor()
         assert rotor.window_letter == exp
         assert rotor.actual_cypher_position == pos
-        assert encode_thru_rotor(rotor, entry_position=0) == (26 + entry.index(cypher) - pos) % 26
+        assert encode_thru_rotor(rotor, entry_position=0) == (26 + ENTRY.index(cypher) - pos) % 26
 
 
 def test_reflector_setup() -> None:
@@ -92,10 +92,10 @@ dat_reflector = [
 @pytest.mark.parametrize("ref_type, exp", dat_reflector)
 def test_encode_thru_reflector(ref_type: str, exp: str) -> None:
     reflector = Reflector(reflector_type=ref_type)
-    for in_letter, exp_letter in zip(entry, exp):
-        in_pos = entry.index(in_letter)
+    for in_letter, exp_letter in zip(ENTRY, exp):
+        in_pos = ENTRY.index(in_letter)
         res = encode_thru_reflector(reflector=reflector, entry_position=in_pos)
-        assert exp_letter == entry[res]
+        assert exp_letter == ENTRY[res]
 
 
 # TODO delete, once old Enigma3 no longer used
@@ -161,13 +161,13 @@ def test_once_through_scramble_no_ring_settings(current_window_3, exp_forward, e
     middle_rotor = Rotor(rotor_type=eg3.middle_rotor, window_letter=eg3.current_window_3[1])
     right_rotor = Rotor(rotor_type=eg3.right_rotor, window_letter=eg3.current_window_3[2])
     # forward direction
-    for in_char, expected in zip(entry, exp_forward):
+    for in_char, expected in zip(ENTRY, exp_forward):
         ans_pos = once_thru_scramble(in_char, forward=True, left_rotor=left_rotor,
                                      middle_rotor=middle_rotor, right_rotor=right_rotor)
         assert ans_pos == expected
 
     # reverse direction
-    for in_char, expected in zip(entry, exp_reverse):
+    for in_char, expected in zip(ENTRY, exp_reverse):
         ans_pos = once_thru_scramble(in_char, forward=False, left_rotor=left_rotor,
                                      middle_rotor=middle_rotor, right_rotor=right_rotor)
         assert ans_pos == expected
@@ -185,7 +185,7 @@ full_data_no_ring = [
 def test_full_scramble_no_ring_settings(current_window_3, exp_out, eg):
     eg.set_window_letters(current_window_3=current_window_3)
 
-    for in_char, expected in zip(entry, exp_out):
+    for in_char, expected in zip(ENTRY, exp_out):
         ans = full_scramble(eg, in_char)
         assert ans == expected
 

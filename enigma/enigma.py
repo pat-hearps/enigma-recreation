@@ -6,7 +6,7 @@ import os
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from enigma.design import (entry, raw_rotors, forward_rotors, rev_rotors, notches, REFLECTORS_CYPHER, ROTOR_INDEX, ROTORS,
+from enigma.design import (ENTRY, raw_rotors, FORWARD_ROTORS, REVERSE_ROTORS, notches, REFLECTORS_CYPHER, ROTOR_INDEX, ROTORS,
                            NOTCHES, REFLECTORS_INDEX)
 
 
@@ -32,14 +32,14 @@ class Rotor:
         self.rotor_type: str = rotor_type
         self.cypher: str = ROTORS.MAP[rotor_type]
         self.notch: str = NOTCHES.MAP[rotor_type]
-        self.index_cypher_forward: List[int] = forward_rotors[rotor_type]
-        self.index_cypher_reverse: List[int] = rev_rotors[rotor_type]
+        self.index_cypher_forward: List[int] = FORWARD_ROTORS[rotor_type]
+        self.index_cypher_reverse: List[int] = REVERSE_ROTORS[rotor_type]
         # these given letters are how the settings would be set physically
         self.window_letter = window_letter
         self.ring_setting = ring_setting
         # and are converted into numerical indexes
-        self.window_position = entry.index(self.window_letter)
-        self.ring_position = entry.index(self.ring_setting)
+        self.window_position = ENTRY.index(self.window_letter)
+        self.ring_position = ENTRY.index(self.ring_setting)
         self.update_cypher_position()
 
     def update_cypher_position(self):
@@ -47,12 +47,12 @@ class Rotor:
 
     def set_window_letter(self, window_letter: str):
         self.window_letter = window_letter
-        self.window_position = entry.index(self.window_letter)
+        self.window_position = ENTRY.index(self.window_letter)
         self.update_cypher_position()
 
     def step_rotor(self):
         self.window_position = (self.window_position + 1) % 26
-        self.window_letter = entry[self.window_position]
+        self.window_letter = ENTRY[self.window_position]
         self.update_cypher_position()
 
 
@@ -72,8 +72,8 @@ class Enigma:
         self.right_rotor: Rotor = Rotor(rotor_type=right_rotor_type, ring_setting=ring_settings_3[2])
 
         self.set_window_letters(current_window_3=current_window_3)
-        self.in_status: Dict = {char: 0 for char in entry}
-        self.out_status: Dict = {char: 0 for char in entry}
+        self.in_status: Dict = {char: 0 for char in ENTRY}
+        self.out_status: Dict = {char: 0 for char in ENTRY}
         self.record: Dict = {}
 
     def set_window_letters(self, current_window_3: str):
@@ -140,9 +140,9 @@ def full_scramble(enigma: Enigma, letter_in: str) -> str:
                                                   middle_rotor=enigma.middle_rotor,
                                                   right_rotor=enigma.right_rotor)
 
-    position_into_reflector = entry.index(letter_forward_scrambled)
+    position_into_reflector = ENTRY.index(letter_forward_scrambled)
     position_reflected = encode_thru_reflector(reflector=enigma.reflector, entry_position=position_into_reflector)
-    letter_reflected = entry[position_reflected]
+    letter_reflected = ENTRY[position_reflected]
 
     letter_reverse_scrambled = once_thru_scramble(start_character=letter_reflected,
                                                   forward=False,
@@ -155,7 +155,7 @@ def full_scramble(enigma: Enigma, letter_in: str) -> str:
 def once_thru_scramble(start_character: str, forward: bool, left_rotor: Rotor, middle_rotor: Rotor,
                        right_rotor: Rotor) -> str:
     """ start_character must be single ASCII character A-Z"""
-    entry_pos = entry.index(start_character.upper())
+    entry_pos = ENTRY.index(start_character.upper())
 
     if forward:
         first_rotor, third_rotor = right_rotor, left_rotor
@@ -166,14 +166,14 @@ def once_thru_scramble(start_character: str, forward: bool, left_rotor: Rotor, m
     rotor_2_out = encode_thru_rotor(middle_rotor, entry_position=rotor_1_out, forward=forward)
     rotor_3_out = encode_thru_rotor(third_rotor, entry_position=rotor_2_out, forward=forward)
 
-    return entry[rotor_3_out]
+    return ENTRY[rotor_3_out]
 
 
 def encode_thru_reflector(reflector: Reflector, entry_position: int) -> int:
     vprint(f"---- Rotor type {reflector.reflector_type} ----", 2)
-    vprint(f"signal into reflector at position {entry_position}   = {entry[entry_position]}", 1)
+    vprint(f"signal into reflector at position {entry_position}   = {ENTRY[entry_position]}", 1)
     position_out = reflector.index_cypher_forward[entry_position]
-    vprint(f"signal out of reflector at position {position_out} = {entry[position_out]}", 1)
+    vprint(f"signal out of reflector at position {position_out} = {ENTRY[position_out]}", 1)
     return position_out
 
 
@@ -183,17 +183,17 @@ def encode_thru_rotor(rotor: Rotor, entry_position: int, forward: bool = True) -
     - entry_position = 0-25 index at which signal is entering, relative to the 'A' position of
     the fixed 'entry' or 'reflector' where signal would be coming from"""
     vprint(f"---- Rotor type {rotor.rotor_type} / window {rotor.window_letter} / ring {rotor.ring_setting} ----", 2)
-    vprint(f"signal into rotor at position {entry_position} =       {entry[entry_position]}", 1)
+    vprint(f"signal into rotor at position {entry_position} =       {ENTRY[entry_position]}", 1)
     index_cypher = rotor.index_cypher_forward if forward else rotor.index_cypher_reverse
     # which letter on the cypher rotor the signal is entering at - offset based on rotor step and ring setting
     cypher_in = (entry_position + rotor.actual_cypher_position) % 26
-    vprint(f"signal into cypher wiring at letter =    {entry[cypher_in]}", 1)
+    vprint(f"signal into cypher wiring at letter =    {ENTRY[cypher_in]}", 1)
     # cypher_out from cypher_in is the actual enigma internal wiring encoding
     cypher_out = index_cypher[cypher_in]
-    vprint(f"signal encoded out of cypher at letter = {entry[cypher_out]}", 1)
+    vprint(f"signal encoded out of cypher at letter = {ENTRY[cypher_out]}", 1)
     # where the signal will exit at, offset due same reasons as cypher_in
     position_out = (26 + cypher_out - rotor.actual_cypher_position) % 26
-    vprint(f"signal out of rotor at position {position_out} =      {entry[position_out]}", 1)
+    vprint(f"signal out of rotor at position {position_out} =      {ENTRY[position_out]}", 1)
     return position_out
 
 
@@ -212,13 +212,13 @@ class Enigma3:
         self.reflector = REFLECTORS_CYPHER[reflector]
         self.current_window_3 = current_window_3
         ## point if right rotor reaches will trigger middle rotor to step
-        self.middle_notch = entry.index(notches[self.middle_rotor])
+        self.middle_notch = ENTRY.index(notches[self.middle_rotor])
         ## point if middle rotor reaches will trigger left rotor to step
-        self.left_notch = entry.index(notches[self.left_rotor])
+        self.left_notch = ENTRY.index(notches[self.left_rotor])
         self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor = (ascii_uppercase.index(m) for m in
                                                                        current_window_3.upper())
-        self.in_status = {char: 0 for char in entry}
-        self.out_status = {char: 0 for char in entry}
+        self.in_status = {char: 0 for char in ENTRY}
+        self.out_status = {char: 0 for char in ENTRY}
         self.current_position = current_window_3
         self.record = {}
 
@@ -227,32 +227,32 @@ class Enigma3:
         """ start_character must be single ASCII character A-Z
         direction is either 'forward' or 'back' """
         if direction == 'forward':
-            usedict = {k: v for k, v in forward_rotors.items()}
+            usedict = {k: v for k, v in FORWARD_ROTORS.items()}
         elif direction == 'back':
-            usedict = {k: v for k, v in rev_rotors.items()}
+            usedict = {k: v for k, v in REVERSE_ROTORS.items()}
         else:
             print('only forward or back for direction')
             return 'wtf'
         # problem is confusion around left/middle/right rotors vs first/second/third rotors and forward/back
         # this currently works as if first = left, middle=second, third = right. If in 'forward'. Is this desired?
         start_character = start_character.upper()
-        entry_pos = entry.index(start_character)
+        entry_pos = ENTRY.index(start_character)
         fst_pos_modifier = (26 + pos1 - 0) % 26
         fst_in = (entry_pos + fst_pos_modifier) % 26
         fst_out = usedict[first_rotor][fst_in]
-        ch1o = entry[fst_out]
+        ch1o = ENTRY[fst_out]
 
         scd_pos_modifier = (26 + pos2 - pos1) % 26
         scd_in = (fst_out + scd_pos_modifier) % 26
-        ch2i = entry[scd_in]
+        ch2i = ENTRY[scd_in]
         scd_out = usedict[second_rotor][scd_in]
-        ch2o = entry[scd_out]
+        ch2o = ENTRY[scd_out]
 
         thd_pos_modifier = (26 + pos3 - pos2) % 26
         thd_in = (scd_out + thd_pos_modifier) % 26
-        ch3i = entry[thd_in]
+        ch3i = ENTRY[thd_in]
         thd_out = usedict[third_rotor][thd_in]
-        ch3o = entry[thd_out]
+        ch3o = ENTRY[thd_out]
         if direction == 'forward':
             print(
                 f"{start_character} -> (RR out) {ch1o} -> (MR in) {ch2i} -> (MR out) {ch2o} -> (LR in) {ch3i} -> (LR out) {ch3o}")
@@ -277,8 +277,8 @@ class Enigma3:
         # # reflector back around for return
         rfi_pos_mod = (
                                   26 + 0 - self.pos_left_rotor) % 26  ## the '0' is there to matching formatting of other position modifiers - reflector is not moved so it will always be 0
-        rf_in = (entry.index(forward_run) + rfi_pos_mod) % 26
-        chri = entry[rf_in]
+        rf_in = (ENTRY.index(forward_run) + rfi_pos_mod) % 26
+        chri = ENTRY[rf_in]
         mirrored = rflector[chri]
 
         #         print(f"{forward_run} -> {chri} (into reflector) -> {mirrored} (reflected out)")
@@ -288,11 +288,11 @@ class Enigma3:
                                                second_rotor=middle_rotor, pos2=self.pos_mid_rotor, third_rotor=right_rotor,
                                                pos3=self.pos_rgt_rotor)
 
-        bk_out = entry.index(back_run)
+        bk_out = ENTRY.index(back_run)
         bko_pos_mod = (
                                   26 + 0 - self.pos_rgt_rotor) % 26  ## as above, '0' just reflects that the entry interface doesn't move
         bk_final = (bk_out + bko_pos_mod) % 26
-        final = entry[bk_final]
+        final = ENTRY[bk_final]
         #         print('RR back out:  ', back_run, '-->', final)
         #         print(in_ch,"-->",final)
         return final
@@ -317,7 +317,7 @@ class Enigma3:
     def translate_current_position(self):
         self.current_position = ''
         for pos in self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor:
-            self.current_position += entry[pos]
+            self.current_position += ENTRY[pos]
 
     def step_enigma(self):
         """Just acts on itself, steps the rotors"""
@@ -379,7 +379,7 @@ class MenuMaker:
     def do_pairs(self):
         self.pairs = {i: {c, m} for i, c, m in zip(range(len(self.crib)), self.crib, self.encoded_crib)}
         self.links = {character: len([pair for pair in self.pairs.values() if character in pair]) for character in
-                      entry}
+                      ENTRY}
         self.hilinks = {k: v for k, v in self.links.items() if v > 0}
         # ## actually think I should make hilinks just a ranked(sorted) list of characters from highest to lowest
         self.mostlinks = sorted(self.hilinks.values(), reverse=True)[0]
@@ -582,7 +582,7 @@ class MenuMaker:
                 pass
             else:
                 l = m['menu_link']
-                l = entry[l - 1]
+                l = ENTRY[l - 1]
                 l = 'ZZ' + l
                 #     print(l)
                 self.menu[k]['menu_link'] = l
