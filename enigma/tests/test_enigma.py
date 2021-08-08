@@ -187,3 +187,26 @@ def test_full_scramble_no_ring_settings(current_window_3, exp_out, eg):
     for in_char, expected in zip(entry, exp_out):
         ans = full_scramble(eg, in_char)
         assert ans == expected
+
+
+def test_step_enigma_1(eg):
+    start_pos = 'AAP'
+    eg.set_current_position(current_window_3=start_pos)
+
+    eg.step_enigma()
+    assert eg.current_position == 'AAQ'
+
+    eg.step_enigma()
+    assert eg.current_position == 'ABR'
+
+
+def test_step_enigma_2(eg):
+    """Double step of middle rotor"""
+    start_pos = 'KDO'
+    eg.set_current_position(current_window_3=start_pos)
+
+    expected_windows = ['KDP', 'KDQ', 'KER', 'LFS', 'LFT', 'LFU']
+    for exp in expected_windows:
+        eg.step_enigma()
+        assert eg.current_position == exp
+

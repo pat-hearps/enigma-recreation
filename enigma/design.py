@@ -29,6 +29,7 @@ class ROTORS:
 
 @dataclass
 class NOTCHES:
+    "Window setting at which the rotor will cause the rotor to its left to step"
     I = "Q"
     II = "E"
     III = "V"

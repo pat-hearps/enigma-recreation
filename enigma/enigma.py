@@ -95,6 +95,11 @@ class Enigma:
         """without changing current state of class and rotor subclasses, return the current window setting"""
         return "".join([self.left_rotor.window_letter, self.middle_rotor.window_letter, self.right_rotor.window_letter])
 
+    def step_enigma(self):
+        # TODO what is notch operating, how do ring settings affect it, how to test
+        # if self.left_rotor.notch == self.middle_rotor.window_position:
+            pass
+
 
 def full_scramble(enigma: Enigma, letter_in: str) -> str:
 
