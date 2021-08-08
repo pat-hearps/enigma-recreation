@@ -1,4 +1,4 @@
-from string import ascii_uppercase, ascii_letters
+from string import ascii_uppercase
 from copy import deepcopy
 from typing import List, Dict
 import os
@@ -6,7 +6,7 @@ import os
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from enigma.design import (ENTRY, raw_rotors, FORWARD_ROTORS, REVERSE_ROTORS, notches, REFLECTORS_CYPHER, ROTOR_INDEX, ROTORS,
+from enigma.design import (ENTRY, raw_rotors, FORWARD_ROTORS, REVERSE_ROTORS, REFLECTORS_CYPHER, ROTOR_INDEX, ROTORS,
                            NOTCHES, REFLECTORS_INDEX)
 
 
