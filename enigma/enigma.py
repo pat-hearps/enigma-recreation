@@ -92,7 +92,13 @@ class Enigma:
         self.window_letters = "".join([r.window_letter for r in (self.left_rotor, self.middle_rotor, self.right_rotor)])
 
     def step_enigma(self):
-        # TODO effect of ring settings, how to test
+        """Step the 3 rotors, as occurs when a key is depressed
+        - right rotor is always stepped
+        - middle rotor steps if right rotor has reached its notch point
+        - left rotor steps if middle rotor has reached its notch point. If this occurs, the middle rotor also steps,
+        due to 'double-stepping' of pawl/teeth mechanism.
+        Note that notches are not affected by ring position, as the notch is on the moveable outer ring. Rotor will
+        always step it's adjacent rotor if its window is displaying it's notch letter."""
         vprint(f"enigma position before stepping={self.window_letters}", 1)
 
         vprint(f"middle rotor notch={self.middle_rotor.notch}", 2)
