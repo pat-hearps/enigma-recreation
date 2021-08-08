@@ -95,10 +95,30 @@ class Enigma:
         """without changing current state of class and rotor subclasses, return the current window setting"""
         return "".join([self.left_rotor.window_letter, self.middle_rotor.window_letter, self.right_rotor.window_letter])
 
+    def update_current_position(self):
+        """Update the enigma's class attribute 'current_position' to reflect the positions of the rotors"""
+        self.current_position = "".join([self.left_rotor.window_letter, self.middle_rotor.window_letter, self.right_rotor.window_letter])
+
     def step_enigma(self):
-        # TODO what is notch operating, how do ring settings affect it, how to test
-        # if self.left_rotor.notch == self.middle_rotor.window_position:
-            pass
+        # TODO effect of ring settings, how to test
+        vprint(f"current enigma position={self.current_position}", 1)
+
+        vprint(f"middle rotor notch={self.middle_rotor.notch}", 2)
+        if self.middle_rotor.notch == self.middle_rotor.window_letter:
+            vprint("stepping left rotor", 2)
+            self.left_rotor.step_rotor()
+            vprint("stepping middle rotor with left rotor", 2)
+            self.middle_rotor.step_rotor()
+
+        vprint(f"right rotor notch={self.right_rotor.notch}", 2)
+        if self.right_rotor.notch == self.right_rotor.window_letter:
+            vprint("stepping middle rotor", 2)
+            self.middle_rotor.step_rotor()
+
+        vprint("stepping right rotor", 2)
+        self.right_rotor.step_rotor()
+        self.update_current_position()
+        vprint(f"new enigma position={self.current_position}", 1)
 
 
 def full_scramble(enigma: Enigma, letter_in: str) -> str:
