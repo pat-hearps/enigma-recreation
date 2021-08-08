@@ -89,7 +89,7 @@ class Enigma:
 
     def update_window_letters(self):
         """Update the enigma's class attribute 'current_position' to reflect the positions of the rotors"""
-        self.window_letters = "".join([self.left_rotor.window_letter, self.middle_rotor.window_letter, self.right_rotor.window_letter])
+        self.window_letters = "".join([r.window_letter for r in (self.left_rotor, self.middle_rotor, self.right_rotor)])
 
     def step_enigma(self):
         # TODO effect of ring settings, how to test
