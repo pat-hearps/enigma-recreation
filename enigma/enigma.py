@@ -1,6 +1,6 @@
 from string import ascii_uppercase, ascii_letters
 from copy import deepcopy
-from typing import List
+from typing import List, Dict
 import os
 
 import networkx as nx
@@ -66,19 +66,15 @@ class Enigma:
         assert all([r in raw_rotors.keys() for r in (left_rotor_type, middle_rotor_type, right_rotor_type)])
         assert reflector_type in REFLECTORS_CYPHER.keys()
 
-        self.reflector = Reflector(reflector_type=reflector_type)
-        self.left_rotor = Rotor(rotor_type=left_rotor_type, ring_setting=ring_settings_3[0])
-        self.middle_rotor = Rotor(rotor_type=middle_rotor_type, ring_setting=ring_settings_3[1])
-        self.right_rotor = Rotor(rotor_type=right_rotor_type, ring_setting=ring_settings_3[2])
-        ## point if right rotor reaches will trigger middle rotor to step
-        self.middle_notch = self.middle_rotor.notch
-        ## point if middle rotor reaches will trigger left rotor to step
-        self.left_notch = self.left_rotor.notch
+        self.reflector: Reflector = Reflector(reflector_type=reflector_type)
+        self.left_rotor: Rotor = Rotor(rotor_type=left_rotor_type, ring_setting=ring_settings_3[0])
+        self.middle_rotor: Rotor = Rotor(rotor_type=middle_rotor_type, ring_setting=ring_settings_3[1])
+        self.right_rotor: Rotor = Rotor(rotor_type=right_rotor_type, ring_setting=ring_settings_3[2])
 
         self.set_current_position(current_window_3=current_window_3)
-        self.in_status = {char: 0 for char in entry}
-        self.out_status = {char: 0 for char in entry}
-        self.record = {}
+        self.in_status: Dict = {char: 0 for char in entry}
+        self.out_status: Dict = {char: 0 for char in entry}
+        self.record: Dict = {}
 
     def set_current_position(self, current_window_3: str):
         """Given a three-letter menu link (e.g. 'ZAB'), set the current positions of the enigma to correspond to the menu link"""
@@ -89,7 +85,7 @@ class Enigma:
         self.middle_rotor.set_window_letter(current_window_3[1])
         self.right_rotor.set_window_letter(current_window_3[2])
 
-        self.current_position = current_window_3
+        self.current_position: str = current_window_3
 
     def update_current_position(self):
         """Update the enigma's class attribute 'current_position' to reflect the positions of the rotors"""
