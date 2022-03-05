@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 
-LOG_FORMAT = "%(levelname)-5s | %(asctime)s | %(module)s:%(lineno)s-3s | %(message)s"
+LOG_FORMAT = "%(levelname)-5s | %(asctime)s | %(module)s:%(funcName)s:%(lineno)-3s | %(message)s"
 DT_FORMAT = "%H:%M:%S"
 
 def vprint(message: str, msg_level: int, v_level: int = None):
