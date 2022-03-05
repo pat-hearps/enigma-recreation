@@ -7,19 +7,17 @@ CRIB_SETS = {
         "crib_guess": "TOTHEPRESIDENTOFTHEUNITEDSTATES",
         "crib_cypher": "CQNZPVLILPEUIKTEDCGLOVWVGTUFLNZ"
     },
-    "dermot": {
-        "crib_guess": "",
-        "crib_cypher": ""
+    "dermot_BB": {
+        "crib_guess": "WETTERVORHERSAGE",
+        "crib_cypher": "SNMKGGSTZZUGARLV"
     }
 }
-
 gw_all_loops = {frozenset(('E', 'I', 'P')), frozenset(('I', 'P', 'V')), frozenset(('N', 'O', 'T'))}
-
-
 loop_data = [
     ("welchman", 0, 14, {frozenset(('E', 'I', 'P'))}),
     ("welchman", 3, 23, gw_all_loops),
-    ("welchman", 14, 27, set())
+    ("welchman", 14, 27, set()),
+    ("dermot_BB", 0, 30, {frozenset(('G', 'E', 'V', 'S', 'A', 'R'))})
 ]
 
 
