@@ -11,11 +11,12 @@ def vprint(message: str, msg_level: int, v_level: int = None):
     if msg_level <= v_level:
         print(message)
 
+
 logging.addLevelName(5, "VERBOSE")
 VERBOSE = 5
+LOG_LEVEL = os.environ.get("LOG_LEVEL", default="INFO")
 
-
-def get_logger(name: str, level: str = "DEBUG") -> logging.Logger:
+def get_logger(name: str, level: str = LOG_LEVEL) -> logging.Logger:
 
     formatter = logging.Formatter(fmt=LOG_FORMAT, datefmt=DT_FORMAT)
     stream_handler = logging.StreamHandler(sys.stdout)
