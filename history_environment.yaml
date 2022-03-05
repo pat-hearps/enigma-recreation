@@ -3,7 +3,6 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - factory_boy
   - seaborn
   - numpy
   - pandas
@@ -16,5 +15,7 @@ dependencies:
   - python=3.7
   - matplotlib
   - dill
+  - pytest
+  - factory_boy
+  - pylint
 prefix: /opt/miniconda3/envs/enigma
-
