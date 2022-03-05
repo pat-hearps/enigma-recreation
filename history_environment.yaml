@@ -9,10 +9,8 @@ dependencies:
   - plotly
   - networkx
   - openblas
-  - dash_cytoscape
   - jupyterlab
-  - jupyterlab-dash
-  - python=3.10
+  - python=3.9
   - matplotlib
   - dill
   - pytest
