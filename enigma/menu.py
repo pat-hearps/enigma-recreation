@@ -92,15 +92,17 @@ class MenuMaker:
 
     def find_loops(self, starting_character):
         working_dict = {i + 0.0: starting_character for i in range(len(self.hipairs[starting_character]))}
+        logger.log(VERBOSE, f"working dict = {working_dict}")
         for i, v in zip(range(len(self.hipairs[starting_character])), self.hipairs[starting_character].values()):
             working_dict[i] += v
-
+        logger.log(VERBOSE, f"working dict is now = {working_dict}")
         run = 1
         tracker = len(self.found_loops)
         while len(working_dict) > 0:
-            working_dict, self.found_loops, self.dead_ends = self.make_connections(starting_character, working_dict,
-                                                                                   self.found_loops, self.dead_ends,
-                                                                                   run, tracker)
+            working_dict, self.found_loops, self.dead_ends = self.make_connections(
+                starting_character, working_dict, self.found_loops, self.dead_ends, run, tracker
+            )
+            logger.log(SPAM, f"working dict is now = {working_dict}")
             run += 1
 
     def rationalise_to_list(self, indict):
@@ -171,7 +173,7 @@ class MenuMaker:
         self.found_loops = {}
         self.dead_ends = {}
         for char in self.best_characters:
-            #             print('############ run for ',char)
+            logger.debug(f"finding loops for char {char}")
             self.find_loops(char)
         self.dead_ends = self.rationalise_to_list(self.dead_ends)
         logger.debug(f'num dends b4 {len(self.dead_ends)}')
