@@ -5,13 +5,15 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 from enigma.design import ENTRY
-from enigma.utils import get_logger
+from enigma.utils import get_logger, VERBOSE
 
 logger = get_logger(__name__)
 
 class MenuMaker:
 
     def __init__(self, crib, encoded_crib):
+        logger.info(f"prepping menu, crib   = {crib}")
+        logger.info(f"prepping menu, cypher = {encoded_crib}")
         self.crib = crib
         self.encoded_crib = encoded_crib
         self.pairs: Dict = {}
@@ -24,12 +26,17 @@ class MenuMaker:
     def do_pairs(self):
         logger.debug("doing pairs")
         self.pairs = {i: {c, m} for i, c, m in zip(range(len(self.crib)), self.crib, self.encoded_crib)}
+        logger.debug(f"pairs are: {self.pairs}")
         self.links = {character: len([pair for pair in self.pairs.values() if character in pair]) for character in
                       ENTRY}
+        logger.debug(f"links are: {self.links}")
         self.hilinks = {k: v for k, v in self.links.items() if v > 0}
+        logger.debug(f"hilinks are: {self.hilinks}")
         # ## actually think I should make hilinks just a ranked(sorted) list of characters from highest to lowest
         self.mostlinks = sorted(self.hilinks.values(), reverse=True)[0]
+        logger.debug(f"mostlinks are: {self.mostlinks}")
         self.best_characters = [k for k, v in self.hilinks.items() if v == self.mostlinks]
+        logger.debug(f"best characters are: {self.best_characters}")
 
         for character in self.hilinks.keys():
             hset = {k: list(pair) for k, pair in self.pairs.items() if character in pair}
@@ -78,7 +85,6 @@ class MenuMaker:
         return dx, loops, deadends
 
     def find_loops(self, starting_character):
-        logger.debug(f"finding loops for {starting_character}")
         working_dict = {i + 0.0: starting_character for i in range(len(self.hipairs[starting_character]))}
         for i, v in zip(range(len(self.hipairs[starting_character])), self.hipairs[starting_character].values()):
             working_dict[i] += v
@@ -134,11 +140,11 @@ class MenuMaker:
                 test = ((smaller in bigger) or (smaller[::-1] in bigger))
                 if smaller == bigger:
                     test = False
-                print(smaller, bigger, test)
+                logger.log(VERBOSE, (smaller, bigger, test))
                 if test and bigger in unique and smaller in unique:
                     unique.remove(bigger)
-                    print('removed', bigger)
-                    print(unique)
+                    logger.log(VERBOSE, f'removed {bigger}')
+                    logger.log(VERBOSE, f'unique: {unique}')
 
         return unique
 
@@ -162,13 +168,13 @@ class MenuMaker:
             #             print('############ run for ',char)
             self.find_loops(char)
         self.dead_ends = self.rationalise_to_list(self.dead_ends)
-        print('dends b4', self.dead_ends)
+        logger.debug(f'num dends b4 {len(self.dead_ends)}')
         self.dead_ends = self.unsub_list(self.dead_ends)
-        print('dends after', self.dead_ends)
+        logger.debug(f'num dends after {len(self.dead_ends)}')
         self.found_loops = self.rationalise_to_list(self.found_loops)
-        print('loops b4', self.found_loops)
+        logger.debug(f'num loops b4 {len(self.found_loops)}')
         self.found_loops = self.get_smallest_loop(self.found_loops)
-        print('loops after', self.found_loops)
+        logger.debug(f'num loops after {len(self.found_loops)}')
         self.lose_redundant_deadends()
 
     def loop_to_menu(self, mainloop=0):
@@ -198,7 +204,7 @@ class MenuMaker:
                     wdict = self.hipairs[char]
                     position = [k for k, v in wdict.items() if v == next_char][0]
                     self.menu[position] = {'in': char, 'out': next_char, 'menu_link': position}
-                    print(f"added item from deadend '{ends}' to menu {position} : {self.menu[position]}")
+                    logger.debug(f"added item from deadend '{ends}' to menu {position} : {self.menu[position]}")
 
     def configure_menu(self):
         try:
