@@ -50,11 +50,9 @@ class MenuMaker:
         # pairs = pairs of letters by their position in the crib <> encoded crib
         self.pairs = {i: {c, m} for i, c, m in zip(range(len(self.crib)), self.crib, self.encoded_crib)}
         logger.debug(f"this crib-cypher has the char pairs: {self.pairs}")
-        # links = for each character, how many times does it link to another letter
-        self.links = {character: len([pair for pair in self.pairs.values() if character in pair]) for character in
-                      ENTRY}
-        # hilinks = of self.links, any greater than zero
-        self.hilinks = {k: v for k, v in self.links.items() if v > 0}
+        # hilinks = for each character, how many times does it link to another letter (only keep those >0)
+        self.hilinks = {char: _count for char in ENTRY
+                      if (_count := len([pair for pair in self.pairs.values() if char in pair])) > 0}
         logger.debug(f"these chars link to at least one other char: {self.hilinks}")
         # ## actually think I should make hilinks just a ranked(sorted) list of characters from highest to lowest
         # mostlinks = the highest number of pairs of any single character
