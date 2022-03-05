@@ -12,7 +12,7 @@ dependencies:
   - dash_cytoscape
   - jupyterlab
   - jupyterlab-dash
-  - python=3.7
+  - python=3.10
   - matplotlib
   - dill
   - pytest
