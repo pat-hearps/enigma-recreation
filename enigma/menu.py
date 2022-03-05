@@ -112,15 +112,20 @@ class MenuMaker:
     def rationalise_to_list(self, indict):
         """goes through list values of results from find_loops, turns into single large list,
         gets rid of any elements that are mirror images of each other (keeping one unique)"""
+        # logger.log(SPAM, f"rationalising {indict}")
         invals = list(set(indict.values()))
+        # logger.log(SPAM, f"invals = {invals}")
         for i, loop in enumerate(invals):
             test = deepcopy(invals)
+            # logger.log(SPAM, f"setting pos {i} to {loop[::-1]}")
             test[i] = loop[::-1]
             test = list(set(test))
+            # logger.log(SPAM, f"test is now {test}")
             if len(test) != len(invals):
                 invals[i] = loop[::-1]
+                # logger.log(SPAM, f"lens unequal")
         invals = list(set(invals))
-
+        # logger.log(SPAM, f"invals is now {invals}")
         return invals
 
     def unsub_list(self, inlist):
@@ -152,11 +157,10 @@ class MenuMaker:
                 test = ((smaller in bigger) or (smaller[::-1] in bigger))
                 if smaller == bigger:
                     test = False
-                logger.log(VERBOSE, (smaller, bigger, test))
+                logger.log(SPAM, (smaller, bigger, test))
                 if test and bigger in unique and smaller in unique:
                     unique.remove(bigger)
                     logger.log(VERBOSE, f'removed {bigger}')
-                    logger.log(VERBOSE, f'unique: {unique}')
 
         return unique
 
@@ -179,14 +183,17 @@ class MenuMaker:
         for char in self.best_characters:
             logger.debug(f"finding loops for char {char}")
             self.find_loops(char)
+        logger.debug(f'num dead ends b4 rationalising= {len(self.dead_ends)}')
+        # # TODO get rid of rationalisting deadends, doesn't appear to change anything
         self.dead_ends = self.rationalise_to_list(self.dead_ends)
-        logger.debug(f'num dends b4 {len(self.dead_ends)}')
+        logger.debug(f'num dead ends after ration, b4 unsub= {len(self.dead_ends)}')
         self.dead_ends = self.unsub_list(self.dead_ends)
-        logger.debug(f'num dends after {len(self.dead_ends)}')
+        logger.debug(f'num dead ends after unsub= {len(self.dead_ends)}')
+        logger.debug(f'num loops b4 rationalising= {len(self.dead_ends)}')
         self.found_loops = self.rationalise_to_list(self.found_loops)
-        logger.debug(f'num loops b4 {len(self.found_loops)}')
+        logger.debug(f'num loops after ration, b4 unsub= {len(self.found_loops)}')
         self.found_loops = self.get_smallest_loop(self.found_loops)
-        logger.debug(f'num loops after {len(self.found_loops)}')
+        logger.debug(f'num loops after unsub= {len(self.found_loops)}')
         self.lose_redundant_deadends()
 
     def loop_to_menu(self, mainloop=0):
