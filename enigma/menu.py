@@ -4,7 +4,9 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 from enigma.design import ENTRY
+from enigma.utils import get_logger
 
+logger = get_logger(__name__)
 
 class MenuMaker:
 
@@ -13,6 +15,7 @@ class MenuMaker:
         self.encoded_crib = encoded_crib
 
     def do_pairs(self):
+        logger.debug("doing pairs")
         self.pairs = {i: {c, m} for i, c, m in zip(range(len(self.crib)), self.crib, self.encoded_crib)}
         self.links = {character: len([pair for pair in self.pairs.values() if character in pair]) for character in
                       ENTRY}
@@ -31,6 +34,7 @@ class MenuMaker:
                     newresult[k] = v[0]
             if len(newresult) > 0:
                 self.hipairs[character] = newresult
+        logger.debug(f"hipairs are: {self.hipairs}")
         #     hipairs[character] = {k:pair.remove(character) for k,pair in pairs.items() if character in pair}
         # # maybe try a comprehension again later, involves a few steps...
 
@@ -68,6 +72,7 @@ class MenuMaker:
         return dx, loops, deadends
 
     def find_loops(self, starting_character):
+        logger.debug(f"finding loops for {starting_character}")
         working_dict = {i + 0.0: starting_character for i in range(len(self.hipairs[starting_character]))}
         for i, v in zip(range(len(self.hipairs[starting_character])), self.hipairs[starting_character].values()):
             working_dict[i] += v
