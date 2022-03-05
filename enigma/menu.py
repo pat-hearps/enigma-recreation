@@ -5,7 +5,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 from enigma.design import ENTRY
-from enigma.utils import get_logger, VERBOSE
+from enigma.utils import get_logger, VERBOSE, SPAM
 
 logger = get_logger(__name__)
 
@@ -42,13 +42,17 @@ class MenuMaker:
 
         for character in self.hilinks.keys():
             hset = {k: list(pair) for k, pair in self.pairs.items() if character in pair}
+            logger.log(VERBOSE, f"hset for char={character} is len={len(hset)}: {hset}")
             newresult = {}
             for k, v in hset.items():
                 v.remove(character)
-                if v[0] in self.hilinks.keys():
-                    newresult[k] = v[0]
+                other_char = v[0]
+                if other_char in self.hilinks.keys():
+                    logger.log(SPAM, f'{character} links to {other_char}')
+                    newresult[k] = other_char
             if len(newresult) > 0:
                 self.hipairs[character] = newresult
+        # hipairs = for each char in hilinks, what other chars are they linked to. result is dict of k=position, v=char
         logger.debug(f"hipairs are: {self.hipairs}")
         #     hipairs[character] = {k:pair.remove(character) for k,pair in pairs.items() if character in pair}
         # # maybe try a comprehension again later, involves a few steps...
