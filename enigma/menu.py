@@ -70,12 +70,13 @@ class MenuMaker:
             working_dict = deepcopy(indict)
 
         for iD, chain in indict.items():
-
+            logger.log(SPAM, f"itr={itr} | id-chain = {iD, chain}")
             current_end = chain[-1]
             letters_that_current_end_is_connected_to = self.hipairs[current_end]
+            logger.log(SPAM, f"itr={itr} | current end ({current_end}) is connected to {letters_that_current_end_is_connected_to}")
             for jid, conxn in enumerate(letters_that_current_end_is_connected_to.values()):
                 key = round(iD + jid / 10 ** itr, 5)
-
+                logger.log(SPAM, f"itr={itr} | key={key}, jid={jid}, conxn={conxn}")
                 if conxn != current_end:
                     working_dict[key] = indict[iD] + conxn
 
@@ -84,25 +85,28 @@ class MenuMaker:
             if chain[-1] == chain[-3]:  # and len(v):
                 chain = chain[:-1]
                 deadends[kid] = chain
+                logger.log(SPAM, f"itr={itr} | {chain} is a deadend")
             elif chain[-1] == starting_character and len(chain) > 3:  ## ie we're legit back to the start after a loop
                 loops[kid] = chain
+                logger.log(VERBOSE, f"itr={itr} | loop found = {chain}")
             else:
                 dx[kid] = chain
+                logger.log(SPAM, f"itr={itr} | keep going for {chain}")
         return dx, loops, deadends
 
     def find_loops(self, starting_character):
         working_dict = {i + 0.0: starting_character for i in range(len(self.hipairs[starting_character]))}
-        logger.log(VERBOSE, f"working dict = {working_dict}")
+        logger.log(SPAM, f"working dict = {working_dict}")
         for i, v in zip(range(len(self.hipairs[starting_character])), self.hipairs[starting_character].values()):
             working_dict[i] += v
-        logger.log(VERBOSE, f"working dict is now = {working_dict}")
+        logger.log(SPAM, f"working dict is now = {working_dict}")
         run = 1
         tracker = len(self.found_loops)
         while len(working_dict) > 0:
             working_dict, self.found_loops, self.dead_ends = self.make_connections(
                 starting_character, working_dict, self.found_loops, self.dead_ends, run, tracker
             )
-            logger.log(SPAM, f"working dict is now = {working_dict}")
+            logger.log(SPAM, f"itr={run} | working dict is now = {working_dict}")
             run += 1
 
     def rationalise_to_list(self, indict):
