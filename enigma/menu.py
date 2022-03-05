@@ -24,19 +24,21 @@ class MenuMaker:
         self.hipairs: Dict = {}
 
     def do_pairs(self):
-        logger.debug("doing pairs")
+        # pairs = pairs of letters by their position in the crib <> encoded crib
         self.pairs = {i: {c, m} for i, c, m in zip(range(len(self.crib)), self.crib, self.encoded_crib)}
-        logger.debug(f"pairs are: {self.pairs}")
+        logger.debug(f"this crib-cypher has the char pairs: {self.pairs}")
+        # links = for each character, how many times does it link to another letter
         self.links = {character: len([pair for pair in self.pairs.values() if character in pair]) for character in
                       ENTRY}
-        logger.debug(f"links are: {self.links}")
+        # hilinks = of self.links, any greater than zero
         self.hilinks = {k: v for k, v in self.links.items() if v > 0}
-        logger.debug(f"hilinks are: {self.hilinks}")
+        logger.debug(f"these chars link to at least one other char: {self.hilinks}")
         # ## actually think I should make hilinks just a ranked(sorted) list of characters from highest to lowest
+        # mostlinks = the highest number of pairs of any single character
         self.mostlinks = sorted(self.hilinks.values(), reverse=True)[0]
-        logger.debug(f"mostlinks are: {self.mostlinks}")
+        # best_characters = any character that has the number of pairs equal to self.mostlinks (len >= 1)
         self.best_characters = [k for k, v in self.hilinks.items() if v == self.mostlinks]
-        logger.debug(f"best characters are: {self.best_characters}")
+        logger.debug(f"chars with the most links ({self.mostlinks}) are: {self.best_characters}")
 
         for character in self.hilinks.keys():
             hset = {k: list(pair) for k, pair in self.pairs.items() if character in pair}
