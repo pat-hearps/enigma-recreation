@@ -23,6 +23,29 @@ class MenuMaker:
         self.best_characters: List[str] = []
         self.hipairs: Dict = {}
 
+    def process_stuff(self):
+        """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
+        self.do_pairs()
+        self.found_loops = {}
+        self.dead_ends = {}
+        for char in self.best_characters:
+            logger.debug(f"finding loops for char {char}")
+            self.find_loops(char)
+        logger.debug(f'num dead ends b4 rationalising= {len(self.dead_ends)}')
+        # # TODO get rid of rationalisting deadends, doesn't appear to change anything
+        self.dead_ends = self.rationalise_to_list(self.dead_ends)
+        logger.debug(f'num dead ends after ration, b4 unsub= {len(self.dead_ends)}')
+        self.dead_ends = self.unsub_list(self.dead_ends)
+        logger.debug(f'num dead ends after unsub= {len(self.dead_ends)}')
+        logger.debug(f'num loops b4 rationalising= {len(self.dead_ends)}')
+        self.found_loops = self.rationalise_to_list(self.found_loops)
+        logger.debug(f'num loops after ration, b4 unsub= {len(self.found_loops)}')
+        self.found_loops = self.get_smallest_loop(self.found_loops)
+        logger.debug(f'num loops after unsub= {len(self.found_loops)}')
+        logger.debug(f'num dead ends b4 lose_redundant= {len(self.dead_ends)}')
+        self.lose_redundant_deadends()
+        logger.debug(f'num dead ends after lose_redundant= {len(self.dead_ends)}')
+
     def do_pairs(self):
         # pairs = pairs of letters by their position in the crib <> encoded crib
         self.pairs = {i: {c, m} for i, c, m in zip(range(len(self.crib)), self.crib, self.encoded_crib)}
@@ -191,27 +214,6 @@ class MenuMaker:
         logger.log(SPAM, f"dropped deadends = {dropped}")
         self.dead_ends = final_uniq_dends
 
-    def process_stuff(self):
-        self.do_pairs()
-        self.found_loops = {}
-        self.dead_ends = {}
-        for char in self.best_characters:
-            logger.debug(f"finding loops for char {char}")
-            self.find_loops(char)
-        logger.debug(f'num dead ends b4 rationalising= {len(self.dead_ends)}')
-        # # TODO get rid of rationalisting deadends, doesn't appear to change anything
-        self.dead_ends = self.rationalise_to_list(self.dead_ends)
-        logger.debug(f'num dead ends after ration, b4 unsub= {len(self.dead_ends)}')
-        self.dead_ends = self.unsub_list(self.dead_ends)
-        logger.debug(f'num dead ends after unsub= {len(self.dead_ends)}')
-        logger.debug(f'num loops b4 rationalising= {len(self.dead_ends)}')
-        self.found_loops = self.rationalise_to_list(self.found_loops)
-        logger.debug(f'num loops after ration, b4 unsub= {len(self.found_loops)}')
-        self.found_loops = self.get_smallest_loop(self.found_loops)
-        logger.debug(f'num loops after unsub= {len(self.found_loops)}')
-        logger.debug(f'num dead ends b4 lose_redundant= {len(self.dead_ends)}')
-        self.lose_redundant_deadends()
-        logger.debug(f'num dead ends after lose_redundant= {len(self.dead_ends)}')
 
     def loop_to_menu(self, mainloop=0):
         if mainloop == 0:
