@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Dict, List
 
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -13,6 +14,12 @@ class MenuMaker:
     def __init__(self, crib, encoded_crib):
         self.crib = crib
         self.encoded_crib = encoded_crib
+        self.pairs: Dict = {}
+        self.links: Dict = {}
+        self.hilinks: Dict = {}
+        self.mostlinks: int = None
+        self.best_characters: List[str] = []
+        self.hipairs: Dict = {}
 
     def do_pairs(self):
         logger.debug("doing pairs")
@@ -24,7 +31,6 @@ class MenuMaker:
         self.mostlinks = sorted(self.hilinks.values(), reverse=True)[0]
         self.best_characters = [k for k, v in self.hilinks.items() if v == self.mostlinks]
 
-        self.hipairs = {}
         for character in self.hilinks.keys():
             hset = {k: list(pair) for k, pair in self.pairs.items() if character in pair}
             newresult = {}
