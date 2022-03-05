@@ -11,6 +11,9 @@ def vprint(message: str, msg_level: int, v_level: int = None):
     if msg_level <= v_level:
         print(message)
 
+logging.addLevelName(5, "VERBOSE")
+VERBOSE = 5
+
 
 def get_logger(name: str, level: str = "DEBUG") -> logging.Logger:
 
