@@ -1,16 +1,9 @@
 from string import ascii_uppercase
 from typing import List, Dict
-import os
 
 from enigma.design import (ENTRY, raw_rotors, FORWARD_ROTORS, REVERSE_ROTORS, REFLECTORS_CYPHER, ROTOR_INDEX, ROTORS,
                            NOTCHES, REFLECTORS_INDEX)
-
-
-def vprint(message: str, msg_level: int, v_level: int = None):
-    if v_level is None:
-        v_level = int(os.getenv("verbosity", default="0"))
-    if msg_level <= v_level:
-        print(message)
+from enigma.utils import vprint
 
 
 class Reflector:
