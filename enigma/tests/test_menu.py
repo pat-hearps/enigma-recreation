@@ -1,8 +1,9 @@
 import pytest
+from typing import Tuple
 
 from enigma.menu import MenuMaker
 
-CRIB_SETS = {
+CRIBS = {
     "welchman": {
         "crib_guess": "TOTHEPRESIDENTOFTHEUNITEDSTATES",
         "crib_cypher": "CQNZPVLILPEUIKTEDCGLOVWVGTUFLNZ"
@@ -12,6 +13,14 @@ CRIB_SETS = {
         "crib_cypher": "SNMKGGSTZZUGARLV"
     }
 }
+
+
+def get_crib_cypher(crib_set_name: str) -> Tuple[str, str]:
+    crib_guess = CRIBS[crib_set_name]["crib_guess"]
+    crib_cypher = CRIBS[crib_set_name]["crib_cypher"]
+    return crib_guess, crib_cypher
+
+
 gw_all_loops = {frozenset(('E', 'I', 'P')), frozenset(('I', 'P', 'V')), frozenset(('N', 'O', 'T'))}
 loop_data = [
     ("welchman", 0, 14, {frozenset(('E', 'I', 'P'))}),
@@ -23,8 +32,7 @@ loop_data = [
 
 @pytest.mark.parametrize("crib_set_name, start, end, expected", loop_data)
 def test_menumaker_loops(crib_set_name: str, start: int, end: int, expected: set) -> None:
-    crib_guess = CRIB_SETS[crib_set_name]["crib_guess"]
-    crib_cypher = CRIB_SETS[crib_set_name]["crib_cypher"]
+    crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
     menu_mkr = MenuMaker(crib=crib_guess[start:end], encoded_crib=crib_cypher[start:end])
     menu_mkr.process_stuff()
     found_loops = set(frozenset(loop) for loop in menu_mkr.found_loops)
