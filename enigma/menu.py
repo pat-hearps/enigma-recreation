@@ -14,12 +14,12 @@ class MenuMaker:
     def __init__(self, crib, encoded_crib):
         logger.info(f"prepping menu, crib   = {crib}")
         logger.info(f"prepping menu, cypher = {encoded_crib}")
-        self.crib = crib
-        self.encoded_crib = encoded_crib
-        self.pairs: Dict = {}
-        self.links: Dict = {}
+        self.crib: str = crib
+        self.encoded_crib: str = encoded_crib
+        self.pairs: Dict[int, set] = {}
+        self.links: Dict[str, int] = {}
         self.best_characters: List[str] = []
-        self.hipairs: Dict = {}
+        self.hipairs: Dict[str, dict] = {}
 
     def process_stuff(self):
         """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
