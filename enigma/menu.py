@@ -58,15 +58,15 @@ class MenuMaker:
         logger.debug(f"chars with the most links ({most_n_links}) are: {self.best_characters}")
 
         for character in self.links.keys():
-            hset = {k: list(pair) for k, pair in self.pairs.items() if character in pair}
+            hset = {pos: pair for pos, pair in self.pairs.items() if character in pair}
             logger.log(VERBOSE, f"hset for char={character} is len={len(hset)}: {hset}")
             newresult = {}
-            for k, v in hset.items():
-                v.remove(character)
-                other_char = v[0]
+            for pos, pair in hset.items():
+                pair.remove(character)
+                other_char = pair[0]
                 if other_char in self.links.keys():
                     logger.log(SPAM, f'{character} links to {other_char}')
-                    newresult[k] = other_char
+                    newresult[pos] = other_char
             if len(newresult) > 0:
                 self.hipairs[character] = newresult
         # hipairs = for each char in links, what other chars are they linked to. result is dict of k=position, v=char
