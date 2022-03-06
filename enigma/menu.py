@@ -59,20 +59,13 @@ class MenuMaker:
 
         for character in self.links.keys():
             hset = {pos: pair for pos, pair in self.pairs.items() if character in pair}
-            logger.log(VERBOSE, f"hset for char={character} is len={len(hset)}: {hset}")
-            newresult = {}
-            for pos, pair in hset.items():
-                pair.remove(character)
-                other_char = pair[0]
-                if other_char in self.links.keys():
-                    logger.log(SPAM, f'{character} links to {other_char}')
-                    newresult[pos] = other_char
+            logger.log(SPAM, f"hset for char={character} is len={len(hset)}: {hset}")
+            newresult = {pos: other_char for pos, pair in hset.items() if
+                         (other_char := (pair - {character}).pop()) in self.links.keys()}
             if len(newresult) > 0:
                 self.hipairs[character] = newresult
         # hipairs = for each char in links, what other chars are they linked to. result is dict of k=position, v=char
         logger.debug(f"hipairs are: {self.hipairs}")
-        #     hipairs[character] = {k:pair.remove(character) for k,pair in pairs.items() if character in pair}
-        # # maybe try a comprehension again later, involves a few steps...
 
     def make_connections(self, starting_character, indict, loops={}, deadends={}, itr=1, tracking_len=0):
         """for sorting through a hipairs dictionary of letters of interest and their corresponding paired letters.
