@@ -49,19 +49,30 @@ class MenuMaker:
         self.pairs = {i: {c, m} for i, c, m in zip(range(len(self.crib)), self.crib, self.encoded_crib)}
         logger.debug(f"this crib-cypher has the char pairs: {self.pairs}")
         # links = for each character, how many times does it link to another letter (only keep those >0)
-        self.links = {char: n_links for char in ENTRY
-                      if (n_links := len([pair for pair in self.pairs.values() if char in pair])) > 0}
+        self.links = {
+            char: n_links for char in ENTRY
+            if
+            (n_links := len([pair for pair in self.pairs.values() if char in pair]))
+            > 0
+        }
         logger.debug(f"these chars link to at least one other char: {self.links}")
         # ## actually think I should make links just a ranked(sorted) list of characters from highest to lowest
-        self.best_characters = [char for char, n_links in self.links.items()
-                                if n_links == (most_n_links := max(self.links.values()))]
+        self.best_characters = [
+            char for char, n_links in self.links.items()
+            if n_links ==
+            (most_n_links := max(self.links.values()))
+        ]
         logger.debug(f"chars with the most links ({most_n_links}) are: {self.best_characters}")
 
         for character in self.links.keys():
             hset = {pos: pair for pos, pair in self.pairs.items() if character in pair}
             logger.log(SPAM, f"hset for char={character} is len={len(hset)}: {hset}")
-            newresult = {pos: other_char for pos, pair in hset.items() if
-                         (other_char := (pair - {character}).pop()) in self.links.keys()}
+            newresult = {
+                pos: other_char for pos, pair in hset.items()
+                if
+                (other_char := (pair - {character}).pop())
+                in self.links.keys()
+            }
             if len(newresult) > 0:
                 self.hipairs[character] = newresult
         # hipairs = for each char in links, what other chars are they linked to. result is dict of k=position, v=char
