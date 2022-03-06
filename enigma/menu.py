@@ -18,7 +18,6 @@ class MenuMaker:
         self.encoded_crib = encoded_crib
         self.pairs: Dict = {}
         self.links: Dict = {}
-        self.hilinks: Dict = {}
         self.best_characters: List[str] = []
         self.hipairs: Dict = {}
 
@@ -49,28 +48,28 @@ class MenuMaker:
         # pairs = pairs of letters by their position in the crib <> encoded crib
         self.pairs = {i: {c, m} for i, c, m in zip(range(len(self.crib)), self.crib, self.encoded_crib)}
         logger.debug(f"this crib-cypher has the char pairs: {self.pairs}")
-        # hilinks = for each character, how many times does it link to another letter (only keep those >0)
-        self.hilinks = {char: n_links for char in ENTRY
-                        if (n_links := len([pair for pair in self.pairs.values() if char in pair])) > 0}
-        logger.debug(f"these chars link to at least one other char: {self.hilinks}")
-        # ## actually think I should make hilinks just a ranked(sorted) list of characters from highest to lowest
-        self.best_characters = [char for char, n_links in self.hilinks.items()
-                                if n_links == (most_n_links := max(self.hilinks.values()))]
+        # links = for each character, how many times does it link to another letter (only keep those >0)
+        self.links = {char: n_links for char in ENTRY
+                      if (n_links := len([pair for pair in self.pairs.values() if char in pair])) > 0}
+        logger.debug(f"these chars link to at least one other char: {self.links}")
+        # ## actually think I should make links just a ranked(sorted) list of characters from highest to lowest
+        self.best_characters = [char for char, n_links in self.links.items()
+                                if n_links == (most_n_links := max(self.links.values()))]
         logger.debug(f"chars with the most links ({most_n_links}) are: {self.best_characters}")
 
-        for character in self.hilinks.keys():
+        for character in self.links.keys():
             hset = {k: list(pair) for k, pair in self.pairs.items() if character in pair}
             logger.log(VERBOSE, f"hset for char={character} is len={len(hset)}: {hset}")
             newresult = {}
             for k, v in hset.items():
                 v.remove(character)
                 other_char = v[0]
-                if other_char in self.hilinks.keys():
+                if other_char in self.links.keys():
                     logger.log(SPAM, f'{character} links to {other_char}')
                     newresult[k] = other_char
             if len(newresult) > 0:
                 self.hipairs[character] = newresult
-        # hipairs = for each char in hilinks, what other chars are they linked to. result is dict of k=position, v=char
+        # hipairs = for each char in links, what other chars are they linked to. result is dict of k=position, v=char
         logger.debug(f"hipairs are: {self.hipairs}")
         #     hipairs[character] = {k:pair.remove(character) for k,pair in pairs.items() if character in pair}
         # # maybe try a comprehension again later, involves a few steps...
