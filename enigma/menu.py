@@ -19,7 +19,6 @@ class MenuMaker:
         self.pairs: Dict = {}
         self.links: Dict = {}
         self.hilinks: Dict = {}
-        self.mostlinks: int = None
         self.best_characters: List[str] = []
         self.hipairs: Dict = {}
 
@@ -55,9 +54,9 @@ class MenuMaker:
                         if (n_links := len([pair for pair in self.pairs.values() if char in pair])) > 0}
         logger.debug(f"these chars link to at least one other char: {self.hilinks}")
         # ## actually think I should make hilinks just a ranked(sorted) list of characters from highest to lowest
-        self.mostlinks = sorted(self.hilinks.values(), reverse=True)[0]
-        self.best_characters = [char for char, n_links in self.hilinks.items() if n_links == self.mostlinks]
-        logger.debug(f"chars with the most links ({self.mostlinks}) are: {self.best_characters}")
+        self.best_characters = [char for char, n_links in self.hilinks.items()
+                                if n_links == (most_n_links := max(self.hilinks.values()))]
+        logger.debug(f"chars with the most links ({most_n_links}) are: {self.best_characters}")
 
         for character in self.hilinks.keys():
             hset = {k: list(pair) for k, pair in self.pairs.items() if character in pair}
