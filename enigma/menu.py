@@ -66,8 +66,7 @@ class MenuMaker:
                 (other_char := (pair - {character}).pop())
                 in self.char_counts.keys()
             }
-            if newresult:
-                self.link_index[character] = newresult
+            self.link_index[character] = newresult
         # link_index = for each char in links, what other chars are they linked to at what position
         # result is dict of k=position, v=char
         logger.debug(f"index of links are: {self.link_index}")
