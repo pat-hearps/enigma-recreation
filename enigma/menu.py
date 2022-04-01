@@ -51,9 +51,7 @@ class MenuMaker:
         # links = for each character, how many times does it link to another letter (only keep those >0)
         self.links = {
             char: n_links for char in ENTRY
-            if
-            (n_links := len([pair for pair in self.pairs.values() if char in pair]))
-            > 0
+            if (n_links := [pair for pair in self.pairs.values() if char in pair])
         }
         logger.debug(f"these chars link to at least one other char: {self.links}")
         # ## actually think I should make links just a ranked(sorted) list of characters from highest to lowest
@@ -73,7 +71,7 @@ class MenuMaker:
                 (other_char := (pair - {character}).pop())
                 in self.links.keys()
             }
-            if len(newresult) > 0:
+            if newresult:
                 self.hipairs[character] = newresult
         # hipairs = for each char in links, what other chars are they linked to. result is dict of k=position, v=char
         logger.debug(f"hipairs are: {self.hipairs}")
