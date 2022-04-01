@@ -58,9 +58,9 @@ class MenuMaker:
         logger.debug(f"these chars link to at least one other char: {self.char_counts}")
 
         for character in self.char_counts.keys():
-            newresult = {pos: (pair - {character}).pop() for pos, pair in self.pairs.items() if character in pair}
-            logger.log(SPAM, f"result for char={character} is {newresult}")
-            self.link_index[character] = newresult
+            link_idx = {pos: (pair - {character}).pop() for pos, pair in self.pairs.items() if character in pair}
+            logger.log(SPAM, f"index of links for char={character} is {link_idx}")
+            self.link_index[character] = link_idx
         # link_index = for each char in links, what other chars are they linked to at what position
         # result is dict of k=position, v=char
         logger.debug(f"index of links are: {self.link_index}")
