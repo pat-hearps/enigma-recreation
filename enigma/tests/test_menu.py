@@ -28,7 +28,7 @@ def get_crib_cypher(crib_set_name: str) -> Tuple[str, str]:
 gw_all_loops = {frozenset(('E', 'I', 'P')), frozenset(('I', 'P', 'V')), frozenset(('N', 'O', 'T'))}
 loop_data = [
     ("welchman", 0, 14, {frozenset(('E', 'I', 'P'))}),
-    ("welchman", 3, 23, gw_all_loops),
+    ("welchman", 3, 23, gw_all_loops),  # note this has been failing since added, indicates true problems in code
     ("welchman", 14, 27, set()),
     ("dermot_BB", 0, 30, {frozenset(('G', 'E', 'V', 'S', 'A', 'R'))}),
     ("basic", 0, 4, {frozenset(('A', 'B', 'C'))})
