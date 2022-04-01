@@ -23,7 +23,7 @@ class MenuMaker:
 
     def process_stuff(self):
         """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
-        self.do_pairs()
+        self.find_linked_characters()
         self.found_loops = {}
         self.dead_ends = {}
         for char in self.best_characters:
@@ -44,7 +44,7 @@ class MenuMaker:
         self.lose_redundant_deadends()
         logger.debug(f'num dead ends after lose_redundant= {len(self.dead_ends)}')
 
-    def do_pairs(self):
+    def find_linked_characters(self):
         # pairs = pairs of letters by their position in the crib <> encoded crib
         self.pairs = {i: {c, m} for i, (c, m) in enumerate(zip(self.crib, self.encoded_crib))}
         logger.debug(f"this crib-cypher has the char pairs: {self.pairs}")
