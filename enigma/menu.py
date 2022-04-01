@@ -58,13 +58,13 @@ class MenuMaker:
         """
         # pairs = pairs of letters by their position in the crib <> encoded crib
         self.pairs = {i: {c, m} for i, (c, m) in enumerate(zip(self.crib, self.encoded_crib))}
-        logger.debug(f"this crib-cypher has the char pairs: {self.pairs}")
+        logger.log(VERBOSE, "this crib-cypher has the char pairs: {self.pairs}")
         # char_counts = for each character, how many times does it occur
         count = defaultdict(int)
         for char in sorted(''.join((self.crib, self.encoded_crib))):
             count[char] += 1
         self.char_counts = dict(count)
-        logger.debug(f"these chars link to at least one other char: {self.char_counts}")
+        logger.log(VERBOSE, f"with characters appearing with the frequencies: {self.char_counts}")
 
     def create_link_index(self):
         """Create a dictionary referencing the links between characters and where they occur
