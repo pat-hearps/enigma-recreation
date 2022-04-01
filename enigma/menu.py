@@ -46,7 +46,7 @@ class MenuMaker:
 
     def do_pairs(self):
         # pairs = pairs of letters by their position in the crib <> encoded crib
-        self.pairs = {i: {c, m} for i, c, m in zip(range(len(self.crib)), self.crib, self.encoded_crib)}
+        self.pairs = {i: {c, m} for i, (c, m) in enumerate(zip(self.crib, self.encoded_crib))}
         logger.debug(f"this crib-cypher has the char pairs: {self.pairs}")
         # links = for each character, how many times does it link to another letter (only keep those >0)
         self.links = {
