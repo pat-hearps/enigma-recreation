@@ -58,14 +58,8 @@ class MenuMaker:
         logger.debug(f"these chars link to at least one other char: {self.char_counts}")
 
         for character in self.char_counts.keys():
-            hset = {pos: pair for pos, pair in self.pairs.items() if character in pair}
-            logger.log(SPAM, f"hset for char={character} is len={len(hset)}: {hset}")
-            newresult = {
-                pos: other_char for pos, pair in hset.items()
-                if
-                (other_char := (pair - {character}).pop())
-                in self.char_counts.keys()
-            }
+            newresult = {pos: (pair - {character}).pop() for pos, pair in self.pairs.items() if character in pair}
+            logger.log(SPAM, f"result for char={character} is {newresult}")
             self.link_index[character] = newresult
         # link_index = for each char in links, what other chars are they linked to at what position
         # result is dict of k=position, v=char
