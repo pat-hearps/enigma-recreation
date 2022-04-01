@@ -25,6 +25,7 @@ class MenuMaker:
     def process_stuff(self):
         """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
         self.count_characters()
+        self.create_link_index()
         self.find_best_characters()
         self.found_loops = {}
         self.dead_ends = {}
@@ -57,6 +58,7 @@ class MenuMaker:
         self.char_counts = dict(count)
         logger.debug(f"these chars link to at least one other char: {self.char_counts}")
 
+    def create_link_index(self):
         for character in self.char_counts.keys():
             link_idx = {pos: (pair - {character}).pop() for pos, pair in self.pairs.items() if character in pair}
             logger.log(SPAM, f"index of links for char={character} is {link_idx}")
