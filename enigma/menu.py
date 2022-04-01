@@ -56,12 +56,11 @@ class MenuMaker:
         self.char_counts = dict(count)
         logger.debug(f"these chars link to at least one other char: {self.char_counts}")
 
-        self.best_characters = [
-            char for char, n_links in self.char_counts.items()
-            if n_links ==
-            (most_n_links := max(self.char_counts.values()))
-        ]
-        logger.debug(f"chars with the most links ({most_n_links}) are: {self.best_characters}")
+        max_count = max(self.char_counts.values())
+        self.best_characters = (
+            char for char, n_links in self.char_counts.items() if n_links == max_count
+        )
+        logger.debug(f"chars with the most links ({max_count}) are: {self.best_characters}")
 
         for character in self.char_counts.keys():
             hset = {pos: pair for pos, pair in self.pairs.items() if character in pair}
