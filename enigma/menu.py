@@ -48,6 +48,14 @@ class MenuMaker:
         logger.debug(f'num dead ends after lose_redundant= {len(self.dead_ends)}')
 
     def count_characters(self):
+        """Create two attribute dictionaries:
+        self.pairs:
+            keys    = position along crib/cypher
+            values  = set(two chars, 1 each from the crib & cypher at the position)
+        self.char_counts:
+            keys    = each unique character that appears in the crib/cypher
+            values  = how many times the character occurs across both the crib/cypher (min 1)
+        """
         # pairs = pairs of letters by their position in the crib <> encoded crib
         self.pairs = {i: {c, m} for i, (c, m) in enumerate(zip(self.crib, self.encoded_crib))}
         logger.debug(f"this crib-cypher has the char pairs: {self.pairs}")
@@ -59,6 +67,13 @@ class MenuMaker:
         logger.debug(f"these chars link to at least one other char: {self.char_counts}")
 
     def create_link_index(self):
+        """Create a dictionary referencing the links between characters and where they occur
+        self.link_index:
+            keys    = each unique character that appears in the crib/cypher
+            values  = dictionary indexing which other characters link to it and where:
+                        keys    = the position of the link (int along the crib/cypher)
+                        values  = which other character is part of the link
+        """
         for character in self.char_counts.keys():
             link_idx = {pos: (pair - {character}).pop() for pos, pair in self.pairs.items() if character in pair}
             logger.log(SPAM, f"index of links for char={character} is {link_idx}")
