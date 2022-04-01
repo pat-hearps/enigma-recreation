@@ -25,6 +25,7 @@ class MenuMaker:
     def process_stuff(self):
         """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
         self.find_linked_characters()
+        self.find_best_characters()
         self.found_loops = {}
         self.dead_ends = {}
         for char in self.best_characters:
@@ -56,12 +57,6 @@ class MenuMaker:
         self.char_counts = dict(count)
         logger.debug(f"these chars link to at least one other char: {self.char_counts}")
 
-        max_count = max(self.char_counts.values())
-        self.best_characters = (
-            char for char, n_links in self.char_counts.items() if n_links == max_count
-        )
-        logger.debug(f"chars with the most links ({max_count}) are: {self.best_characters}")
-
         for character in self.char_counts.keys():
             hset = {pos: pair for pos, pair in self.pairs.items() if character in pair}
             logger.log(SPAM, f"hset for char={character} is len={len(hset)}: {hset}")
@@ -75,6 +70,16 @@ class MenuMaker:
                 self.hipairs[character] = newresult
         # hipairs = for each char in links, what other chars are they linked to. result is dict of k=position, v=char
         logger.debug(f"hipairs are: {self.hipairs}")
+
+    def find_best_characters(self):
+        """Find which characters occur the most in the crib/cypher,
+        set these to self.best_characters
+        """
+        max_count = max(self.char_counts.values())
+        self.best_characters = (
+            char for char, n_links in self.char_counts.items() if n_links == max_count
+        )
+        logger.debug(f"chars with the most links ({max_count}) are: {self.best_characters}")
 
     def make_connections(self, starting_character, indict, loops={}, deadends={}, itr=1, tracking_len=0):
         """for sorting through a hipairs dictionary of letters of interest and their corresponding paired letters.
