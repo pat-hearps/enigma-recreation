@@ -50,7 +50,7 @@ class MenuMaker:
         logger.debug(f"this crib-cypher has the char pairs: {self.pairs}")
         # links = for each character, how many times does it link to another letter (only keep those >0)
         self.links = {
-            char: n_links for char in ENTRY
+            char: n_links for char in set(ENTRY)
             if (n_links := [pair for pair in self.pairs.values() if char in pair])
         }
         logger.debug(f"these chars link to at least one other char: {self.links}")
