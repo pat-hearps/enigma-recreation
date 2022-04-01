@@ -17,7 +17,7 @@ class MenuMaker:
         self.crib: str = crib
         self.encoded_crib: str = encoded_crib
         self.pairs: Dict[int, set] = {}
-        self.links: Dict[str, int] = {}
+        self.char_counts: Dict[str, int] = {}
         self.best_characters: List[str] = []
         self.hipairs: Dict[str, dict] = {}
 
@@ -48,28 +48,28 @@ class MenuMaker:
         # pairs = pairs of letters by their position in the crib <> encoded crib
         self.pairs = {i: {c, m} for i, (c, m) in enumerate(zip(self.crib, self.encoded_crib))}
         logger.debug(f"this crib-cypher has the char pairs: {self.pairs}")
-        # links = for each character, how many times does it link to another letter (only keep those >0)
-        self.links = {
-            char: n_links for char in set(ENTRY)
-            if (n_links := [pair for pair in self.pairs.values() if char in pair])
+        # char_counts = for each character, how many times does it occur
+        self.char_counts = {
+            char: n_links for char in ENTRY
+            if (n_links := len([pair for pair in self.pairs.values() if char in pair]))
         }
-        logger.debug(f"these chars link to at least one other char: {self.links}")
+        logger.debug(f"these chars link to at least one other char: {self.char_counts}")
         # ## actually think I should make links just a ranked(sorted) list of characters from highest to lowest
         self.best_characters = [
-            char for char, n_links in self.links.items()
+            char for char, n_links in self.char_counts.items()
             if n_links ==
-            (most_n_links := max(self.links.values()))
+            (most_n_links := max(self.char_counts.values()))
         ]
         logger.debug(f"chars with the most links ({most_n_links}) are: {self.best_characters}")
 
-        for character in self.links.keys():
+        for character in self.char_counts.keys():
             hset = {pos: pair for pos, pair in self.pairs.items() if character in pair}
             logger.log(SPAM, f"hset for char={character} is len={len(hset)}: {hset}")
             newresult = {
                 pos: other_char for pos, pair in hset.items()
                 if
                 (other_char := (pair - {character}).pop())
-                in self.links.keys()
+                in self.char_counts.keys()
             }
             if newresult:
                 self.hipairs[character] = newresult
