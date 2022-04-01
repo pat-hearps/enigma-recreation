@@ -20,7 +20,7 @@ class MenuMaker:
         self.pairs: Dict[int, set] = {}
         self.char_counts: Dict[str, int] = {}
         self.best_characters: List[str] = []
-        self.hipairs: Dict[str, dict] = {}
+        self.link_index: Dict[str, dict] = {}
 
     def process_stuff(self):
         """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
@@ -67,9 +67,10 @@ class MenuMaker:
                 in self.char_counts.keys()
             }
             if newresult:
-                self.hipairs[character] = newresult
-        # hipairs = for each char in links, what other chars are they linked to. result is dict of k=position, v=char
-        logger.debug(f"hipairs are: {self.hipairs}")
+                self.link_index[character] = newresult
+        # link_index = for each char in links, what other chars are they linked to at what position
+        # result is dict of k=position, v=char
+        logger.debug(f"index of links are: {self.link_index}")
 
     def find_best_characters(self):
         """Find which characters occur the most in the crib/cypher,
@@ -96,7 +97,7 @@ class MenuMaker:
         for iD, chain in indict.items():
             logger.log(SPAM, f"itr={itr} | id-chain = {iD, chain}")
             current_end = chain[-1]
-            letters_that_current_end_is_connected_to = self.hipairs[current_end]
+            letters_that_current_end_is_connected_to = self.link_index[current_end]
             logger.log(SPAM, f"itr={itr} | current end ({current_end}) is connected to {letters_that_current_end_is_connected_to}")
             for jid, conxn in enumerate(letters_that_current_end_is_connected_to.values()):
                 key = round(iD + jid / 10 ** itr, 5)
@@ -119,9 +120,9 @@ class MenuMaker:
         return dx, loops, deadends
 
     def find_loops(self, starting_character):
-        working_dict = {i + 0.0: starting_character for i in range(len(self.hipairs[starting_character]))}
+        working_dict = {i + 0.0: starting_character for i in range(len(self.link_index[starting_character]))}
         logger.log(SPAM, f"working dict = {working_dict}")
-        for i, v in zip(range(len(self.hipairs[starting_character])), self.hipairs[starting_character].values()):
+        for i, v in zip(range(len(self.link_index[starting_character])), self.link_index[starting_character].values()):
             working_dict[i] += v
         logger.log(SPAM, f"working dict is now = {working_dict}")
         run = 1
@@ -222,7 +223,7 @@ class MenuMaker:
 
         for i, char in enumerate(mainloop[:-1]):
             next_char = mainloop[i + 1]
-            wdict = self.hipairs[char]
+            wdict = self.link_index[char]
             position = [k for k, v in wdict.items() if v == next_char][0]
             ### note that I'm just picking the first one where there are double (or more) linkages
             ### not sure if this matters for now or if its better to somehow include both linkages in the menu
@@ -240,7 +241,7 @@ class MenuMaker:
                 else:
                     next_char = ends[i + 1]
                     #         print(i,char,next_char)
-                    wdict = self.hipairs[char]
+                    wdict = self.link_index[char]
                     position = [k for k, v in wdict.items() if v == next_char][0]
                     self.menu[position] = {'in': char, 'out': next_char, 'menu_link': position}
                     logger.debug(f"added item from deadend '{ends}' to menu {position} : {self.menu[position]}")
