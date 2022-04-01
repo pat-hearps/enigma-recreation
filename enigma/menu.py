@@ -1,3 +1,4 @@
+from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List
 
@@ -49,12 +50,12 @@ class MenuMaker:
         self.pairs = {i: {c, m} for i, (c, m) in enumerate(zip(self.crib, self.encoded_crib))}
         logger.debug(f"this crib-cypher has the char pairs: {self.pairs}")
         # char_counts = for each character, how many times does it occur
-        self.char_counts = {
-            char: n_links for char in ENTRY
-            if (n_links := len([pair for pair in self.pairs.values() if char in pair]))
-        }
+        count = defaultdict(int)
+        for char in sorted(''.join((self.crib, self.encoded_crib))):
+            count[char] += 1
+        self.char_counts = dict(count)
         logger.debug(f"these chars link to at least one other char: {self.char_counts}")
-        # ## actually think I should make links just a ranked(sorted) list of characters from highest to lowest
+
         self.best_characters = [
             char for char, n_links in self.char_counts.items()
             if n_links ==
