@@ -59,5 +59,5 @@ link_idx_data = [
 def test_menumaker_find_linked_characters(crib_set_name: str, start: int, end: int, expected: set) -> None:
     crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
     menu_mkr = MenuMaker(crib=crib_guess[start:end], encoded_crib=crib_cypher[start:end])
-    menu_mkr.find_linked_characters()
+    menu_mkr.count_characters()
     assert menu_mkr.link_index == expected
