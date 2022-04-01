@@ -4,6 +4,10 @@ from typing import Tuple
 from enigma.menu import MenuMaker
 
 CRIBS = {
+    "basic": {
+        "crib_guess":  "ABCDD",
+        "crib_cypher": "BCABE"
+    },
     "welchman": {
         "crib_guess": "TOTHEPRESIDENTOFTHEUNITEDSTATES",
         "crib_cypher": "CQNZPVLILPEUIKTEDCGLOVWVGTUFLNZ"
@@ -26,7 +30,8 @@ loop_data = [
     ("welchman", 0, 14, {frozenset(('E', 'I', 'P'))}),
     ("welchman", 3, 23, gw_all_loops),
     ("welchman", 14, 27, set()),
-    ("dermot_BB", 0, 30, {frozenset(('G', 'E', 'V', 'S', 'A', 'R'))})
+    ("dermot_BB", 0, 30, {frozenset(('G', 'E', 'V', 'S', 'A', 'R'))}),
+    ("basic", 0, 4, {frozenset(('A', 'B', 'C'))})
 ]
 
 
