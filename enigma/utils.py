@@ -5,6 +5,7 @@ import sys
 LOG_FORMAT = "%(levelname)-5s | %(asctime)s | %(module)s:%(funcName)s:%(lineno)-3s | %(message)s"
 DT_FORMAT = "%H:%M:%S"
 
+
 def vprint(message: str, msg_level: int, v_level: int = None):
     if v_level is None:
         v_level = int(os.getenv("verbosity", default="0"))
@@ -17,6 +18,7 @@ SPAM = 3
 logging.addLevelName(VERBOSE, "VERBOSE")
 logging.addLevelName(SPAM, "SPAM")
 LOG_LEVEL = os.environ.get("LOG_LEVEL", default="INFO")
+
 
 def get_logger(name: str, level: str = LOG_LEVEL) -> logging.Logger:
 

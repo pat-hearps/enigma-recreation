@@ -10,6 +10,7 @@ from enigma.utils import get_logger, VERBOSE, SPAM
 
 logger = get_logger(__name__)
 
+
 class MenuMaker:
 
     def __init__(self, crib, encoded_crib):
@@ -123,7 +124,9 @@ class MenuMaker:
             logger.log(SPAM, f"itr={itr} | id-chain = {iD, chain}")
             current_end = chain[-1]
             letters_that_current_end_is_connected_to = self.link_index[current_end]
-            logger.log(SPAM, f"itr={itr} | current end ({current_end}) is connected to {letters_that_current_end_is_connected_to}")
+            logger.log(
+                SPAM,
+                f"itr={itr} | current end ({current_end}) is connected to {letters_that_current_end_is_connected_to}")
             for jid, conxn in enumerate(letters_that_current_end_is_connected_to.values()):
                 key = round(iD + jid / 10 ** itr, 5)
                 logger.log(SPAM, f"itr={itr} | key={key}, jid={jid}, conxn={conxn}")
@@ -136,7 +139,7 @@ class MenuMaker:
                 chain = chain[:-1]
                 deadends[kid] = chain
                 logger.log(SPAM, f"itr={itr} | {chain} is a deadend")
-            elif chain[-1] == starting_character and len(chain) > 3:  ## ie we're legit back to the start after a loop
+            elif chain[-1] == starting_character and len(chain) > 3:  # ie we're legit back to the start after a loop
                 loops[kid] = chain
                 logger.log(VERBOSE, f"itr={itr} | loop found = {chain}")
             else:
@@ -226,7 +229,6 @@ class MenuMaker:
         logger.log(SPAM, f"dropped deadends = {dropped}")
         self.dead_ends = final_uniq_dends
 
-
     def loop_to_menu(self, mainloop=0):
         if mainloop == 0:
             mainloop = self.found_loops[0]
@@ -235,9 +237,9 @@ class MenuMaker:
             next_char = mainloop[i + 1]
             wdict = self.link_index[char]
             position = [k for k, v in wdict.items() if v == next_char][0]
-            ### note that I'm just picking the first one where there are double (or more) linkages
-            ### not sure if this matters for now or if its better to somehow include both linkages in the menu
-            ### revisit later depending on bombe methodology
+            # note that I'm just picking the first one where there are double (or more) linkages
+            # not sure if this matters for now or if its better to somehow include both linkages in the menu
+            # revisit later depending on bombe methodology
             self.menu[position] = {'in': char, 'out': next_char, 'menu_link': position}
             print(f"added item from loop '{mainloop}' to menu {position} : {self.menu[position]}")
 
@@ -259,7 +261,7 @@ class MenuMaker:
     def configure_menu(self):
         try:
             test_char = self.found_loops[0][0]
-        except:
+        except BaseException:
             dend_string = "".join(m for m in self.dead_ends)
             count_of_dead_ends = {}
             for d in dend_string:
@@ -268,8 +270,11 @@ class MenuMaker:
                 else:
                     count_of_dead_ends[d] += 1
 
-            test_char = \
-            [k for k, v in count_of_dead_ends.items() if v == sorted(count_of_dead_ends.values(), reverse=True)[0]][0]
+            test_char = [
+                k for k,
+                v in count_of_dead_ends.items() if v == sorted(
+                    count_of_dead_ends.values(),
+                    reverse=True)[0]][0]
 
         self.menu['config'] = {}
         self.menu['config']['test_char'] = test_char
@@ -279,7 +284,7 @@ class MenuMaker:
         self.menu['config']['conxns'] = {'in': {}, 'out': {}}
 
     def connections_add_to_menu(self):
-        ## this part adds in blank conx_in/out dicts and converts position to menulink 3-letter ZZ code
+        # this part adds in blank conx_in/out dicts and converts position to menulink 3-letter ZZ code
         for k, m in self.menu.items():
             if k == 'config':
                 pass
@@ -292,7 +297,7 @@ class MenuMaker:
                 self.menu[k]['conxns'] = {'in': {}, 'out': {}}
         #                 self.menu[k]['conx_out'] = {}
 
-        ## this part does the heavy lifting of populating the connections for each menu item
+        # this part does the heavy lifting of populating the connections for each menu item
         for pos, mdict in self.menu.items():
             sin = mdict['in']
             for k, v in self.menu.items():
@@ -317,7 +322,7 @@ class MenuMaker:
         try:
             for loop in self.found_loops:
                 self.loop_to_menu(mainloop=loop)
-        except:
+        except BaseException:
             pass
         self.add_deadends_to_menu(length_of_menu=length_of_menu)
         self.configure_menu()
@@ -332,7 +337,7 @@ class MenuMaker:
 
         fig, ax = plt.subplots(figsize=(8, 8))
 
-        if reset_pos == False:
+        if not reset_pos:
             pass
         else:
             self.pos = nx.spring_layout(self.MultiGraph, k=0.4, scale=1)
@@ -341,6 +346,6 @@ class MenuMaker:
 
         labels = nx.get_edge_attributes(self.MultiGraph, 'label')
         labels = {(k[0], k[1]): v for k, v in
-                  labels.items()}  ## doesnt' seem to be able to deal with labels for multiples edges
+                  labels.items()}  # doesnt' seem to be able to deal with labels for multiples edges
         edge_labels = nx.draw_networkx_edge_labels(self.MultiGraph, pos=self.pos, edge_labels=labels)
         plt.show(fig)
