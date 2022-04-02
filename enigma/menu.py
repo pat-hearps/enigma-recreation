@@ -31,6 +31,7 @@ class MenuMaker:
         self.create_link_index()
         self.find_best_characters()
         self.found_loops, self.dead_ends = {}, {}  # reset every time
+        # TODO - if no loops found, could try starting from non-best characters?
         for char in self.best_characters:
             logger.debug(f"finding loops for char {char}")
             self.find_loops(char)
