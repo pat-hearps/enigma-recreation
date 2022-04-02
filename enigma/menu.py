@@ -36,7 +36,11 @@ class MenuMaker:
             logger.debug(f"finding loops for char {char}")
             self.find_loops(char)
         logger.debug(f'num dead ends b4 rationalising= {len(self.dead_ends)}')
-        # # TODO get rid of rationalisting deadends, doesn't appear to change anything
+        """TODO:
+         - rationalise_to_list, unsub_list and get_smallest_loop appear to be dumb inefficient ways of picking
+           out the unique loops from the many possible ways of defining them. Replace with something shorter and more
+           intelligent based on using sets
+         - why am I keeping the deadends, what are they for?"""
         self.dead_ends = self.rationalise_to_list(self.dead_ends)
         logger.debug(f'num dead ends after ration, b4 unsub= {len(self.dead_ends)}')
         self.dead_ends = self.unsub_list(self.dead_ends)
@@ -96,6 +100,7 @@ class MenuMaker:
         logger.debug(f"chars with the most links ({max_count}) are: {self.best_characters}")
 
     def find_loops(self, starting_character: str):
+        # is really 'finding all possible loops' by brute-forcing traversing the chain
         working_dict = {i + 0.0: starting_character for i in range(len(self.link_index[starting_character]))}
         logger.log(SPAM, f"working dict = {working_dict}")
         for i, v in enumerate(self.link_index[starting_character].values()):
@@ -104,6 +109,8 @@ class MenuMaker:
         run = 1
         tracker = len(self.found_loops)
         while len(working_dict) > 0:
+            # with each iteration, size of chains grows by one each time, only keep those that are neither
+            # loops or deadends
             working_dict, self.found_loops, self.dead_ends = self.make_connections(
                 starting_character, working_dict, self.found_loops, self.dead_ends, run, tracker
             )
@@ -121,10 +128,12 @@ class MenuMaker:
         if itr == 1:
             working_dict = {k + tracking_len: v for k, v in deepcopy(indict).items()}
             indict = deepcopy(working_dict)
+            logger.log(VERBOSE, f"itr={itr} | working dict with tracking is now {working_dict}")
         else:
             working_dict = deepcopy(indict)
 
         for iD, chain in indict.items():
+            # this loop extends out each chain, by one more character, creating more chains if there is a fork?
             logger.log(SPAM, f"itr={itr} | id-chain = {iD, chain}")
             current_end = chain[-1]
             letters_that_current_end_is_connected_to = self.link_index[current_end]
@@ -136,9 +145,11 @@ class MenuMaker:
                 logger.log(SPAM, f"itr={itr} | key={key}, jid={jid}, conxn={conxn}")
                 if conxn != current_end:
                     working_dict[key] = indict[iD] + conxn
-
+        logger.log(VERBOSE, f"itr={itr} | chains grown, working dict is {working_dict}")
         dx = {}
         for kid, chain in working_dict.items():
+            # this loop parses the results of the chain additions, whether it's found a deadend or loop, or neither
+            # if neither, chain is added back into the working dict for the next iteration
             if chain[-1] == chain[-3]:  # and len(v):
                 chain = chain[:-1]
                 deadends[kid] = chain
@@ -149,6 +160,7 @@ class MenuMaker:
             else:
                 dx[kid] = chain
                 logger.log(SPAM, f"itr={itr} | keep going for {chain}")
+        logger.log(VERBOSE, f"itr={itr} | parsed working dict is {dx}")
         return dx, loops, deadends
 
     def rationalise_to_list(self, indict):
