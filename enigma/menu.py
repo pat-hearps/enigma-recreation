@@ -290,10 +290,10 @@ class MenuMaker:
                 pass
             else:
                 l = m['menu_link']
-                l = ENTRY[l - 1]
-                l = 'ZZ' + l
+                l1 = ENTRY[l - 1]
+                l2 = 'ZZ' + l1
                 #     print(l)
-                self.menu[k]['menu_link'] = l
+                self.menu[k]['menu_link'] = l2
                 self.menu[k]['conxns'] = {'in': {}, 'out': {}}
         #                 self.menu[k]['conx_out'] = {}
 
@@ -347,5 +347,5 @@ class MenuMaker:
         labels = nx.get_edge_attributes(self.MultiGraph, 'label')
         labels = {(k[0], k[1]): v for k, v in
                   labels.items()}  # doesnt' seem to be able to deal with labels for multiples edges
-        edge_labels = nx.draw_networkx_edge_labels(self.MultiGraph, pos=self.pos, edge_labels=labels)
+        # edge_labels = nx.draw_networkx_edge_labels(self.MultiGraph, pos=self.pos, edge_labels=labels)
         plt.show(fig)

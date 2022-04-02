@@ -45,6 +45,7 @@ def test_menumaker_loops(crib_set_name: str, start: int, end: int, expected: set
     assert found_loops == expected
     # assert 0
 
+
 # fmt: off
 basic_link_idx = {'A': {0: 'B', 2: 'C'}, 'B': {0: 'A', 1: 'C', 3: 'D'}, 'C': {1: 'B', 2: 'A'}, 'D': {3: 'B', 4: 'E'}, 'E': {4: 'D'}}
 w_14_link_idx = {'C': {0: 'T'}, 'D': {10: 'E'}, 'E': {4: 'P', 7: 'I', 10: 'D', 11: 'U'}, 'H': {3: 'Z'}, 'I': {7: 'E', 9: 'P', 12: 'N'}, 'K': {13: 'T'}, 'L': {6: 'R', 8: 'S'}, 'N': {2: 'T', 12: 'I'}, 'O': {1: 'Q'}, 'P': {4: 'E', 5: 'V', 9: 'I'}, 'Q': {1: 'O'}, 'R': {6: 'L'}, 'S': {8: 'L'}, 'T': {0: 'C', 2: 'N', 13: 'K'}, 'U': {11: 'E'}, 'V': {5: 'P'}, 'Z': {3: 'H'}}
