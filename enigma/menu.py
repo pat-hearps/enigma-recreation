@@ -94,7 +94,7 @@ class MenuMaker:
         )
         logger.debug(f"chars with the most links ({max_count}) are: {self.best_characters}")
 
-    def find_loops(self, starting_character):
+    def find_loops(self, starting_character: str):
         working_dict = {i + 0.0: starting_character for i in range(len(self.link_index[starting_character]))}
         logger.log(SPAM, f"working dict = {working_dict}")
         for i, v in enumerate(self.link_index[starting_character].values()):
@@ -109,7 +109,9 @@ class MenuMaker:
             logger.log(SPAM, f"itr={run} | working dict is now = {working_dict}")
             run += 1
 
-    def make_connections(self, starting_character, indict, loops={}, deadends={}, itr=1, tracking_len=0):
+    def make_connections(
+            self, starting_character: str, indict: Dict, loops: Dict, deadends: Dict, itr: int, tracking_len: int
+    ):
         """for sorting through a hipairs dictionary of letters of interest and their corresponding paired letters.
         Used with a WHILE loop, can recursively search through 'chains' or paths that a letter sequence can take
         by following pairs from one letter to the next. Looks for 'loops', where a chain path can return to its original
