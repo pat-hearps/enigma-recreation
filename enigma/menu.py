@@ -111,6 +111,10 @@ class MenuMaker:
         while len(working_dict) > 0:
             # with each iteration, size of chains grows by one each time, only keep those that are neither
             # loops or deadends
+            #  TODO refactor to call the 3 separate funcs making up make_Connections here, e.g.
+            # self.copy_dict()
+            # self.make_connections()
+            # self.parse_chains()
             working_dict, self.found_loops, self.dead_ends = self.make_connections(
                 starting_character, working_dict, self.found_loops, self.dead_ends, run, tracker
             )
@@ -125,6 +129,7 @@ class MenuMaker:
         by following pairs from one letter to the next. Looks for 'loops', where a chain path can return to its original
         starting letter. Records other chains as deadends
         """
+        # TODO refactor to make this a minifunc in itself, e.g. def copy_dict()
         if itr == 1:
             working_dict = {k + tracking_len: v for k, v in deepcopy(indict).items()}
             indict = deepcopy(working_dict)
@@ -132,6 +137,8 @@ class MenuMaker:
         else:
             working_dict = deepcopy(indict)
 
+        # TODO refactor to make just this loop the make_connections part
+        # def make_connections()  # or 'grow_chains()' ?
         for iD, chain in indict.items():
             # this loop extends out each chain, by one more character, creating more chains if there is a fork?
             logger.log(SPAM, f"itr={itr} | id-chain = {iD, chain}")
@@ -146,6 +153,9 @@ class MenuMaker:
                     logger.log(SPAM, f"itr={itr} | saving key={key} = {chain} + conxn={conxn}")
                     working_dict[key] = indict[iD] + conxn
         logger.log(VERBOSE, f"itr={itr} | chains grown, working dict is {working_dict}")
+
+        # TODO refactor this to its own func, could potentially add in the smarts for rationalising loops here
+        # def parse_chains()
         dx = {}
         for kid, chain in working_dict.items():
             # this loop parses the results of the chain additions, whether it's found a deadend or loop, or neither
