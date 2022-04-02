@@ -6,8 +6,8 @@ from enigma.menu import MenuMaker
 
 CRIBS = {
     "basic": {
-        "crib__guess": "ABCDD",
-        "crib_cypher": "BCABE"
+        "crib__guess": "ABCDDEF",
+        "crib_cypher": "BCABEFB"
     },
     "welchman": {
         "crib__guess": "TOTHEPRESIDENTOFTHEUNITEDSTATES",
@@ -32,7 +32,8 @@ loop_data = [
     ("welchman", 3, 23, gw_all_loops),  # note this has been failing since added, indicates true problems in code
     ("welchman", 14, 27, set()),
     ("dermot_BB", 0, 30, {frozenset(('G', 'E', 'V', 'S', 'A', 'R'))}),
-    ("basic", 0, 4, {frozenset(('A', 'B', 'C'))})
+    ("basic", 0, 4, {frozenset(('A', 'B', 'C'))}),
+    ("basic", 1, 7, {frozenset(('B', 'D', 'E', 'F'))})
 ]
 
 
