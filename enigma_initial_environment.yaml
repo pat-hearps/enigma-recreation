@@ -4,18 +4,20 @@ channels:
   - nodefaults
   - plotly
 dependencies:
-  - python=3.7
-  - dash_cytoscape=0.2.0
-  - dill=0.3.2
-  - jupyterlab=2.2.4
-  - jupyterlab-dash=0.1.0a3
-  - matplotlib=3.3.0
-  - networkx=2.4
-  - numpy=1.19.1
-  - openblas=0.3.10
-  - pandas=1.1.0
-  - plotly=4.9.0
-  - pytest=6.0.1
-  - seaborn=0.10.1
+  - dash_cytoscape
+  - dill
+  - factory_boy
+  - jupyterlab
+  - jupyterlab-dash
+  - matplotlib
+  - networkx
+  - numpy
+  - openblas
+  - pandas
+  - plotly
+  - pytest
+  - pylint
+  - python=3.9
+  - seaborn
 prefix: /opt/miniconda3/envs/enigma
 
