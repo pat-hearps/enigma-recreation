@@ -81,3 +81,14 @@ def test_find_best_characters(crib_set_name: str, start: int, end: int, expected
     menu_mkr.create_link_index()
     menu_mkr.find_best_characters()
     assert menu_mkr.best_characters == expected
+
+
+@pytest.mark.parametrize("crib_set_name, start, end, expected", best_chars_data)
+def test_find_loops(crib_set_name: str, start: int, end: int, expected: set) -> None:
+    crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
+    menu_mkr = MenuMaker(crib=crib_guess[start:end], encoded_crib=crib_cypher[start:end])
+    menu_mkr.count_characters()
+    menu_mkr.create_link_index()
+    menu_mkr.find_best_characters()
+    for best_char in expected:
+        menu_mkr.find_loops(best_char)
