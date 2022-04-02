@@ -1,13 +1,15 @@
 import random
-from string import ascii_uppercase, ascii_letters
-from pprint import pprint
 from copy import deepcopy
+from pprint import pprint
+from string import ascii_letters, ascii_uppercase
+
 import dill
+import matplotlib.colors as mclr
+import matplotlib.pyplot as plt
+import networkx as nx
 import numpy as np
 import pandas as pd
-import networkx as nx
-import matplotlib.pyplot as plt
-import matplotlib.colors as mclr
+
 from enigma.design import ENTRY, REFLECTORS_CYPHER, notches
 
 

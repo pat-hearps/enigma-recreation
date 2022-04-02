@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 import matplotlib.colors as mclr
 
 i = 'I'

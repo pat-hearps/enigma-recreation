@@ -3,9 +3,16 @@ from typing import Tuple
 
 import pytest
 
-from enigma.enigma import Rotor, once_thru_scramble, encode_thru_rotor, Enigma, Reflector, \
-    encode_thru_reflector, full_scramble
 from enigma.design import ENTRY, i, ii, iii, iv, v
+from enigma.enigma import (
+    Enigma,
+    Reflector,
+    Rotor,
+    encode_thru_reflector,
+    encode_thru_rotor,
+    full_scramble,
+    once_thru_scramble,
+)
 from enigma.tests.factories import WindowFactory
 
 

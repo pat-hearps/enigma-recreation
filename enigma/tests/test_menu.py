@@ -1,5 +1,6 @@
-import pytest
 from typing import Tuple
+
+import pytest
 
 from enigma.menu import MenuMaker
 

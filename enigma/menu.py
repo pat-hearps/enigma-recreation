@@ -2,11 +2,11 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List
 
-import networkx as nx
 import matplotlib.pyplot as plt
+import networkx as nx
 
 from enigma.design import ENTRY
-from enigma.utils import get_logger, VERBOSE, SPAM
+from enigma.utils import SPAM, VERBOSE, get_logger
 
 logger = get_logger(__name__)
 
