@@ -70,11 +70,13 @@ def test_menumaker_create_link_index(crib_set_name: str, start: int, end: int, e
 
 best_chars_data = [
     ("basic", 0, 5, ('B',)),
+    ("basic", 1, 7, ('B',)),
     ("welchman", 0, 14, ('E',)),
     ("dermot_BB", 0, 30, ('E', 'G', 'R'))
 ]
 exp_loops = [
     [{'BACB', 'BCAB'}],
+    [{'BDEFB', 'BFEDB'}],  # finds loops both clockwise and anticlockwise
     [{'EPIE', 'EIPE'}]
 ]
 loops_data = [tuple(list(data) + exp) for data, exp in zip(best_chars_data[:2], exp_loops)]
