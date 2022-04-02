@@ -18,7 +18,7 @@ notches = {'I': 'Q', 'II': 'E', 'III': 'V', 'IV': 'J', 'V': 'Z'}
 
 @dataclass
 class ROTORS:
-    I = 'EKMFLGDQVZNTOWYHXUSPAIBRCJ'
+    I = 'EKMFLGDQVZNTOWYHXUSPAIBRCJ'  # noqa: E741
     II = 'AJDKSIRUXBLHWTMCQGZNPYFVOE'
     III = 'BDFHJLCPRTXVZNYEIWGAKMUSQO'
     IV = 'ESOVPZJAYQUIRHXLNFTGKDCMWB'
@@ -30,7 +30,7 @@ class ROTORS:
 @dataclass
 class NOTCHES:
     "Window setting at which the rotor will cause the rotor to its left to step"
-    I = "Q"
+    I = "Q"  # noqa: E741
     II = "E"
     III = "V"
     IV = "J"
