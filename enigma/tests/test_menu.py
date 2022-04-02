@@ -26,7 +26,8 @@ def get_crib_cypher(crib_set_name: str) -> Tuple[str, str]:
     return crib_guess, crib_cypher
 
 
-gw_all_loops = {frozenset(['E', 'I', 'P']), frozenset(['I', 'P', 'V']), frozenset(['N', 'O', 'T'])}
+gw_all_loops = {frozenset(['E', 'I', 'P']), frozenset(['I', 'P', 'V']), frozenset(['N', 'O', 'T']),
+                frozenset(['D', 'E', 'I', 'N', 'T'])}
 loop_data = [
     ("welchman", 0, 14, {frozenset(['E', 'I', 'P'])}),
     ("welchman", 2, 22, gw_all_loops),  # note this has been failing since added, indicates true problems in code
