@@ -83,7 +83,7 @@ class MenuMaker:
         """
         for character in self.char_counts.keys():
             link_idx = {pos: (pair - {character}).pop() for pos, pair in self.pairs.items() if character in pair}
-            logger.log(SPAM, f"index of links for char={character} is {link_idx}")
+            # logger.log(SPAM, f"index of links for char={character} is {link_idx}")
             self.link_index[character] = link_idx
         # link_index = for each char in links, what other chars are they linked to at what position
         # result is dict of k=position, v=char
@@ -102,10 +102,10 @@ class MenuMaker:
     def find_loops(self, starting_character: str):
         # is really 'finding all possible loops' by brute-forcing traversing the chain
         working_dict = {i + 0.0: starting_character for i in range(len(self.link_index[starting_character]))}
-        logger.log(SPAM, f"working dict = {working_dict}")
+        logger.log(VERBOSE, f"working dict = {working_dict}")
         for i, v in enumerate(self.link_index[starting_character].values()):
             working_dict[i] += v
-        logger.log(SPAM, f"working dict is now = {working_dict}")
+        logger.log(VERBOSE, f"working dict is now = {working_dict}")
         run = 1
         tracker = len(self.found_loops)
         while len(working_dict) > 0:
@@ -114,7 +114,7 @@ class MenuMaker:
             working_dict, self.found_loops, self.dead_ends = self.make_connections(
                 starting_character, working_dict, self.found_loops, self.dead_ends, run, tracker
             )
-            logger.log(SPAM, f"itr={run} | working dict is now = {working_dict}")
+            logger.log(VERBOSE, f"itr={run} | working dict is now = {working_dict}")
             run += 1
 
     def make_connections(
@@ -142,18 +142,19 @@ class MenuMaker:
                 f"itr={itr} | current end ({current_end}) is connected to {letters_that_current_end_is_connected_to}")
             for jid, conxn in enumerate(letters_that_current_end_is_connected_to.values()):
                 key = round(iD + jid / 10 ** itr, 5)
-                logger.log(SPAM, f"itr={itr} | key={key}, jid={jid}, conxn={conxn}")
                 if conxn != current_end:
+                    logger.log(SPAM, f"itr={itr} | saving key={key} = {chain} + conxn={conxn}")
                     working_dict[key] = indict[iD] + conxn
         logger.log(VERBOSE, f"itr={itr} | chains grown, working dict is {working_dict}")
         dx = {}
         for kid, chain in working_dict.items():
             # this loop parses the results of the chain additions, whether it's found a deadend or loop, or neither
             # if neither, chain is added back into the working dict for the next iteration
+            logger.log(SPAM, f"kid={kid}, chain={chain}")
             if chain[-1] == chain[-3]:  # and len(v):
+                logger.log(SPAM, f"itr={itr} | {chain} is a deadend bc last({chain[-1]}) == 3rd last({chain[-3]})")
                 chain = chain[:-1]
                 deadends[kid] = chain
-                logger.log(SPAM, f"itr={itr} | {chain} is a deadend")
             elif chain[-1] == starting_character and len(chain) > 3:  # ie we're legit back to the start after a loop
                 loops[kid] = chain
                 logger.log(VERBOSE, f"itr={itr} | loop found = {chain}")
