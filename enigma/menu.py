@@ -22,14 +22,15 @@ class MenuMaker:
         self.char_counts: Dict[str, int] = {}
         self.best_characters: List[str] = []
         self.link_index: Dict[str, dict] = {}
+        self.found_loops: Dict = {}
+        self.dead_ends: Dict = {}
 
     def process_stuff(self):
         """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
         self.count_characters()
         self.create_link_index()
         self.find_best_characters()
-        self.found_loops = {}
-        self.dead_ends = {}
+        self.found_loops, self.dead_ends = {}, {}  # reset every time
         for char in self.best_characters:
             logger.debug(f"finding loops for char {char}")
             self.find_loops(char)
