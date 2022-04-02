@@ -88,7 +88,7 @@ class MenuMaker:
         set these to self.best_characters
         """
         max_count = max(self.char_counts.values())
-        self.best_characters = (
+        self.best_characters = tuple(
             char for char, n_links in self.char_counts.items() if n_links == max_count
         )
         logger.debug(f"chars with the most links ({max_count}) are: {self.best_characters}")
