@@ -71,6 +71,11 @@ best_chars_data = [
     ("welchman", 0, 14, ('E',)),
     ("dermot_BB", 0, 30, ('E', 'G', 'R'))
 ]
+exp_loops = [
+    [{'BACB', 'BCAB'}],
+    [{'EPIE', 'EIPE'}]
+]
+loops_data = [tuple(list(data) + exp) for data, exp in zip(best_chars_data[:2], exp_loops)]
 
 
 @pytest.mark.parametrize("crib_set_name, start, end, expected", best_chars_data)
@@ -83,12 +88,15 @@ def test_find_best_characters(crib_set_name: str, start: int, end: int, expected
     assert menu_mkr.best_characters == expected
 
 
-@pytest.mark.parametrize("crib_set_name, start, end, expected", best_chars_data)
-def test_find_loops(crib_set_name: str, start: int, end: int, expected: set) -> None:
+@pytest.mark.parametrize("crib_set_name, start, end, best_chars, expected", loops_data)
+def test_find_loops(crib_set_name: str, start: int, end: int, best_chars: tuple, expected: set) -> None:
     crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
     menu_mkr = MenuMaker(crib=crib_guess[start:end], encoded_crib=crib_cypher[start:end])
     menu_mkr.count_characters()
     menu_mkr.create_link_index()
     menu_mkr.find_best_characters()
-    for best_char in expected:
+    for best_char in best_chars:
+        print(f'finding for char {best_char}')
         menu_mkr.find_loops(best_char)
+        print(f'found loops = {menu_mkr.found_loops}')
+    assert set(menu_mkr.found_loops.values()) == expected
