@@ -1,0 +1,33 @@
+[tool.autopep8]
+max_line_length = 120
+ignore = "W6"
+in-place = true
+recursive = true
+aggressive = 2
+
+# configurations for Black pre-commit hook
+[tool.black]
+# autoformat to this max line length
+line-length = 120
+
+# configurations for mypy pre-commit hook
+[tool.mypy]
+# error codes will give more info to users to help correct a problem
+show_error_codes = true
+# ignoring missing import avoids undesired errors with our own source code
+# missing python stubs
+ignore_missing_imports = true
+
+# configuration for isort pre-commit hook
+[tool.isort]
+# profile tells isort to co-operate and not conlict with Black's format
+profile = "black"
+# tells isort to filter files by its usual patterns (e.g. *.py files only),
+# even when pre-commit passes all changed files as CLI args
+# see https://jugmac00.github.io/blog/isort-and-pre-commit-a-friendship-with-obstacles/
+filter_files = true
+# tells isort to ignore any files that are gitignored
+skip_gitignore = true
+# match our Black autoformatting max line length
+line_length = 120
+known_first_party=["src",]

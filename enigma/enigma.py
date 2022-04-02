@@ -1,8 +1,17 @@
 from string import ascii_uppercase
-from typing import List, Dict
+from typing import Dict, List
 
-from enigma.design import (ENTRY, raw_rotors, FORWARD_ROTORS, REVERSE_ROTORS, REFLECTORS_CYPHER, ROTOR_INDEX, ROTORS,
-                           NOTCHES, REFLECTORS_INDEX)
+from enigma.design import (
+    ENTRY,
+    FORWARD_ROTORS,
+    NOTCHES,
+    REFLECTORS_CYPHER,
+    REFLECTORS_INDEX,
+    REVERSE_ROTORS,
+    ROTOR_INDEX,
+    ROTORS,
+    raw_rotors,
+)
 from enigma.utils import vprint
 
 

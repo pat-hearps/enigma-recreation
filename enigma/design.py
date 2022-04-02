@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 import matplotlib.colors as mclr
 
 i = 'I'
@@ -17,19 +18,19 @@ notches = {'I': 'Q', 'II': 'E', 'III': 'V', 'IV': 'J', 'V': 'Z'}
 
 @dataclass
 class ROTORS:
-    I = 'EKMFLGDQVZNTOWYHXUSPAIBRCJ'
+    I = 'EKMFLGDQVZNTOWYHXUSPAIBRCJ'  # noqa: E741
     II = 'AJDKSIRUXBLHWTMCQGZNPYFVOE'
     III = 'BDFHJLCPRTXVZNYEIWGAKMUSQO'
     IV = 'ESOVPZJAYQUIRHXLNFTGKDCMWB'
     V = 'VZBRGITYUPSDNHLXAWMJQOFECK'
     ALL = (I, II, III, IV, V)
-    MAP = {i:I, ii:II, iii:III, iv:IV, v:V}
+    MAP = {i: I, ii: II, iii: III, iv: IV, v: V}
 
 
 @dataclass
 class NOTCHES:
     "Window setting at which the rotor will cause the rotor to its left to step"
-    I = "Q"
+    I = "Q"  # noqa: E741
     II = "E"
     III = "V"
     IV = "J"
@@ -38,7 +39,8 @@ class NOTCHES:
     MAP = {i: I, ii: II, iii: III, iv: IV, v: V}
 
 
-## forward rotors is the forward in:out pairings of each rotor as the character index of the A-Z ascii alphabet stored in 'entry'
+# forward rotors is the forward in:out pairings of each rotor as the
+# character index of the A-Z ascii alphabet stored in 'entry'
 FORWARD_ROTORS = {i: [4, 10, 12, 5, 11, 6, 3, 16, 21, 25, 13, 19, 14, 22, 24, 7, 23, 20, 18, 15, 0, 8, 1, 17, 2, 9],
                   ii: [0, 9, 3, 10, 18, 8, 17, 20, 23, 1, 11, 7, 22, 19, 12, 2, 16, 6, 25, 13, 15, 24, 5, 21, 14, 4],
                   iii: [1, 3, 5, 7, 9, 11, 2, 15, 17, 19, 23, 21, 25, 13, 24, 4, 8, 22, 6, 0, 10, 12, 20, 18, 16, 14],
@@ -52,7 +54,7 @@ REVERSE_ROTORS = {i: [20, 22, 24, 6, 0, 3, 5, 15, 21, 25, 1, 4, 2, 10, 12, 19, 7
                   iv: [7, 25, 22, 21, 0, 17, 19, 13, 11, 6, 20, 15, 23, 16, 2, 4, 9, 12, 1, 18, 10, 3, 24, 14, 8, 5],
                   v: [16, 2, 24, 11, 23, 22, 4, 13, 5, 19, 25, 14, 18, 12, 21, 9, 20, 3, 10, 6, 8, 0, 17, 15, 7, 1]}
 
-## in:out pairings for reflectors
+# in:out pairings for reflectors
 REFLECTORS_CYPHER = {
     'B': {'A': 'Y', 'B': 'R', 'C': 'U', 'D': 'H', 'E': 'Q', 'F': 'S', 'G': 'L', 'H': 'D', 'I': 'P', 'J': 'X', 'K': 'N',
           'L': 'G', 'M': 'O', 'N': 'K', 'O': 'M', 'P': 'I', 'Q': 'E', 'R': 'B', 'S': 'F', 'T': 'Z', 'U': 'C', 'V': 'W',
