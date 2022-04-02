@@ -6,22 +6,22 @@ from enigma.menu import MenuMaker
 
 CRIBS = {
     "basic": {
-        "crib_guess": "ABCDD",
+        "crib__guess": "ABCDD",
         "crib_cypher": "BCABE"
     },
     "welchman": {
-        "crib_guess": "TOTHEPRESIDENTOFTHEUNITEDSTATES",
+        "crib__guess": "TOTHEPRESIDENTOFTHEUNITEDSTATES",
         "crib_cypher": "CQNZPVLILPEUIKTEDCGLOVWVGTUFLNZ"
     },
     "dermot_BB": {
-        "crib_guess": "WETTERVORHERSAGE",
+        "crib__guess": "WETTERVORHERSAGE",
         "crib_cypher": "SNMKGGSTZZUGARLV"
     }
 }
 
 
 def get_crib_cypher(crib_set_name: str) -> Tuple[str, str]:
-    crib_guess = CRIBS[crib_set_name]["crib_guess"]
+    crib_guess = CRIBS[crib_set_name]["crib__guess"]
     crib_cypher = CRIBS[crib_set_name]["crib_cypher"]
     return crib_guess, crib_cypher
 
