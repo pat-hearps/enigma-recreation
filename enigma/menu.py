@@ -245,7 +245,7 @@ class MenuMaker:
 
     def add_deadends_to_menu(self, length_of_menu=12):
         for ends in sorted(self.dead_ends, reverse=True):
-            current_len = len(self.menu)
+            # current_len = len(self.menu)
             #     print(current_len)
             for i, char in enumerate(ends[:-1]):
                 if len(self.menu) >= length_of_menu:
@@ -289,7 +289,7 @@ class MenuMaker:
             if k == 'config':
                 pass
             else:
-                l = m['menu_link']
+                l = m['menu_link']  # noqa: E741
                 l1 = ENTRY[l - 1]
                 l2 = 'ZZ' + l1
                 #     print(l)
@@ -344,7 +344,7 @@ class MenuMaker:
 
         nx.draw_networkx(self.MultiGraph, pos=self.pos)
 
-        labels = nx.get_edge_attributes(self.MultiGraph, 'label')
+        # labels = nx.get_edge_attributes(self.MultiGraph, 'label')
         # labels = {(k[0], k[1]): v for k, v in
         #           labels.items()}  # doesnt' seem to be able to deal with labels for multiples edges
         # edge_labels = nx.draw_networkx_edge_labels(self.MultiGraph, pos=self.pos, edge_labels=labels)
