@@ -97,7 +97,7 @@ class MenuMaker:
     def find_loops(self, starting_character):
         working_dict = {i + 0.0: starting_character for i in range(len(self.link_index[starting_character]))}
         logger.log(SPAM, f"working dict = {working_dict}")
-        for i, v in zip(range(len(self.link_index[starting_character])), self.link_index[starting_character].values()):
+        for i, v in enumerate(self.link_index[starting_character].values()):
             working_dict[i] += v
         logger.log(SPAM, f"working dict is now = {working_dict}")
         run = 1
