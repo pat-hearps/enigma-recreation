@@ -1,6 +1,5 @@
 name: enigma
 channels:
-  - conda-forge
   - defaults
 dependencies:
   - seaborn
