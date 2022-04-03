@@ -137,6 +137,14 @@ class MenuMaker:
         else:
             working_dict = deepcopy(indict)
 
+        self.grow_chains(indict, itr, working_dict)
+
+        dx, loops, deadends = self.parse_chains(deadends, itr, loops, starting_character, working_dict)
+        return dx, loops, deadends
+
+    def grow_chains(self, indict, itr, working_dict):
+        """For all the chains of letters in the working_dict, grow the chain by one letter, for each letter
+        that the end is connected to. This may forking to create multiple chains from one original."""
         # TODO refactor to make just this loop the make_connections part
         # def make_connections()  # or 'grow_chains()' ?
         for iD, chain in indict.items():
@@ -153,9 +161,6 @@ class MenuMaker:
                     logger.log(SPAM, f"itr={itr} | saving key={key} = {chain} + conxn={conxn}")
                     working_dict[key] = indict[iD] + conxn
         logger.log(VERBOSE, f"itr={itr} | chains grown, working dict is {working_dict}")
-
-        dx, loops, deadends = self.parse_chains(deadends, itr, loops, starting_character, working_dict)
-        return dx, loops, deadends
 
     def parse_chains(self, deadends, itr, loops, starting_character, working_dict):
         # TODO refactor this to its own func, could potentially add in the smarts for rationalising loops here
