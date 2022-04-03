@@ -104,7 +104,7 @@ class MenuMaker:
         working_dict = {i + 0.0: ''.join((starting_character, v))
                         for i, v in enumerate(self.link_index[starting_character].values())
                         }
-        logger.log(VERBOSE, f"working dict is= {working_dict}")
+        logger.log(VERBOSE, f"initial working dict is= {working_dict}")
         run, tracker = 1, len(self.found_loops)
         while len(working_dict) > 0:
             # with each iteration, size of chains grows by one each time, only keep those that are neither
@@ -116,7 +116,7 @@ class MenuMaker:
             working_dict, self.found_loops, self.dead_ends = self.make_connections(
                 starting_character, working_dict, self.found_loops, self.dead_ends, run, tracker
             )
-            logger.log(VERBOSE, f"itr={run} | working dict is now = {working_dict}")
+            logger.log(VERBOSE, f"itr={run} | end itr working dict is now = {working_dict}")
             run += 1
 
     def make_connections(
@@ -136,7 +136,7 @@ class MenuMaker:
             working_dict = deepcopy(indict)
 
         self.grow_chains(indict, itr, working_dict)
-
+        logger.log(SPAM, f"out of grow_chains, \nin={indict}\nwd={working_dict}")
         dx, loops, deadends = self.parse_chains(deadends, itr, loops, starting_character, working_dict)
         return dx, loops, deadends
 
@@ -145,6 +145,7 @@ class MenuMaker:
         that the end is connected to. This may forking to create multiple chains from one original."""
         # TODO refactor to make just this loop the make_connections part
         # def make_connections()  # or 'grow_chains()' ?
+        logger.log(SPAM, f"itr={itr} | starting grow_chains\nin={indict}\nwd={working_dict}")
         for iD, chain in indict.items():
             # this loop extends out each chain, by one more character, creating more chains if there is a fork?
             logger.log(SPAM, f"itr={itr} | id-chain = {iD, chain}")
@@ -156,9 +157,9 @@ class MenuMaker:
             for jid, conxn in enumerate(letters_that_current_end_is_connected_to.values()):
                 key = round(iD + jid / 10 ** itr, 5)
                 if conxn != current_end:
-                    logger.log(SPAM, f"itr={itr} | saving key={key} = {chain} + conxn={conxn}")
+                    logger.log(SPAM, f"itr={itr} | saving key={key} = {chain}+{conxn}")
                     working_dict[key] = indict[iD] + conxn
-        logger.log(VERBOSE, f"itr={itr} | chains grown, working dict is {working_dict}")
+        logger.log(VERBOSE, f"itr={itr} | chains grown,\nin={indict}\nwd={working_dict}")
 
     def parse_chains(self, deadends, itr, loops, starting_character, working_dict):
         # TODO refactor this to its own func, could potentially add in the smarts for rationalising loops here
