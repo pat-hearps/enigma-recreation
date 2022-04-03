@@ -140,13 +140,13 @@ class MenuMaker:
         dx, loops, deadends = self.parse_chains(deadends, itr, loops, starting_character, working_dict)
         return dx, loops, deadends
 
-    def grow_chains(self, indict, itr, working_dict):
+    def grow_chains(self, old_working_dict, itr, working_dict):
         """For all the chains of letters in the working_dict, grow the chain by one letter, for each letter
         that the end is connected to. This may forking to create multiple chains from one original."""
         # TODO refactor to make just this loop the make_connections part
         # def make_connections()  # or 'grow_chains()' ?
-        logger.log(SPAM, f"itr={itr} | starting grow_chains\nin={indict}\nwd={working_dict}")
-        for iD, chain in indict.items():
+        logger.log(SPAM, f"itr={itr} | starting grow_chains\nin={old_working_dict}\nwd={working_dict}")
+        for iD, chain in old_working_dict.items():
             # this loop extends out each chain, by one more character, creating more chains if there is a fork?
             logger.log(SPAM, f"itr={itr} | id-chain = {iD, chain}")
             current_end = chain[-1]
@@ -159,7 +159,7 @@ class MenuMaker:
                 logger.log(SPAM, f"itr={itr} | saving key={key} = {chain}+{conxn}")
                 working_dict[key] = chain + conxn
 
-        logger.log(VERBOSE, f"itr={itr} | chains grown,\nin={indict}\nwd={working_dict}")
+        logger.log(VERBOSE, f"itr={itr} | chains grown,\nin={old_working_dict}\nwd={working_dict}")
 
     def parse_chains(self, deadends, itr, loops, starting_character, working_dict):
         # TODO refactor this to its own func, could potentially add in the smarts for rationalising loops here
