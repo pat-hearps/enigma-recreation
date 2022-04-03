@@ -101,7 +101,7 @@ class MenuMaker:
 
     def find_loops(self, starting_character: str):
         # is really 'finding all possible loops' by brute-forcing traversing the chain
-        working_dict = {i + 0.0: starting_character for i in range(len(self.link_index[starting_character]))}
+        working_dict = {i + 0.0: starting_character for i, _ in enumerate(self.link_index[starting_character])}
         logger.log(VERBOSE, f"working dict = {working_dict}")
         for i, v in enumerate(self.link_index[starting_character].values()):
             working_dict[i] += v
