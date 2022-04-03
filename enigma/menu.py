@@ -105,8 +105,7 @@ class MenuMaker:
                         for i, v in enumerate(self.link_index[starting_character].values())
                         }
         logger.log(VERBOSE, f"working dict is= {working_dict}")
-        run = 1
-        tracker = len(self.found_loops)
+        run, tracker = 1, len(self.found_loops)
         while len(working_dict) > 0:
             # with each iteration, size of chains grows by one each time, only keep those that are neither
             # loops or deadends
