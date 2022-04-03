@@ -156,9 +156,9 @@ class MenuMaker:
                 f"itr={itr} | current end ({current_end}) is connected to {letters_that_current_end_is_connected_to}")
             for jid, conxn in enumerate(letters_that_current_end_is_connected_to.values()):
                 key = round(iD + jid / 10 ** itr, 5)
-                if conxn != current_end:
-                    logger.log(SPAM, f"itr={itr} | saving key={key} = {chain}+{conxn}")
-                    working_dict[key] = chain + conxn
+                logger.log(SPAM, f"itr={itr} | saving key={key} = {chain}+{conxn}")
+                working_dict[key] = chain + conxn
+
         logger.log(VERBOSE, f"itr={itr} | chains grown,\nin={indict}\nwd={working_dict}")
 
     def parse_chains(self, deadends, itr, loops, starting_character, working_dict):
