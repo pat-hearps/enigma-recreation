@@ -154,6 +154,10 @@ class MenuMaker:
                     working_dict[key] = indict[iD] + conxn
         logger.log(VERBOSE, f"itr={itr} | chains grown, working dict is {working_dict}")
 
+        dx, loops, deadends = self.parse_chains(deadends, itr, loops, starting_character, working_dict)
+        return dx, loops, deadends
+
+    def parse_chains(self, deadends, itr, loops, starting_character, working_dict):
         # TODO refactor this to its own func, could potentially add in the smarts for rationalising loops here
         # def parse_chains()
         dx = {}
