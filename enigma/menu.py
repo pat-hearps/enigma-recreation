@@ -136,9 +136,7 @@ class MenuMaker:
 
     def grow_chains(self, old_working_dict, itr):
         """For all the chains of letters in the working_dict, grow the chain by one letter, for each letter
-        that the end is connected to. This may forking to create multiple chains from one original."""
-        # TODO refactor to make just this loop the make_connections part
-        # def make_connections()  # or 'grow_chains()' ?
+        that the end is connected to. This may fork to create multiple chains from one original."""
         new_working_dict = deepcopy(old_working_dict)
 
         for iD, chain in old_working_dict.items():
