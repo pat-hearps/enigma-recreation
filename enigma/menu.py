@@ -176,9 +176,21 @@ class MenuMaker:
                 parsed_working_dict[iD] = chain
         return parsed_working_dict, deadends
 
-    def add_to_found_loops(self, new_loop: str) -> None:
+    def add_to_found_loops(self, new_loop: str, itr: int = None) -> None:
+        """Makes sure candidate new loop is genuinely new. Converts to frozenset for comparison
+        against existing found loops."""
         new_loop_set = frozenset(new_loop)
-        self.found_loops[new_loop_set] = new_loop
+        already_found = False
+
+        for found_loop in self.found_loops.keys():
+            if found_loop.issubset(new_loop_set):
+                already_found = True
+            elif new_loop_set.issubset(found_loop):
+                del self.found_loops[found_loop]
+
+        if not already_found:
+            self.found_loops[new_loop_set] = new_loop
+            logger.debug(f"itr={itr} | loop found = {new_loop}")
 
     def rationalise_to_list(self, indict):
         """goes through list values of results from find_loops, turns into single large list,
