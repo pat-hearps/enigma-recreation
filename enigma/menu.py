@@ -132,7 +132,7 @@ class MenuMaker:
         logger.log(VERBOSE, f"out of grow_chains, \n{spc50}in={indict}\n{spc50}wd={grown_working_dict}")
 
         parsed_working_dict, deadends = self.parse_chains(
-            deadends, itr, starting_character, grown_working_dict)
+            deadends, itr, grown_working_dict)
         logger.log(VERBOSE, f"chains parsed, \n{spc50}in={grown_working_dict}\n{spc50}out={parsed_working_dict}")
 
         return parsed_working_dict, deadends
@@ -158,7 +158,7 @@ class MenuMaker:
 
         return new_working_dict
 
-    def parse_chains(self, deadends, itr, starting_character, grown_working_dict):
+    def parse_chains(self, deadends, itr, grown_working_dict):
         """This loop parses the results of the chain additions, whether it's found a deadend or loop, or neither
         if neither, chain is added back into the working dict for the next iteration
         """
@@ -168,9 +168,8 @@ class MenuMaker:
                 logger.log(SPAM, f"itr={itr} | {chain} is a deadend bc last({chain[-1]}) == 3rd last({chain[-3]})")
                 chain = chain[:-1]
                 deadends[iD] = chain
-            elif chain[-1] == starting_character and len(chain) > 3:  # ie we're legit back to the start after a loop
-                logger.log(VERBOSE, f"itr={itr} | loop found = {chain}")
-                self.add_to_found_loops(chain)
+            elif (chain_len := len(chain)) > 3 and len(set(chain)) < chain_len:  # ie we're legit back to the start after a loop
+                self.add_to_found_loops(chain, itr)
             else:  # just keep growing to see where it goes
                 logger.log(SPAM, f"itr={itr} | keep going for {chain}")
                 parsed_working_dict[iD] = chain
@@ -181,7 +180,8 @@ class MenuMaker:
         against existing found loops."""
         new_loop_set = frozenset(new_loop)
         already_found = False
-
+        # TODO use some string counting mechanism to find subset of loop that represents smallest chunk
+        #  e.g. EINTON --> NTON, by only keeping the bit between the two 'N's which is the double counted letter
         for found_loop in self.found_loops.keys():
             if found_loop.issubset(new_loop_set):
                 already_found = True
