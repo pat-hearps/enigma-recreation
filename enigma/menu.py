@@ -147,8 +147,9 @@ class MenuMaker:
                 SPAM,
                 f"itr={itr} | id-chain = {iD, chain} | current end ({current_end}) connects to {letters_current_end_connects_to}"
             )
-            for sub_iD, conxn in enumerate(letters_current_end_connects_to.values()):
-                new_key = round(iD + sub_iD / 10 ** itr, 5)  # adds fractional float value, smaller for each iteration
+            for position_iD, conxn in enumerate(letters_current_end_connects_to.values()):
+                # adds fractional float value to new_key, smaller for each iteration, for tracking purposes
+                new_key = round(iD + position_iD / 10 ** itr, 5)
                 logger.log(SPAM, f"itr={itr} | saving key={new_key} = {chain}+{conxn}")
                 new_working_dict[new_key] = chain + conxn
 
