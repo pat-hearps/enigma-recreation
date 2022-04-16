@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 from enigma.design import ENTRY
-from enigma.utils import SPAM, VERBOSE, get_logger
+from enigma.utils import SPAM, VERBOSE, get_logger, spaces
 
 logger = get_logger(__name__)
 
@@ -22,19 +22,25 @@ class MenuMaker:
         self.char_counts: Dict[str, int] = {}
         self.best_characters: List[str] = []
         self.link_index: Dict[str, dict] = {}
+        self.found_loops: Dict = {}
+        self.dead_ends: Dict = {}
 
     def process_stuff(self):
         """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
         self.count_characters()
         self.create_link_index()
         self.find_best_characters()
-        self.found_loops = {}
-        self.dead_ends = {}
+        self.found_loops, self.dead_ends = {}, {}  # reset every time
+        # TODO - if no loops found, could try starting from non-best characters?
         for char in self.best_characters:
             logger.debug(f"finding loops for char {char}")
             self.find_loops(char)
         logger.debug(f'num dead ends b4 rationalising= {len(self.dead_ends)}')
-        # # TODO get rid of rationalisting deadends, doesn't appear to change anything
+        """TODO:
+         - rationalise_to_list, unsub_list and get_smallest_loop appear to be dumb inefficient ways of picking
+           out the unique loops from the many possible ways of defining them. Replace with something shorter and more
+           intelligent based on using sets
+         - why am I keeping the deadends, what are they for?"""
         self.dead_ends = self.rationalise_to_list(self.dead_ends)
         logger.debug(f'num dead ends after ration, b4 unsub= {len(self.dead_ends)}')
         self.dead_ends = self.unsub_list(self.dead_ends)
@@ -59,7 +65,7 @@ class MenuMaker:
         """
         # pairs = pairs of letters by their position in the crib <> encoded crib
         self.pairs = {i: {c, m} for i, (c, m) in enumerate(zip(self.crib, self.encoded_crib))}
-        logger.log(VERBOSE, "this crib-cypher has the char pairs: {self.pairs}")
+        logger.log(VERBOSE, f"this crib-cypher has the char pairs: {self.pairs}")
         # char_counts = for each character, how many times does it occur
         count = defaultdict(int)
         for char in sorted(''.join((self.crib, self.encoded_crib))):
@@ -77,7 +83,7 @@ class MenuMaker:
         """
         for character in self.char_counts.keys():
             link_idx = {pos: (pair - {character}).pop() for pos, pair in self.pairs.items() if character in pair}
-            logger.log(SPAM, f"index of links for char={character} is {link_idx}")
+            # logger.log(SPAM, f"index of links for char={character} is {link_idx}")
             self.link_index[character] = link_idx
         # link_index = for each char in links, what other chars are they linked to at what position
         # result is dict of k=position, v=char
@@ -88,64 +94,87 @@ class MenuMaker:
         set these to self.best_characters
         """
         max_count = max(self.char_counts.values())
-        self.best_characters = (
+        self.best_characters = tuple(
             char for char, n_links in self.char_counts.items() if n_links == max_count
         )
         logger.debug(f"chars with the most links ({max_count}) are: {self.best_characters}")
 
-    def find_loops(self, starting_character):
-        working_dict = {i + 0.0: starting_character for i in range(len(self.link_index[starting_character]))}
-        logger.log(SPAM, f"working dict = {working_dict}")
-        for i, v in zip(range(len(self.link_index[starting_character])), self.link_index[starting_character].values()):
-            working_dict[i] += v
-        logger.log(SPAM, f"working dict is now = {working_dict}")
+    def find_loops(self, starting_character: str):
+        # is really 'finding all possible loops' by brute-forcing traversing the chain
+        working_dict = {i + len(self.found_loops) + 0.0: ''.join((starting_character, v))
+                        for i, v in enumerate(self.link_index[starting_character].values())
+                        }
+        logger.log(VERBOSE, f"initial working dict is= {working_dict}")
         run = 1
-        tracker = len(self.found_loops)
         while len(working_dict) > 0:
+            # with each iteration, size of chains grows by one each time, only keep those that are neither
+            # loops or deadends
+            #  TODO refactor to call the 3 separate funcs making up make_Connections here, e.g.
+            # self.copy_dict()
+            # self.make_connections()
+            # self.parse_chains()
             working_dict, self.found_loops, self.dead_ends = self.make_connections(
-                starting_character, working_dict, self.found_loops, self.dead_ends, run, tracker
+                starting_character, working_dict, self.found_loops, self.dead_ends, run
             )
-            logger.log(SPAM, f"itr={run} | working dict is now = {working_dict}")
             run += 1
 
-    def make_connections(self, starting_character, indict, loops={}, deadends={}, itr=1, tracking_len=0):
+    def make_connections(
+            self, starting_character: str, indict: Dict, loops: Dict, deadends: Dict, itr: int
+    ):
         """for sorting through a hipairs dictionary of letters of interest and their corresponding paired letters.
         Used with a WHILE loop, can recursively search through 'chains' or paths that a letter sequence can take
         by following pairs from one letter to the next. Looks for 'loops', where a chain path can return to its original
         starting letter. Records other chains as deadends
         """
-        if itr == 1:
-            working_dict = {k + tracking_len: v for k, v in deepcopy(indict).items()}
-            indict = deepcopy(working_dict)
-        else:
-            working_dict = deepcopy(indict)
+        spc50 = spaces(50)
 
-        for iD, chain in indict.items():
-            logger.log(SPAM, f"itr={itr} | id-chain = {iD, chain}")
+        grown_working_dict = self.grow_chains(indict, itr)
+        logger.log(VERBOSE, f"out of grow_chains, \n{spc50}in={indict}\n{spc50}wd={grown_working_dict}")
+
+        parsed_working_dict, loops, deadends = self.parse_chains(
+            deadends, itr, loops, starting_character, grown_working_dict)
+        logger.log(VERBOSE, f"chains parsed, \n{spc50}in={grown_working_dict}\n{spc50}out={parsed_working_dict}")
+
+        return parsed_working_dict, loops, deadends
+
+    def grow_chains(self, old_working_dict, itr):
+        """For all the chains of letters in the working_dict, grow the chain by one letter, for each letter
+        that the end is connected to. This may fork to create multiple chains from one original."""
+        new_working_dict = deepcopy(old_working_dict)
+
+        for iD, chain in old_working_dict.items():
+            # this loop extends out each chain, by one more character, creating more chains if there is a fork?
             current_end = chain[-1]
-            letters_that_current_end_is_connected_to = self.link_index[current_end]
+            letters_current_end_connects_to = self.link_index[current_end]
             logger.log(
                 SPAM,
-                f"itr={itr} | current end ({current_end}) is connected to {letters_that_current_end_is_connected_to}")
-            for jid, conxn in enumerate(letters_that_current_end_is_connected_to.values()):
-                key = round(iD + jid / 10 ** itr, 5)
-                logger.log(SPAM, f"itr={itr} | key={key}, jid={jid}, conxn={conxn}")
-                if conxn != current_end:
-                    working_dict[key] = indict[iD] + conxn
+                f"itr={itr} | id-chain = {iD, chain} | current end ({current_end}) connects to {letters_current_end_connects_to}"
+            )
+            for position_iD, conxn in enumerate(letters_current_end_connects_to.values()):
+                # adds fractional float value to new_key, smaller for each iteration, for tracking purposes
+                new_key = round(iD + position_iD / 10 ** itr, 5)
+                logger.log(SPAM, f"itr={itr} | saving key={new_key} = {chain}+{conxn}")
+                new_working_dict[new_key] = chain + conxn
 
-        dx = {}
-        for kid, chain in working_dict.items():
-            if chain[-1] == chain[-3]:  # and len(v):
+        return new_working_dict
+
+    def parse_chains(self, deadends, itr, loops, starting_character, grown_working_dict):
+        """This loop parses the results of the chain additions, whether it's found a deadend or loop, or neither
+        if neither, chain is added back into the working dict for the next iteration
+        """
+        parsed_working_dict = {}
+        for iD, chain in grown_working_dict.items():
+            if chain[-1] == chain[-3]:  # it's a deadend
+                logger.log(SPAM, f"itr={itr} | {chain} is a deadend bc last({chain[-1]}) == 3rd last({chain[-3]})")
                 chain = chain[:-1]
-                deadends[kid] = chain
-                logger.log(SPAM, f"itr={itr} | {chain} is a deadend")
+                deadends[iD] = chain
             elif chain[-1] == starting_character and len(chain) > 3:  # ie we're legit back to the start after a loop
-                loops[kid] = chain
                 logger.log(VERBOSE, f"itr={itr} | loop found = {chain}")
-            else:
-                dx[kid] = chain
+                loops[iD] = chain
+            else:  # just keep growing to see where it goes
                 logger.log(SPAM, f"itr={itr} | keep going for {chain}")
-        return dx, loops, deadends
+                parsed_working_dict[iD] = chain
+        return parsed_working_dict, loops, deadends
 
     def rationalise_to_list(self, indict):
         """goes through list values of results from find_loops, turns into single large list,

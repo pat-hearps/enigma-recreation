@@ -6,33 +6,35 @@ from enigma.menu import MenuMaker
 
 CRIBS = {
     "basic": {
-        "crib_guess": "ABCDD",
-        "crib_cypher": "BCABE"
+        "crib__guess": "ABCDDEF",
+        "crib_cypher": "BCABEFB"
     },
     "welchman": {
-        "crib_guess": "TOTHEPRESIDENTOFTHEUNITEDSTATES",
+        "crib__guess": "TOTHEPRESIDENTOFTHEUNITEDSTATES",
         "crib_cypher": "CQNZPVLILPEUIKTEDCGLOVWVGTUFLNZ"
     },
     "dermot_BB": {
-        "crib_guess": "WETTERVORHERSAGE",
+        "crib__guess": "WETTERVORHERSAGE",
         "crib_cypher": "SNMKGGSTZZUGARLV"
     }
 }
 
 
 def get_crib_cypher(crib_set_name: str) -> Tuple[str, str]:
-    crib_guess = CRIBS[crib_set_name]["crib_guess"]
+    crib_guess = CRIBS[crib_set_name]["crib__guess"]
     crib_cypher = CRIBS[crib_set_name]["crib_cypher"]
     return crib_guess, crib_cypher
 
 
-gw_all_loops = {frozenset(('E', 'I', 'P')), frozenset(('I', 'P', 'V')), frozenset(('N', 'O', 'T'))}
+gw_all_loops = {frozenset(['E', 'I', 'P']), frozenset(['I', 'P', 'V']), frozenset(['N', 'O', 'T']),
+                frozenset(['D', 'E', 'I', 'N', 'T'])}
 loop_data = [
-    ("welchman", 0, 14, {frozenset(('E', 'I', 'P'))}),
-    ("welchman", 3, 23, gw_all_loops),  # note this has been failing since added, indicates true problems in code
+    ("welchman", 0, 14, {frozenset(['E', 'I', 'P'])}),
+    ("welchman", 2, 22, gw_all_loops),  # note this has been failing since added, indicates true problems in code
     ("welchman", 14, 27, set()),
-    ("dermot_BB", 0, 30, {frozenset(('G', 'E', 'V', 'S', 'A', 'R'))}),
-    ("basic", 0, 4, {frozenset(('A', 'B', 'C'))})
+    ("dermot_BB", 0, 30, {frozenset(['G', 'E', 'V', 'S', 'A', 'R'])}),
+    ("basic", 0, 4, {frozenset(['A', 'B', 'C'])}),
+    ("basic", 1, 7, {frozenset(['B', 'D', 'E', 'F'])})
 ]
 
 
@@ -64,3 +66,41 @@ def test_menumaker_create_link_index(crib_set_name: str, start: int, end: int, e
     menu_mkr.count_characters()
     menu_mkr.create_link_index()
     assert menu_mkr.link_index == expected
+
+
+best_chars_data = [
+    ("basic", 0, 5, ('B',)),
+    ("basic", 1, 7, ('B',)),
+    ("welchman", 0, 14, ('E',)),
+    ("dermot_BB", 0, 30, ('E', 'G', 'R'))
+]
+exp_loops = [
+    [{'BACB', 'BCAB'}],
+    [{'BDEFB', 'BFEDB'}],  # finds loops both clockwise and anticlockwise
+    [{'EPIE', 'EIPE'}]
+]
+loops_data = [tuple(list(data) + exp) for data, exp in zip(best_chars_data, exp_loops)]
+
+
+@pytest.mark.parametrize("crib_set_name, start, end, expected", best_chars_data)
+def test_find_best_characters(crib_set_name: str, start: int, end: int, expected: set) -> None:
+    crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
+    menu_mkr = MenuMaker(crib=crib_guess[start:end], encoded_crib=crib_cypher[start:end])
+    menu_mkr.count_characters()
+    menu_mkr.create_link_index()
+    menu_mkr.find_best_characters()
+    assert menu_mkr.best_characters == expected
+
+
+@pytest.mark.parametrize("crib_set_name, start, end, best_chars, expected", loops_data)
+def test_find_loops(crib_set_name: str, start: int, end: int, best_chars: tuple, expected: set) -> None:
+    crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
+    menu_mkr = MenuMaker(crib=crib_guess[start:end], encoded_crib=crib_cypher[start:end])
+    menu_mkr.count_characters()
+    menu_mkr.create_link_index()
+    menu_mkr.find_best_characters()
+    for best_char in best_chars:
+        print(f'finding for char {best_char}')
+        menu_mkr.find_loops(best_char)
+        print(f'found loops = {menu_mkr.found_loops}')
+    assert set(menu_mkr.found_loops.values()) == expected

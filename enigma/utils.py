@@ -30,3 +30,7 @@ def get_logger(name: str, level: str = LOG_LEVEL) -> logging.Logger:
     logger.setLevel(level)
     logger.addHandler(stream_handler)
     return logger
+
+
+def spaces(n: int):
+    return "".join([" "] * n)
