@@ -116,7 +116,6 @@ class MenuMaker:
             working_dict, self.found_loops, self.dead_ends = self.make_connections(
                 starting_character, working_dict, self.found_loops, self.dead_ends, run
             )
-            logger.log(VERBOSE, f"itr={run} | end itr working dict is now = {working_dict}")
             run += 1
 
     def make_connections(
@@ -130,8 +129,9 @@ class MenuMaker:
         # TODO refactor to make this a minifunc in itself, e.g. def copy_dict()
 
         working_dict = self.grow_chains(indict, itr)
-        logger.log(SPAM, f"out of grow_chains, \n{spaces(47)}in={indict}\n{spaces(47)}wd={working_dict}")
+        logger.log(VERBOSE, f"out of grow_chains, \n{spaces(50)}in={indict}\n{spaces(50)}wd={working_dict}")
         dx, loops, deadends = self.parse_chains(deadends, itr, loops, starting_character, working_dict)
+        logger.log(VERBOSE, f"chains parsed, \n{spaces(50)}in={working_dict}\n{spaces(50)}out={dx}")
         return dx, loops, deadends
 
     def grow_chains(self, old_working_dict, itr):
@@ -141,9 +141,6 @@ class MenuMaker:
         # def make_connections()  # or 'grow_chains()' ?
         new_working_dict = deepcopy(old_working_dict)
 
-        logger.log(
-            SPAM,
-            f"itr={itr} | starting grow_chains\n{spaces(53)}in={old_working_dict}\n{spaces(53)}wd={new_working_dict}")
         for iD, chain in old_working_dict.items():
             # this loop extends out each chain, by one more character, creating more chains if there is a fork?
             logger.log(SPAM, f"itr={itr} | id-chain = {iD, chain}")
@@ -157,9 +154,6 @@ class MenuMaker:
                 logger.log(SPAM, f"itr={itr} | saving key={key} = {chain}+{conxn}")
                 new_working_dict[key] = chain + conxn
 
-        logger.log(
-            VERBOSE,
-            f"itr={itr} | chains grown,\n{spaces(53)}in={old_working_dict}\n{spaces(53)}wd={new_working_dict}")
         return new_working_dict
 
     def parse_chains(self, deadends, itr, loops, starting_character, working_dict):
@@ -180,7 +174,6 @@ class MenuMaker:
             else:
                 dx[kid] = chain
                 logger.log(SPAM, f"itr={itr} | keep going for {chain}")
-        logger.log(VERBOSE, f"itr={itr} | parsed working dict is {dx}")
         return dx, loops, deadends
 
     def rationalise_to_list(self, indict):
