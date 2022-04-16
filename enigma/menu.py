@@ -159,17 +159,17 @@ class MenuMaker:
         if neither, chain is added back into the working dict for the next iteration
         """
         dx = {}
-        for kid, chain in working_dict.items():
+        for iD, chain in working_dict.items():
             if chain[-1] == chain[-3]:  # it's a deadend
                 logger.log(SPAM, f"itr={itr} | {chain} is a deadend bc last({chain[-1]}) == 3rd last({chain[-3]})")
                 chain = chain[:-1]
-                deadends[kid] = chain
+                deadends[iD] = chain
             elif chain[-1] == starting_character and len(chain) > 3:  # ie we're legit back to the start after a loop
                 logger.log(VERBOSE, f"itr={itr} | loop found = {chain}")
-                loops[kid] = chain
+                loops[iD] = chain
             else:  # just keep growing to see where it goes
                 logger.log(SPAM, f"itr={itr} | keep going for {chain}")
-                dx[kid] = chain
+                dx[iD] = chain
         return dx, loops, deadends
 
     def rationalise_to_list(self, indict):
