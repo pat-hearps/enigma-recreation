@@ -128,11 +128,14 @@ class MenuMaker:
         """
         # TODO refactor to make this a minifunc in itself, e.g. def copy_dict()
 
-        working_dict = self.grow_chains(indict, itr)
-        logger.log(VERBOSE, f"out of grow_chains, \n{spaces(50)}in={indict}\n{spaces(50)}wd={working_dict}")
-        dx, loops, deadends = self.parse_chains(deadends, itr, loops, starting_character, working_dict)
-        logger.log(VERBOSE, f"chains parsed, \n{spaces(50)}in={working_dict}\n{spaces(50)}out={dx}")
-        return dx, loops, deadends
+        grown_working_dict = self.grow_chains(indict, itr)
+        logger.log(VERBOSE, f"out of grow_chains, \n{spaces(50)}in={indict}\n{spaces(50)}wd={grown_working_dict}")
+        parsed_working_dict, loops, deadends = self.parse_chains(
+            deadends, itr, loops, starting_character, grown_working_dict)
+        logger.log(
+            VERBOSE,
+            f"chains parsed, \n{spaces(50)}in={grown_working_dict}\n{spaces(50)}out={parsed_working_dict}")
+        return parsed_working_dict, loops, deadends
 
     def grow_chains(self, old_working_dict, itr):
         """For all the chains of letters in the working_dict, grow the chain by one letter, for each letter
@@ -155,12 +158,12 @@ class MenuMaker:
 
         return new_working_dict
 
-    def parse_chains(self, deadends, itr, loops, starting_character, working_dict):
+    def parse_chains(self, deadends, itr, loops, starting_character, grown_working_dict):
         """This loop parses the results of the chain additions, whether it's found a deadend or loop, or neither
         if neither, chain is added back into the working dict for the next iteration
         """
-        dx = {}
-        for iD, chain in working_dict.items():
+        parsed_working_dict = {}
+        for iD, chain in grown_working_dict.items():
             if chain[-1] == chain[-3]:  # it's a deadend
                 logger.log(SPAM, f"itr={itr} | {chain} is a deadend bc last({chain[-1]}) == 3rd last({chain[-3]})")
                 chain = chain[:-1]
@@ -170,8 +173,8 @@ class MenuMaker:
                 loops[iD] = chain
             else:  # just keep growing to see where it goes
                 logger.log(SPAM, f"itr={itr} | keep going for {chain}")
-                dx[iD] = chain
-        return dx, loops, deadends
+                parsed_working_dict[iD] = chain
+        return parsed_working_dict, loops, deadends
 
     def rationalise_to_list(self, indict):
         """goes through list values of results from find_loops, turns into single large list,
