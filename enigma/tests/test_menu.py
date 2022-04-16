@@ -75,9 +75,9 @@ best_chars_data = [
     ("dermot_BB", 0, 30, ('E', 'G', 'R'))
 ]
 exp_loops = [
-    [{'BACB', 'BCAB'}],
-    [{'BDEFB', 'BFEDB'}],  # finds loops both clockwise and anticlockwise
-    [{'EPIE', 'EIPE'}]
+    [{frozenset(['B', 'A', 'C']): 'BACB'}],
+    [{frozenset(['B', 'D', 'E', 'F']): 'BFEDB'}],
+    [{frozenset(['E', 'P', 'I']): 'EIPE'}]
 ]
 loops_data = [tuple(list(data) + exp) for data, exp in zip(best_chars_data, exp_loops)]
 
@@ -93,7 +93,7 @@ def test_find_best_characters(crib_set_name: str, start: int, end: int, expected
 
 
 @pytest.mark.parametrize("crib_set_name, start, end, best_chars, expected", loops_data)
-def test_find_loops(crib_set_name: str, start: int, end: int, best_chars: tuple, expected: set) -> None:
+def test_find_loops(crib_set_name: str, start: int, end: int, best_chars: tuple, expected: dict) -> None:
     crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
     menu_mkr = MenuMaker(crib=crib_guess[start:end], encoded_crib=crib_cypher[start:end])
     menu_mkr.count_characters()
@@ -103,4 +103,4 @@ def test_find_loops(crib_set_name: str, start: int, end: int, best_chars: tuple,
         print(f'finding for char {best_char}')
         menu_mkr.find_loops(best_char)
         print(f'found loops = {menu_mkr.found_loops}')
-    assert set(menu_mkr.found_loops.values()) == expected
+    assert set(menu_mkr.found_loops) == set(expected.keys())
