@@ -77,7 +77,8 @@ best_chars_data = [
 exp_loops = [
     [{frozenset(['B', 'A', 'C']): 'BACB'}],
     [{frozenset(['B', 'D', 'E', 'F']): 'BFEDB'}],
-    [{frozenset(['E', 'P', 'I']): 'EIPE'}]
+    [{frozenset(['E', 'P', 'I']): 'EIPE'}],
+    [{frozenset(['A', 'E', 'S', 'V', 'R', 'G']): 'GRASVEG'}]
 ]
 loops_data = [tuple(list(data) + exp) for data, exp in zip(best_chars_data, exp_loops)]
 
