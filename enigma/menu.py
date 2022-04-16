@@ -126,15 +126,15 @@ class MenuMaker:
         by following pairs from one letter to the next. Looks for 'loops', where a chain path can return to its original
         starting letter. Records other chains as deadends
         """
-        # TODO refactor to make this a minifunc in itself, e.g. def copy_dict()
+        spc50 = spaces(50)
 
         grown_working_dict = self.grow_chains(indict, itr)
-        logger.log(VERBOSE, f"out of grow_chains, \n{spaces(50)}in={indict}\n{spaces(50)}wd={grown_working_dict}")
+        logger.log(VERBOSE, f"out of grow_chains, \n{spc50}in={indict}\n{spc50}wd={grown_working_dict}")
+
         parsed_working_dict, loops, deadends = self.parse_chains(
             deadends, itr, loops, starting_character, grown_working_dict)
-        logger.log(
-            VERBOSE,
-            f"chains parsed, \n{spaces(50)}in={grown_working_dict}\n{spaces(50)}out={parsed_working_dict}")
+        logger.log(VERBOSE, f"chains parsed, \n{spc50}in={grown_working_dict}\n{spc50}out={parsed_working_dict}")
+
         return parsed_working_dict, loops, deadends
 
     def grow_chains(self, old_working_dict, itr):
