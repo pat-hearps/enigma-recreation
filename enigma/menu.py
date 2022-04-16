@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 from enigma.design import ENTRY
-from enigma.utils import SPAM, VERBOSE, get_logger
+from enigma.utils import SPAM, VERBOSE, get_logger, spaces
 
 logger = get_logger(__name__)
 
@@ -101,11 +101,11 @@ class MenuMaker:
 
     def find_loops(self, starting_character: str):
         # is really 'finding all possible loops' by brute-forcing traversing the chain
-        working_dict = {i + 0.0: ''.join((starting_character, v))
+        working_dict = {i + len(self.found_loops) + 0.0: ''.join((starting_character, v))
                         for i, v in enumerate(self.link_index[starting_character].values())
                         }
         logger.log(VERBOSE, f"initial working dict is= {working_dict}")
-        run, tracker = 1, len(self.found_loops)
+        run = 1
         while len(working_dict) > 0:
             # with each iteration, size of chains grows by one each time, only keep those that are neither
             # loops or deadends
@@ -114,13 +114,13 @@ class MenuMaker:
             # self.make_connections()
             # self.parse_chains()
             working_dict, self.found_loops, self.dead_ends = self.make_connections(
-                starting_character, working_dict, self.found_loops, self.dead_ends, run, tracker
+                starting_character, working_dict, self.found_loops, self.dead_ends, run
             )
             logger.log(VERBOSE, f"itr={run} | end itr working dict is now = {working_dict}")
             run += 1
 
     def make_connections(
-            self, starting_character: str, indict: Dict, loops: Dict, deadends: Dict, itr: int, tracking_len: int
+            self, starting_character: str, indict: Dict, loops: Dict, deadends: Dict, itr: int
     ):
         """for sorting through a hipairs dictionary of letters of interest and their corresponding paired letters.
         Used with a WHILE loop, can recursively search through 'chains' or paths that a letter sequence can take
@@ -128,24 +128,22 @@ class MenuMaker:
         starting letter. Records other chains as deadends
         """
         # TODO refactor to make this a minifunc in itself, e.g. def copy_dict()
-        if itr == 1:
-            working_dict = {k + tracking_len: v for k, v in deepcopy(indict).items()}
-            indict = deepcopy(working_dict)
-            logger.log(VERBOSE, f"itr={itr} | working dict with tracking is now {working_dict}")
-        else:
-            working_dict = deepcopy(indict)
 
-        self.grow_chains(indict, itr, working_dict)
-        logger.log(SPAM, f"out of grow_chains, \nin={indict}\nwd={working_dict}")
+        working_dict = self.grow_chains(indict, itr)
+        logger.log(SPAM, f"out of grow_chains, \n{spaces(47)}in={indict}\n{spaces(47)}wd={working_dict}")
         dx, loops, deadends = self.parse_chains(deadends, itr, loops, starting_character, working_dict)
         return dx, loops, deadends
 
-    def grow_chains(self, old_working_dict, itr, working_dict):
+    def grow_chains(self, old_working_dict, itr):
         """For all the chains of letters in the working_dict, grow the chain by one letter, for each letter
         that the end is connected to. This may forking to create multiple chains from one original."""
         # TODO refactor to make just this loop the make_connections part
         # def make_connections()  # or 'grow_chains()' ?
-        logger.log(SPAM, f"itr={itr} | starting grow_chains\nin={old_working_dict}\nwd={working_dict}")
+        new_working_dict = deepcopy(old_working_dict)
+
+        logger.log(
+            SPAM,
+            f"itr={itr} | starting grow_chains\n{spaces(53)}in={old_working_dict}\n{spaces(53)}wd={new_working_dict}")
         for iD, chain in old_working_dict.items():
             # this loop extends out each chain, by one more character, creating more chains if there is a fork?
             logger.log(SPAM, f"itr={itr} | id-chain = {iD, chain}")
@@ -157,9 +155,12 @@ class MenuMaker:
             for jid, conxn in enumerate(letters_that_current_end_is_connected_to.values()):
                 key = round(iD + jid / 10 ** itr, 5)
                 logger.log(SPAM, f"itr={itr} | saving key={key} = {chain}+{conxn}")
-                working_dict[key] = chain + conxn
+                new_working_dict[key] = chain + conxn
 
-        logger.log(VERBOSE, f"itr={itr} | chains grown,\nin={old_working_dict}\nwd={working_dict}")
+        logger.log(
+            VERBOSE,
+            f"itr={itr} | chains grown,\n{spaces(53)}in={old_working_dict}\n{spaces(53)}wd={new_working_dict}")
+        return new_working_dict
 
     def parse_chains(self, deadends, itr, loops, starting_character, working_dict):
         # TODO refactor this to its own func, could potentially add in the smarts for rationalising loops here
