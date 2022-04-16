@@ -113,13 +113,13 @@ class MenuMaker:
             # self.copy_dict()
             # self.make_connections()
             # self.parse_chains()
-            working_dict, self.found_loops, self.dead_ends = self.make_connections(
-                starting_character, working_dict, self.found_loops, self.dead_ends, run
+            working_dict, self.dead_ends = self.make_connections(
+                starting_character, working_dict, self.dead_ends, run
             )
             run += 1
 
     def make_connections(
-            self, starting_character: str, indict: Dict, loops: Dict, deadends: Dict, itr: int
+            self, starting_character: str, indict: Dict, deadends: Dict, itr: int
     ):
         """for sorting through a hipairs dictionary of letters of interest and their corresponding paired letters.
         Used with a WHILE loop, can recursively search through 'chains' or paths that a letter sequence can take
@@ -131,11 +131,11 @@ class MenuMaker:
         grown_working_dict = self.grow_chains(indict, itr)
         logger.log(VERBOSE, f"out of grow_chains, \n{spc50}in={indict}\n{spc50}wd={grown_working_dict}")
 
-        parsed_working_dict, loops, deadends = self.parse_chains(
-            deadends, itr, loops, starting_character, grown_working_dict)
+        parsed_working_dict, deadends = self.parse_chains(
+            deadends, itr, starting_character, grown_working_dict)
         logger.log(VERBOSE, f"chains parsed, \n{spc50}in={grown_working_dict}\n{spc50}out={parsed_working_dict}")
 
-        return parsed_working_dict, loops, deadends
+        return parsed_working_dict, deadends
 
     def grow_chains(self, old_working_dict, itr):
         """For all the chains of letters in the working_dict, grow the chain by one letter, for each letter
@@ -158,7 +158,7 @@ class MenuMaker:
 
         return new_working_dict
 
-    def parse_chains(self, deadends, itr, loops, starting_character, grown_working_dict):
+    def parse_chains(self, deadends, itr, starting_character, grown_working_dict):
         """This loop parses the results of the chain additions, whether it's found a deadend or loop, or neither
         if neither, chain is added back into the working dict for the next iteration
         """
@@ -174,7 +174,7 @@ class MenuMaker:
             else:  # just keep growing to see where it goes
                 logger.log(SPAM, f"itr={itr} | keep going for {chain}")
                 parsed_working_dict[iD] = chain
-        return parsed_working_dict, loops, deadends
+        return parsed_working_dict, deadends
 
     def add_to_found_loops(self, new_loop: str) -> None:
         new_loop_set = frozenset(new_loop)
