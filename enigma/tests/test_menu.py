@@ -79,7 +79,7 @@ exp_loops = [
     [{'BDEFB', 'BFEDB'}],  # finds loops both clockwise and anticlockwise
     [{'EPIE', 'EIPE'}]
 ]
-loops_data = [tuple(list(data) + exp) for data, exp in zip(best_chars_data[:3], exp_loops)]
+loops_data = [tuple(list(data) + exp) for data, exp in zip(best_chars_data, exp_loops)]
 
 
 @pytest.mark.parametrize("crib_set_name, start, end, expected", best_chars_data)
