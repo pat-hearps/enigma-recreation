@@ -147,10 +147,10 @@ class MenuMaker:
             logger.log(
                 SPAM,
                 f"itr={itr} | current end ({current_end}) is connected to {letters_that_current_end_is_connected_to}")
-            for jid, conxn in enumerate(letters_that_current_end_is_connected_to.values()):
-                key = round(iD + jid / 10 ** itr, 5)
-                logger.log(SPAM, f"itr={itr} | saving key={key} = {chain}+{conxn}")
-                new_working_dict[key] = chain + conxn
+            for sub_iD, conxn in enumerate(letters_that_current_end_is_connected_to.values()):
+                new_key = round(iD + sub_iD / 10 ** itr, 5)  # adds fractional float value, smaller for each iteration
+                logger.log(SPAM, f"itr={itr} | saving key={new_key} = {chain}+{conxn}")
+                new_working_dict[new_key] = chain + conxn
 
         return new_working_dict
 
