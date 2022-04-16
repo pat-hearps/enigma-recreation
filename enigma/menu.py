@@ -170,11 +170,15 @@ class MenuMaker:
                 deadends[iD] = chain
             elif chain[-1] == starting_character and len(chain) > 3:  # ie we're legit back to the start after a loop
                 logger.log(VERBOSE, f"itr={itr} | loop found = {chain}")
-                loops[iD] = chain
+                self.add_to_found_loops(chain)
             else:  # just keep growing to see where it goes
                 logger.log(SPAM, f"itr={itr} | keep going for {chain}")
                 parsed_working_dict[iD] = chain
         return parsed_working_dict, loops, deadends
+
+    def add_to_found_loops(self, new_loop: str) -> None:
+        new_loop_set = frozenset(new_loop)
+        self.found_loops[new_loop_set] = new_loop
 
     def rationalise_to_list(self, indict):
         """goes through list values of results from find_loops, turns into single large list,

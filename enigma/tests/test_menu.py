@@ -103,4 +103,4 @@ def test_find_loops(crib_set_name: str, start: int, end: int, best_chars: tuple,
         print(f'finding for char {best_char}')
         menu_mkr.find_loops(best_char)
         print(f'found loops = {menu_mkr.found_loops}')
-    assert set(menu_mkr.found_loops) == set(expected.keys())
+    assert set(menu_mkr.found_loops.keys()) == set(expected.keys())
