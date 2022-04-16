@@ -157,21 +157,19 @@ class MenuMaker:
         return new_working_dict
 
     def parse_chains(self, deadends, itr, loops, starting_character, working_dict):
-        # TODO refactor this to its own func, could potentially add in the smarts for rationalising loops here
-        # def parse_chains()
         dx = {}
         for kid, chain in working_dict.items():
             # this loop parses the results of the chain additions, whether it's found a deadend or loop, or neither
             # if neither, chain is added back into the working dict for the next iteration
             logger.log(SPAM, f"kid={kid}, chain={chain}")
-            if chain[-1] == chain[-3]:  # and len(v):
+            if chain[-1] == chain[-3]:  # it's a deadend
                 logger.log(SPAM, f"itr={itr} | {chain} is a deadend bc last({chain[-1]}) == 3rd last({chain[-3]})")
                 chain = chain[:-1]
                 deadends[kid] = chain
             elif chain[-1] == starting_character and len(chain) > 3:  # ie we're legit back to the start after a loop
                 loops[kid] = chain
                 logger.log(VERBOSE, f"itr={itr} | loop found = {chain}")
-            else:
+            else:  # just keep growing to see where it goes
                 dx[kid] = chain
                 logger.log(SPAM, f"itr={itr} | keep going for {chain}")
         return dx, loops, deadends
