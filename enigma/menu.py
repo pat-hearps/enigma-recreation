@@ -24,6 +24,7 @@ class MenuMaker:
         self.link_index: Dict[str, dict] = {}
         self.found_loops: Dict[frozenset, str] = {}
         self.dead_ends: Dict = {}
+        self.pfx: str = ""
 
     def process_stuff(self):
         """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
@@ -105,18 +106,19 @@ class MenuMaker:
                         for i, v in enumerate(self.link_index[starting_character].values())
                         }
         logger.log(VERBOSE, f"initial working dict is= {working_dict}")
-        run = 1
+        loop_count = 1
         while len(working_dict) > 0:
+            self.pfx = f"loop itr={loop_count} |"
             # with each iteration, size of chains grows by one each time, only keep those that are neither
             # loops or deadends
             #  TODO refactor to call the 3 separate funcs making up make_Connections here, e.g.
             # self.copy_dict()
             # self.make_connections()
             # self.parse_chains()
-            working_dict = self.make_connections(working_dict, run)
-            run += 1
+            working_dict = self.make_connections(working_dict, loop_count)
+            loop_count += 1
 
-    def make_connections(self, indict: Dict, itr: int):
+    def make_connections(self, indict: Dict, loop_count: int):
         """for sorting through a hipairs dictionary of letters of interest and their corresponding paired letters.
         Used with a WHILE loop, can recursively search through 'chains' or paths that a letter sequence can take
         by following pairs from one letter to the next. Looks for 'loops', where a chain path can return to its original
@@ -124,15 +126,15 @@ class MenuMaker:
         """
         spc50 = spaces(50)
 
-        grown_working_dict = self.grow_chains(indict, itr)
-        logger.log(VERBOSE, f"out of grow_chains, \n{spc50}in={indict}\n{spc50}wd={grown_working_dict}")
+        grown_working_dict = self.grow_chains(indict, loop_count)
+        logger.log(VERBOSE, f"{self.pfx} out of grow_chains, \n{spc50}in={indict}\n{spc50}wd={grown_working_dict}")
 
-        parsed_working_dict = self.parse_chains(itr, grown_working_dict)
-        logger.log(VERBOSE, f"chains parsed, \n{spc50}in={grown_working_dict}\n{spc50}out={parsed_working_dict}")
+        parsed_working_dict = self.parse_chains(grown_working_dict)
+        logger.log(VERBOSE, f"{self.pfx} parsed, \n{spc50}in={grown_working_dict}\n{spc50}out={parsed_working_dict}")
 
         return parsed_working_dict
 
-    def grow_chains(self, old_working_dict, itr):
+    def grow_chains(self, old_working_dict, loop_count):
         """For all the chains of letters in the working_dict, grow the chain by one letter, for each letter
         that the end is connected to. This may fork to create multiple chains from one original."""
         new_working_dict = deepcopy(old_working_dict)
@@ -141,16 +143,16 @@ class MenuMaker:
             # this loop extends out each chain, by one more character, creating more chains if there is a fork?
             chain_end = chain[-1]
             chars_chain_end_links_to = self.link_index[chain_end]
-            logger.log(SPAM, f"itr={itr} | chain={iD, chain} | end ({chain_end}) links to {chars_chain_end_links_to}")
+            logger.log(SPAM, f"{self.pfx} chain={iD, chain} | end ({chain_end}) links to {chars_chain_end_links_to}")
             for position_iD, conxn in enumerate(chars_chain_end_links_to.values()):
                 # adds fractional float value to new_key, smaller for each iteration, for tracking purposes
-                new_key = round(iD + position_iD / 10 ** itr, 5)
-                logger.log(SPAM, f"itr={itr} | saving key={new_key} = {chain}+{conxn}")
+                new_key = round(iD + position_iD / 10 ** loop_count, 5)
+                logger.log(SPAM, f"{self.pfx} saving key={new_key} = {chain}+{conxn}")
                 new_working_dict[new_key] = chain + conxn
 
         return new_working_dict
 
-    def parse_chains(self, itr, grown_working_dict):
+    def parse_chains(self, grown_working_dict):
         """This loop parses the results of the chain additions, whether it's found a deadend or loop, or neither
         if neither, chain is added back into the working dict for the next iteration
         """
@@ -160,21 +162,21 @@ class MenuMaker:
             commonest_letter, occurrence_count = chain_count.most_common(1)[0]
 
             if occurrence_count == 1:  # just keep growing to see where it goes
-                logger.log(SPAM, f"itr={itr} | keep going for {chain}")
+                logger.log(SPAM, f"{self.pfx} keep going for {chain}")
                 parsed_working_dict[iD] = chain
 
             elif occurrence_count == 2:
                 if commonest_letter == chain[-1] == chain[-3]:
-                    logger.log(SPAM, f"itr={itr} | {chain} is a deadend")
+                    logger.log(SPAM, f"{self.pfx} {chain} is a deadend")
                     self.dead_ends[iD] = chain[:-1]
                 elif len(chain) > 3:  # ie we're legit back to the start after a loop
-                    self.add_to_found_loops(chain, commonest_letter, itr)
+                    self.add_to_found_loops(chain, commonest_letter)
             else:
                 raise ValueError(f"error parsing chain = {chain}, too many repeated characters")
 
         return parsed_working_dict
 
-    def add_to_found_loops(self, new_loop: str, commonest_letter: str, itr: int = None) -> None:
+    def add_to_found_loops(self, new_loop: str, commonest_letter: str) -> None:
         """Makes sure candidate new loop is genuinely new. Converts to frozenset for comparison
         against existing found loops."""
         # e.g. turns EINTON --> NTON, with knowledge that second occurrence of commonest letter will be at the end
@@ -190,7 +192,7 @@ class MenuMaker:
 
         if not already_found:
             self.found_loops[new_loop_set] = only_loop_section
-            logger.debug(f"itr={itr} | loop found = {only_loop_section}")
+            logger.debug(f"{self.pfx} loop found = {only_loop_section}")
 
     def rationalise_to_list(self, indict):
         """goes through list values of results from find_loops, turns into single large list,
