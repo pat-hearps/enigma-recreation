@@ -45,7 +45,6 @@ def test_menumaker_loops(crib_set_name: str, start: int, end: int, expected: set
     menu_mkr.process_stuff()
     found_loops = set(frozenset(loop) for loop in menu_mkr.found_loops)
     assert found_loops == expected
-    # assert 0
 
 
 # fmt: off
@@ -101,7 +100,5 @@ def test_find_loops(crib_set_name: str, start: int, end: int, best_chars: tuple,
     menu_mkr.create_link_index()
     menu_mkr.find_best_characters()
     for best_char in best_chars:
-        print(f'finding for char {best_char}')
         menu_mkr.find_loops(best_char)
-        print(f'found loops = {menu_mkr.found_loops}')
-    assert set(menu_mkr.found_loops.keys()) == set(expected.keys())
+    assert menu_mkr.found_loops.keys() == expected.keys()
