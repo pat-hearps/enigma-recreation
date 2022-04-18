@@ -22,7 +22,7 @@ class MenuMaker:
         self.char_counts: Dict[str, int] = {}
         self.best_characters: List[str] = []
         self.link_index: Dict[str, dict] = {}
-        self.found_loops: Dict = {}
+        self.found_loops: Dict[frozenset, str] = {}
         self.dead_ends: Dict = {}
 
     def process_stuff(self):
