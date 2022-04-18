@@ -185,6 +185,7 @@ class MenuMaker:
             if found_loop.issubset(new_loop_set):
                 already_found = True
             elif new_loop_set.issubset(found_loop):
+                logger.log(VERBOSE, f"{self.pfx} previously found loop {found_loop} to be replaced by {new_loop_set}")
                 del self.found_loops[found_loop]
 
         if not already_found:
