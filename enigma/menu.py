@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import Counter, defaultdict
 from copy import deepcopy
 from typing import Dict, List
 
@@ -9,6 +9,8 @@ from enigma.design import ENTRY
 from enigma.utils import SPAM, VERBOSE, get_logger, spaces
 
 logger = get_logger(__name__)
+
+LoopDict = Dict[float, str]
 
 
 class MenuMaker:
@@ -22,8 +24,9 @@ class MenuMaker:
         self.char_counts: Dict[str, int] = {}
         self.best_characters: List[str] = []
         self.link_index: Dict[str, dict] = {}
-        self.found_loops: Dict = {}
+        self.found_loops: Dict[frozenset, str] = {}
         self.dead_ends: Dict = {}
+        self.pfx: str = ""
 
     def process_stuff(self):
         """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
@@ -100,81 +103,98 @@ class MenuMaker:
         logger.debug(f"chars with the most links ({max_count}) are: {self.best_characters}")
 
     def find_loops(self, starting_character: str):
-        # is really 'finding all possible loops' by brute-forcing traversing the chain
-        working_dict = {i + len(self.found_loops) + 0.0: ''.join((starting_character, v))
+        """Starting from a particular character, iteratively explore all possible paths in a menu of linked characters,
+        aiming to identify sequences where a 'loop' is formed where a circular path is possible."""
+        # is really 'finding all possible loops' by brute-forcing traversing the network
+        working_dict = {float(i + len(self.found_loops)): ''.join((starting_character, v))
                         for i, v in enumerate(self.link_index[starting_character].values())
                         }
         logger.log(VERBOSE, f"initial working dict is= {working_dict}")
-        run = 1
-        while len(working_dict) > 0:
-            # with each iteration, size of chains grows by one each time, only keep those that are neither
-            # loops or deadends
-            #  TODO refactor to call the 3 separate funcs making up make_Connections here, e.g.
-            # self.copy_dict()
-            # self.make_connections()
-            # self.parse_chains()
-            working_dict, self.found_loops, self.dead_ends = self.make_connections(
-                starting_character, working_dict, self.found_loops, self.dead_ends, run
-            )
-            run += 1
 
-    def make_connections(
-            self, starting_character: str, indict: Dict, loops: Dict, deadends: Dict, itr: int
-    ):
-        """for sorting through a hipairs dictionary of letters of interest and their corresponding paired letters.
-        Used with a WHILE loop, can recursively search through 'chains' or paths that a letter sequence can take
-        by following pairs from one letter to the next. Looks for 'loops', where a chain path can return to its original
-        starting letter. Records other chains as deadends
+        loop_count = 1
+        while len(working_dict) > 0:
+            self.pfx = f"loop itr={loop_count} |"
+            working_dict = self.make_connections(working_dict, loop_count)
+            loop_count += 1
+
+    def make_connections(self, start_working_dict: LoopDict, loop_count: int):
+        """Used to iterate through exploring all possible paths through linked characters in a menu
+        For a given dict where values (chains) represent unique paths through the possible network of linked characters:
+        - grows every chain of letters by 1, for each letter that can link to the end of the chain
+        - parses the resulting chains to see whether any are dead ends, or successful loops. If neither, the chain is
+          kept for another iteration
         """
         spc50 = spaces(50)
 
-        grown_working_dict = self.grow_chains(indict, itr)
-        logger.log(VERBOSE, f"out of grow_chains, \n{spc50}in={indict}\n{spc50}wd={grown_working_dict}")
+        grown_working_dict = self.grow_chains(start_working_dict, loop_count)
+        logger.log(VERBOSE, f"{self.pfx} chains grown,\n{spc50}in={start_working_dict}\n{spc50}wd={grown_working_dict}")
 
-        parsed_working_dict, loops, deadends = self.parse_chains(
-            deadends, itr, loops, starting_character, grown_working_dict)
-        logger.log(VERBOSE, f"chains parsed, \n{spc50}in={grown_working_dict}\n{spc50}out={parsed_working_dict}")
+        parsed_working_dict = self.parse_chains(grown_working_dict)
+        logger.log(VERBOSE, f"{self.pfx} parsed,\n{spc50}in={grown_working_dict}\n{spc50}out={parsed_working_dict}")
 
-        return parsed_working_dict, loops, deadends
+        return parsed_working_dict
 
-    def grow_chains(self, old_working_dict, itr):
+    def grow_chains(self, old_working_dict: LoopDict, loop_count: int):
         """For all the chains of letters in the working_dict, grow the chain by one letter, for each letter
         that the end is connected to. This may fork to create multiple chains from one original."""
         new_working_dict = deepcopy(old_working_dict)
 
         for iD, chain in old_working_dict.items():
-            # this loop extends out each chain, by one more character, creating more chains if there is a fork?
-            current_end = chain[-1]
-            letters_current_end_connects_to = self.link_index[current_end]
-            logger.log(
-                SPAM,
-                f"itr={itr} | id-chain = {iD, chain} | current end ({current_end}) connects to {letters_current_end_connects_to}"
-            )
-            for position_iD, conxn in enumerate(letters_current_end_connects_to.values()):
+            chain_end = chain[-1]
+            chars_chain_end_links_to = self.link_index[chain_end]
+            logger.log(SPAM, f"{self.pfx} chain={iD, chain} | end ({chain_end}) links to {chars_chain_end_links_to}")
+
+            for position_iD, conxn in enumerate(chars_chain_end_links_to.values()):
                 # adds fractional float value to new_key, smaller for each iteration, for tracking purposes
-                new_key = round(iD + position_iD / 10 ** itr, 5)
-                logger.log(SPAM, f"itr={itr} | saving key={new_key} = {chain}+{conxn}")
+                new_key = round(iD + position_iD / 10 ** loop_count, 5)
+                logger.log(SPAM, f"{self.pfx} saving key={new_key} = {chain}+{conxn}")
                 new_working_dict[new_key] = chain + conxn
 
         return new_working_dict
 
-    def parse_chains(self, deadends, itr, loops, starting_character, grown_working_dict):
+    def parse_chains(self, grown_working_dict: LoopDict):
         """This loop parses the results of the chain additions, whether it's found a deadend or loop, or neither
         if neither, chain is added back into the working dict for the next iteration
         """
         parsed_working_dict = {}
         for iD, chain in grown_working_dict.items():
-            if chain[-1] == chain[-3]:  # it's a deadend
-                logger.log(SPAM, f"itr={itr} | {chain} is a deadend bc last({chain[-1]}) == 3rd last({chain[-3]})")
-                chain = chain[:-1]
-                deadends[iD] = chain
-            elif chain[-1] == starting_character and len(chain) > 3:  # ie we're legit back to the start after a loop
-                logger.log(VERBOSE, f"itr={itr} | loop found = {chain}")
-                loops[iD] = chain
-            else:  # just keep growing to see where it goes
-                logger.log(SPAM, f"itr={itr} | keep going for {chain}")
+            chain_count = Counter(chain)
+            commonest_letter, occurrence_count = chain_count.most_common(1)[0]
+
+            if occurrence_count == 1:  # just keep growing to see where it goes
+                logger.log(SPAM, f"{self.pfx} keep going for {chain}")
                 parsed_working_dict[iD] = chain
-        return parsed_working_dict, loops, deadends
+
+            elif occurrence_count == 2:
+                if commonest_letter == chain[-1] == chain[-3]:
+                    logger.log(SPAM, f"{self.pfx} {chain} is a deadend")
+                    self.dead_ends[iD] = chain[:-1]
+                elif len(chain) > 3:  # ie we're legit back to the start after a loop
+                    self.add_to_found_loops(chain, commonest_letter)
+            else:
+                raise ValueError(f"error parsing chain = {chain}, too many repeated characters")
+
+        return parsed_working_dict
+
+    def add_to_found_loops(self, new_loop: str, commonest_letter: str) -> None:
+        """Makes sure candidate new loop is genuinely new. Selects only the portion of the chain representing the loop
+         through a cycle of characters. This loop is converted to a frozenset for comparison against existing found
+         loops, and for use as the key in dictionary of found_loops"""
+        # e.g. turns EINTON --> NTON, with knowledge that second occurrence of commonest letter will be at the end
+        only_loop_section = new_loop[new_loop.index(commonest_letter):]
+        new_loop_set = frozenset(only_loop_section)
+
+        already_found = False
+        for found_loop in self.found_loops.keys():
+            if found_loop.issubset(new_loop_set):
+                already_found = True
+            elif new_loop_set.issubset(found_loop):
+                logger.log(VERBOSE, f"{self.pfx} previously found loop {found_loop} to be replaced by {new_loop_set}")
+                del self.found_loops[found_loop]
+
+        if not already_found:
+            self.found_loops[new_loop_set] = only_loop_section
+            logger.debug(f"{self.pfx} loop found = {only_loop_section}")
 
     def rationalise_to_list(self, indict):
         """goes through list values of results from find_loops, turns into single large list,
