@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import Counter, defaultdict
 from copy import deepcopy
 from typing import Dict, List
 
@@ -164,15 +164,19 @@ class MenuMaker:
         """
         parsed_working_dict = {}
         for iD, chain in grown_working_dict.items():
-            if chain[-1] == chain[-3]:  # it's a deadend
+            count = Counter(chain)
+            repeated_chars = {k: v for k, v in count.items() if v > 1}
+
+            if repeated_chars and chain[-1] == chain[-3]:  # it's a deadend
                 logger.log(SPAM, f"itr={itr} | {chain} is a deadend bc last({chain[-1]}) == 3rd last({chain[-3]})")
                 chain = chain[:-1]
                 deadends[iD] = chain
-            elif (chain_len := len(chain)) > 3 and len(set(chain)) < chain_len:  # ie we're legit back to the start after a loop
+            elif repeated_chars and len(chain) > 3:  # ie we're legit back to the start after a loop
                 self.add_to_found_loops(chain, itr)
             else:  # just keep growing to see where it goes
                 logger.log(SPAM, f"itr={itr} | keep going for {chain}")
                 parsed_working_dict[iD] = chain
+
         return parsed_working_dict, deadends
 
     def add_to_found_loops(self, new_loop: str, itr: int = None) -> None:
