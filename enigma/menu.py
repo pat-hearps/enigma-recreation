@@ -113,7 +113,7 @@ class MenuMaker:
             working_dict = self.make_connections(working_dict, loop_count)
             loop_count += 1
 
-    def make_connections(self, indict: Dict, loop_count: int):
+    def make_connections(self, start_working_dict: Dict, loop_count: int):
         """Used to iterate through exploring all possible paths through linked characters in a menu
         For a given dict where values (chains) represent unique paths through the possible network of linked characters:
         - grows every chain of letters by 1, for each letter that can link to the end of the chain
@@ -122,11 +122,11 @@ class MenuMaker:
         """
         spc50 = spaces(50)
 
-        grown_working_dict = self.grow_chains(indict, loop_count)
-        logger.log(VERBOSE, f"{self.pfx} out of grow_chains, \n{spc50}in={indict}\n{spc50}wd={grown_working_dict}")
+        grown_working_dict = self.grow_chains(start_working_dict, loop_count)
+        logger.log(VERBOSE, f"{self.pfx} chains grown,\n{spc50}in={start_working_dict}\n{spc50}wd={grown_working_dict}")
 
         parsed_working_dict = self.parse_chains(grown_working_dict)
-        logger.log(VERBOSE, f"{self.pfx} parsed, \n{spc50}in={grown_working_dict}\n{spc50}out={parsed_working_dict}")
+        logger.log(VERBOSE, f"{self.pfx} parsed,\n{spc50}in={grown_working_dict}\n{spc50}out={parsed_working_dict}")
 
         return parsed_working_dict
 
