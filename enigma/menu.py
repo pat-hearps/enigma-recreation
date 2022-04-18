@@ -106,23 +106,19 @@ class MenuMaker:
                         for i, v in enumerate(self.link_index[starting_character].values())
                         }
         logger.log(VERBOSE, f"initial working dict is= {working_dict}")
+
         loop_count = 1
         while len(working_dict) > 0:
             self.pfx = f"loop itr={loop_count} |"
-            # with each iteration, size of chains grows by one each time, only keep those that are neither
-            # loops or deadends
-            #  TODO refactor to call the 3 separate funcs making up make_Connections here, e.g.
-            # self.copy_dict()
-            # self.make_connections()
-            # self.parse_chains()
             working_dict = self.make_connections(working_dict, loop_count)
             loop_count += 1
 
     def make_connections(self, indict: Dict, loop_count: int):
-        """for sorting through a hipairs dictionary of letters of interest and their corresponding paired letters.
-        Used with a WHILE loop, can recursively search through 'chains' or paths that a letter sequence can take
-        by following pairs from one letter to the next. Looks for 'loops', where a chain path can return to its original
-        starting letter. Records other chains as deadends
+        """Used to iterate through exploring all possible paths through linked characters in a menu
+        For a given dict where values (chains) represent unique paths through the possible network of linked characters:
+        - grows every chain of letters by 1, for each letter that can link to the end of the chain
+        - parses the resulting chains to see whether any are dead ends, or successful loops. If neither, the chain is
+          kept for another iteration
         """
         spc50 = spaces(50)
 
@@ -140,10 +136,10 @@ class MenuMaker:
         new_working_dict = deepcopy(old_working_dict)
 
         for iD, chain in old_working_dict.items():
-            # this loop extends out each chain, by one more character, creating more chains if there is a fork?
             chain_end = chain[-1]
             chars_chain_end_links_to = self.link_index[chain_end]
             logger.log(SPAM, f"{self.pfx} chain={iD, chain} | end ({chain_end}) links to {chars_chain_end_links_to}")
+
             for position_iD, conxn in enumerate(chars_chain_end_links_to.values()):
                 # adds fractional float value to new_key, smaller for each iteration, for tracking purposes
                 new_key = round(iD + position_iD / 10 ** loop_count, 5)
@@ -177,8 +173,9 @@ class MenuMaker:
         return parsed_working_dict
 
     def add_to_found_loops(self, new_loop: str, commonest_letter: str) -> None:
-        """Makes sure candidate new loop is genuinely new. Converts to frozenset for comparison
-        against existing found loops."""
+        """Makes sure candidate new loop is genuinely new. Selects only the portion of the chain representing the loop
+         through a cycle of characters. This loop is converted to a frozenset for comparison against existing found
+         loops, and for use as the key in dictionary of found_loops"""
         # e.g. turns EINTON --> NTON, with knowledge that second occurrence of commonest letter will be at the end
         only_loop_section = new_loop[new_loop.index(commonest_letter):]
         new_loop_set = frozenset(only_loop_section)
