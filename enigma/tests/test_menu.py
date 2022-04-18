@@ -33,7 +33,7 @@ loop_data = [
     ("welchman", 2, 22, gw_all_loops),  # note this has been failing since added, indicates true problems in code
     ("welchman", 14, 27, set()),
     ("dermot_BB", 0, 30, {frozenset(['G', 'E', 'V', 'S', 'A', 'R'])}),
-    ("basic", 0, 4, {frozenset(['A', 'B', 'C'])}),
+    ("basic", 0, 5, {frozenset(['A', 'B', 'C'])}),
     ("basic", 1, 7, {frozenset(['B', 'D', 'E', 'F'])})
 ]
 
