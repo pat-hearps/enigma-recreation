@@ -101,7 +101,9 @@ class MenuMaker:
         logger.debug(f"chars with the most links ({max_count}) are: {self.best_characters}")
 
     def find_loops(self, starting_character: str):
-        # is really 'finding all possible loops' by brute-forcing traversing the chain
+        """Starting from a particular character, iteratively explore all possible paths in a menu of linked characters,
+        aiming to identify sequences where a 'loop' is formed where a circular path is possible."""
+        # is really 'finding all possible loops' by brute-forcing traversing the network
         working_dict = {i + len(self.found_loops) + 0.0: ''.join((starting_character, v))
                         for i, v in enumerate(self.link_index[starting_character].values())
                         }
