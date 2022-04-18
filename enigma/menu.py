@@ -114,12 +114,12 @@ class MenuMaker:
             # self.make_connections()
             # self.parse_chains()
             working_dict, self.dead_ends = self.make_connections(
-                starting_character, working_dict, self.dead_ends, run
+                working_dict, self.dead_ends, run
             )
             run += 1
 
     def make_connections(
-            self, starting_character: str, indict: Dict, deadends: Dict, itr: int
+            self, indict: Dict, deadends: Dict, itr: int
     ):
         """for sorting through a hipairs dictionary of letters of interest and their corresponding paired letters.
         Used with a WHILE loop, can recursively search through 'chains' or paths that a letter sequence can take
