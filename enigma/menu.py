@@ -10,6 +10,8 @@ from enigma.utils import SPAM, VERBOSE, get_logger, spaces
 
 logger = get_logger(__name__)
 
+LoopDict = Dict[float, str]
+
 
 class MenuMaker:
 
@@ -115,7 +117,7 @@ class MenuMaker:
             working_dict = self.make_connections(working_dict, loop_count)
             loop_count += 1
 
-    def make_connections(self, start_working_dict: Dict, loop_count: int):
+    def make_connections(self, start_working_dict: LoopDict, loop_count: int):
         """Used to iterate through exploring all possible paths through linked characters in a menu
         For a given dict where values (chains) represent unique paths through the possible network of linked characters:
         - grows every chain of letters by 1, for each letter that can link to the end of the chain
@@ -132,7 +134,7 @@ class MenuMaker:
 
         return parsed_working_dict
 
-    def grow_chains(self, old_working_dict, loop_count):
+    def grow_chains(self, old_working_dict: LoopDict, loop_count: int):
         """For all the chains of letters in the working_dict, grow the chain by one letter, for each letter
         that the end is connected to. This may fork to create multiple chains from one original."""
         new_working_dict = deepcopy(old_working_dict)
@@ -150,7 +152,7 @@ class MenuMaker:
 
         return new_working_dict
 
-    def parse_chains(self, grown_working_dict):
+    def parse_chains(self, grown_working_dict: LoopDict):
         """This loop parses the results of the chain additions, whether it's found a deadend or loop, or neither
         if neither, chain is added back into the working dict for the next iteration
         """
