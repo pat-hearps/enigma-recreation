@@ -144,13 +144,10 @@ class MenuMaker:
 
         for iD, chain in old_working_dict.items():
             # this loop extends out each chain, by one more character, creating more chains if there is a fork?
-            current_end = chain[-1]
-            letters_current_end_connects_to = self.link_index[current_end]
-            logger.log(
-                SPAM,
-                f"itr={itr} | id-chain = {iD, chain} | current end ({current_end}) connects to {letters_current_end_connects_to}"
-            )
-            for position_iD, conxn in enumerate(letters_current_end_connects_to.values()):
+            chain_end = chain[-1]
+            chars_chain_end_links_to = self.link_index[chain_end]
+            logger.log(SPAM, f"itr={itr} | chain={iD, chain} | end ({chain_end}) links to {chars_chain_end_links_to}")
+            for position_iD, conxn in enumerate(chars_chain_end_links_to.values()):
                 # adds fractional float value to new_key, smaller for each iteration, for tracking purposes
                 new_key = round(iD + position_iD / 10 ** itr, 5)
                 logger.log(SPAM, f"itr={itr} | saving key={new_key} = {chain}+{conxn}")
@@ -173,7 +170,7 @@ class MenuMaker:
 
             elif occurrence_count == 2:
                 if commonest_letter == chain[-1] == chain[-3]:  # it's a deadend
-                    logger.log(SPAM, f"itr={itr} | {chain} is a deadend bc last({chain[-1]}) == 3rd last({chain[-3]})")
+                    logger.log(SPAM, f"itr={itr} | {chain} is a deadend")
                     deadends[iD] = chain[:-1]
                 elif len(chain) > 3:  # ie we're legit back to the start after a loop
                     self.add_to_found_loops(chain, commonest_letter, itr)
