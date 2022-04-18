@@ -164,27 +164,32 @@ class MenuMaker:
         """
         parsed_working_dict = {}
         for iD, chain in grown_working_dict.items():
-            count = Counter(chain)
-            repeated_chars = {k: v for k, v in count.items() if v > 1}
+            chain_count = Counter(chain)
+            commonest_letter, occurrence_count = chain_count.most_common(1)[0]
 
-            if repeated_chars and chain[-1] == chain[-3]:  # it's a deadend
-                logger.log(SPAM, f"itr={itr} | {chain} is a deadend bc last({chain[-1]}) == 3rd last({chain[-3]})")
-                deadends[iD] = chain[:-1]
-            elif repeated_chars and len(chain) > 3:  # ie we're legit back to the start after a loop
-                self.add_to_found_loops(chain, itr)
-            else:  # just keep growing to see where it goes
+            if occurrence_count == 1:  # just keep growing to see where it goes
                 logger.log(SPAM, f"itr={itr} | keep going for {chain}")
                 parsed_working_dict[iD] = chain
 
+            elif occurrence_count == 2:
+                if commonest_letter == chain[-1] == chain[-3]:  # it's a deadend
+                    logger.log(SPAM, f"itr={itr} | {chain} is a deadend bc last({chain[-1]}) == 3rd last({chain[-3]})")
+                    deadends[iD] = chain[:-1]
+                elif len(chain) > 3:  # ie we're legit back to the start after a loop
+                    self.add_to_found_loops(chain, commonest_letter, itr)
+            else:
+                raise ValueError(f"error parsing chain = {chain}, too many repeated characters")
+
         return parsed_working_dict, deadends
 
-    def add_to_found_loops(self, new_loop: str, itr: int = None) -> None:
+    def add_to_found_loops(self, new_loop: str, commonest_letter: str, itr: int = None) -> None:
         """Makes sure candidate new loop is genuinely new. Converts to frozenset for comparison
         against existing found loops."""
-        new_loop_set = frozenset(new_loop)
+        # e.g. turns EINTON --> NTON, with knowledge that second occurrence of commonest letter will be at the end
+        only_loop_section = new_loop[new_loop.index(commonest_letter):]
+        new_loop_set = frozenset(only_loop_section)
+
         already_found = False
-        # TODO use some string counting mechanism to find subset of loop that represents smallest chunk
-        #  e.g. EINTON --> NTON, by only keeping the bit between the two 'N's which is the double counted letter
         for found_loop in self.found_loops.keys():
             if found_loop.issubset(new_loop_set):
                 already_found = True
@@ -192,8 +197,8 @@ class MenuMaker:
                 del self.found_loops[found_loop]
 
         if not already_found:
-            self.found_loops[new_loop_set] = new_loop
-            logger.debug(f"itr={itr} | loop found = {new_loop}")
+            self.found_loops[new_loop_set] = only_loop_section
+            logger.debug(f"itr={itr} | loop found = {only_loop_section}")
 
     def rationalise_to_list(self, indict):
         """goes through list values of results from find_loops, turns into single large list,
