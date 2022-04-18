@@ -169,8 +169,7 @@ class MenuMaker:
 
             if repeated_chars and chain[-1] == chain[-3]:  # it's a deadend
                 logger.log(SPAM, f"itr={itr} | {chain} is a deadend bc last({chain[-1]}) == 3rd last({chain[-3]})")
-                chain = chain[:-1]
-                deadends[iD] = chain
+                deadends[iD] = chain[:-1]
             elif repeated_chars and len(chain) > 3:  # ie we're legit back to the start after a loop
                 self.add_to_found_loops(chain, itr)
             else:  # just keep growing to see where it goes
