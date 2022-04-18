@@ -3,6 +3,7 @@ from typing import Tuple
 import pytest
 
 from enigma.menu import MenuMaker
+from tests.menu_test_data import BASIC_4CH
 
 CRIBS = {
     "basic": {
@@ -113,3 +114,17 @@ def test_find_loops(crib_set_name: str, best_chars: tuple, expected: dict) -> No
     for best_char in best_chars:
         menu_mkr.find_loops(best_char)
     assert menu_mkr.found_loops.keys() == expected.keys()
+
+
+menu_data = [
+    ("basic_4ch_loop", 7, BASIC_4CH),
+]
+
+
+@pytest.mark.parametrize("crib_set_name, menu_length, expected", menu_data)
+def test_menu_prep(crib_set_name: str, menu_length: int, expected: dict) -> None:
+    crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
+    menu_mkr = MenuMaker(crib=crib_guess, encoded_crib=crib_cypher)
+    menu_mkr.search_menu_structure()
+    menu_mkr.prep_menu(length_of_menu=menu_length)
+    assert menu_mkr.menu == expected

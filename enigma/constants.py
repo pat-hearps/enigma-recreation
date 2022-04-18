@@ -1,8 +1,9 @@
 
 class MENU:
-    CONXNS = "connections"
+    # todo refactor to nicer strings e.g. 'connections'
+    CONXNS = "conxns"
     IN = "in"
     OUT = "out"
-    LINK = "link"
+    LINK = "menu_link"
     CONFIG = "config"
-    TEST_CHAR = "TEST_CHAR"
+    TEST_CHAR = "test_char"
