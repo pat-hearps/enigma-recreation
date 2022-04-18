@@ -28,7 +28,7 @@ class MenuMaker:
         self.dead_ends: Dict = {}
         self.pfx: str = ""
 
-    def process_stuff(self):
+    def search_menu_structure(self):
         """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
         self.count_characters()
         self.create_link_index()

@@ -53,10 +53,9 @@ loop_data = [
 def test_menumaker_loops(crib_set_name: str, expected: set) -> None:
     crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
     menu_mkr = MenuMaker(crib=crib_guess, encoded_crib=crib_cypher)
-    menu_mkr.process_stuff()
+    menu_mkr.search_menu_structure()
     found_loops = set(frozenset(loop) for loop in menu_mkr.found_loops)
     assert found_loops == expected
-    # assert 0
 
 
 # fmt: off
