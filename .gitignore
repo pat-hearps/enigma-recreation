@@ -11,6 +11,7 @@ images/*
 */_pycache_
 *.pyc
 .idea
+*_cache*
 
 .vscode
 
