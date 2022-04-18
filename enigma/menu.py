@@ -104,7 +104,7 @@ class MenuMaker:
         """Starting from a particular character, iteratively explore all possible paths in a menu of linked characters,
         aiming to identify sequences where a 'loop' is formed where a circular path is possible."""
         # is really 'finding all possible loops' by brute-forcing traversing the network
-        working_dict = {i + len(self.found_loops) + 0.0: ''.join((starting_character, v))
+        working_dict = {float(i + len(self.found_loops)): ''.join((starting_character, v))
                         for i, v in enumerate(self.link_index[starting_character].values())
                         }
         logger.log(VERBOSE, f"initial working dict is= {working_dict}")
