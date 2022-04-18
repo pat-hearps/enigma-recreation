@@ -70,6 +70,7 @@ class MenuMaker:
         self.pairs = {i: {c, m} for i, (c, m) in enumerate(zip(self.crib, self.encoded_crib))}
         logger.log(VERBOSE, f"this crib-cypher has the char pairs: {self.pairs}")
         # char_counts = for each character, how many times does it occur
+        # TODO just use Counter() here
         count = defaultdict(int)
         for char in sorted(''.join((self.crib, self.encoded_crib))):
             count[char] += 1
