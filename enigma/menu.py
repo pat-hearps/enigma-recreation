@@ -27,6 +27,7 @@ class MenuMaker:
         self.found_loops: Dict[frozenset, str] = {}
         self.dead_ends: Dict = {}
         self.pfx: str = ""
+        self.menu: dict = {}
 
     def search_menu_structure(self):
         """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
@@ -197,7 +198,7 @@ class MenuMaker:
 
     def prep_menu(self, length_of_menu=12):
         """Second main entrypoint function, creates menu from found loops and deadends"""
-        self.menu = {}
+
         try:
             for loop in self.found_loops:
                 self.loop_to_menu(mainloop=loop)
