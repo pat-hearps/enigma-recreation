@@ -67,7 +67,8 @@ deadend_data = [
     ("basic_3ch_loop", {'E': 'BDE'}),
     ("basic_4ch_loop", {'A': 'BCA'}),
     ("welchman_1_loop", {'C': 'EINTC', 'D': 'ED', 'K': 'EINTK', 'U': 'EU', 'V': 'EPV'}),
-    ("dermot", {'H': 'EGRZH', 'L': 'EGL', 'N': 'EN', 'U': 'EU', 'W': 'EVSW'})
+    ("dermot", {'H': 'EGRZH', 'L': 'EGL', 'N': 'EN', 'U': 'EU', 'W': 'EVSW'}),
+    ("welchman_4_loops", {'F': 'EF', 'G': 'EG', 'K': 'EDTK', 'R': 'EULR', 'S': 'EULS'})
 
 ]
 
