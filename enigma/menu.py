@@ -276,11 +276,10 @@ class MenuMaker:
         connections = {}
         for pos, item in self.menu.items():
             if pos == position or pos == M.CONFIG:
-                pass
-            elif item[M.IN] == char:
-                connections[pos] = M.IN
-            elif item[M.OUT] == char:
-                connections[pos] = M.OUT
+                continue
+            for io in (M.IN, M.OUT):
+                if item[io] == char:
+                    connections[pos] = io
         return connections
 
     def network_graph(self, reset_pos=True):
