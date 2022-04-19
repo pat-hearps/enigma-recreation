@@ -262,29 +262,26 @@ class MenuMaker:
         # this part does the heavy lifting of populating the connections for each menu item
 
         for position, itemdict in self.menu.items():
-            ins = {}
             in_char = itemdict[M.IN]
-            for k, v in self.menu.items():
-                if k == position or k == M.CONFIG:
-                    pass
-                elif v[M.IN] == in_char:
-                    ins[k] = M.IN
-                elif v[M.OUT] == in_char:
-                    ins[k] = M.OUT
+            ins = self.define_connections(in_char, position)
             logger.log(SPAM, f"position={position} in_char ={in_char} ins ={ins}")
 
-            outs = {}
             out_char = itemdict[M.OUT]
-            for k, v in self.menu.items():
-                if k == position or k == M.CONFIG:
-                    pass
-                elif v[M.IN] == out_char:
-                    outs[k] = M.IN
-                elif v[M.OUT] == out_char:
-                    outs[k] = M.OUT
+            outs = self.define_connections(out_char, position)
             logger.log(SPAM, f"position={position} out_char={out_char} outs={outs}")
 
             self.menu[position][M.CONXNS] = {M.IN: ins, M.OUT: outs}
+
+    def define_connections(self, char: str, position: int) -> dict:
+        connections = {}
+        for pos, item in self.menu.items():
+            if pos == position or pos == M.CONFIG:
+                pass
+            elif item[M.IN] == char:
+                connections[pos] = M.IN
+            elif item[M.OUT] == char:
+                connections[pos] = M.OUT
+        return connections
 
     def network_graph(self, reset_pos=True):
         """Using networkx package to display connections of menu letters"""
