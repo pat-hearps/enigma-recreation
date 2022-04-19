@@ -1,5 +1,6 @@
 from collections import Counter, defaultdict
 from copy import deepcopy
+from pprint import pformat
 from typing import Dict, List
 
 import matplotlib.pyplot as plt
@@ -204,13 +205,19 @@ class MenuMaker:
                 self.loop_to_menu(mainloop=loop)
         except Exception:
             pass
+        logger.log(VERBOSE, f"post loop_to_menu,\nmenu={pformat(self.menu)}")
         self.add_deadends_to_menu(length_of_menu=length_of_menu)
+        logger.log(VERBOSE, f"post add_deadends_to_menu,\nmenu={pformat(self.menu)}")
         self.configure_menu()
+        logger.log(VERBOSE, f"post configure_menu,\nmenu={pformat(self.menu)}")
         self.connections_add_to_menu()
+        logger.log(VERBOSE, f"post connections_add_to_menu,\nmenu={pformat(self.menu)}")
 
     def loop_to_menu(self, mainloop=0):
+        logger.log(SPAM, f"entry, mainloop={mainloop}")
         if mainloop == 0:
             mainloop = self.found_loops[0]
+        logger.log(SPAM, f"set,   mainloop={mainloop}")
 
         for i, char in enumerate(mainloop[:-1]):
             next_char = mainloop[i + 1]
@@ -220,7 +227,7 @@ class MenuMaker:
             # not sure if this matters for now or if its better to somehow include both linkages in the menu
             # revisit later depending on bombe methodology
             self.menu[position] = {'in': char, 'out': next_char, 'menu_link': position}
-            print(f"added item from loop '{mainloop}' to menu {position} : {self.menu[position]}")
+            logger.log(SPAM, f"added item from loop '{mainloop}' to menu {position} : {self.menu[position]}")
 
     def add_deadends_to_menu(self, length_of_menu=12):
         for ends in sorted(self.dead_ends, reverse=True):
@@ -235,7 +242,7 @@ class MenuMaker:
                     wdict = self.link_index[char]
                     position = [k for k, v in wdict.items() if v == next_char][0]
                     self.menu[position] = {'in': char, 'out': next_char, 'menu_link': position}
-                    logger.debug(f"added item from deadend '{ends}' to menu {position} : {self.menu[position]}")
+                    logger.log(SPAM, f"added item from deadend '{ends}' to menu {position} : {self.menu[position]}")
 
     def configure_menu(self):
         try:
