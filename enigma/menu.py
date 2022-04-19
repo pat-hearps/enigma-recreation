@@ -268,28 +268,28 @@ class MenuMaker:
         logger.log(SPAM, f"initial process, menu=\n{pformat(self.menu)}")
 
         # this part does the heavy lifting of populating the connections for each menu item
-        for pos, mdict in self.menu.items():
-            in_char = mdict[M.IN]
-            logger.log(SPAM, f"1 pos={pos} mdict={mdict} in_char={in_char}")
+        for position, itemdict in self.menu.items():
+            in_char = itemdict[M.IN]
+            logger.log(SPAM, f"1 position={position} itemdict={itemdict} in_char={in_char}")
             for k, v in self.menu.items():
-                if k == pos or k == M.CONFIG:
+                if k == position or k == M.CONFIG:
                     pass
                 elif v[M.IN] == in_char:
-                    self.menu[pos][M.CONXNS][M.IN][k] = M.IN
+                    self.menu[position][M.CONXNS][M.IN][k] = M.IN
                 elif v[M.OUT] == in_char:
-                    self.menu[pos][M.CONXNS][M.IN][k] = M.OUT
-            logger.log(SPAM, f"2 pos={pos} mdict={mdict} in_char={in_char}")
+                    self.menu[position][M.CONXNS][M.IN][k] = M.OUT
+            logger.log(SPAM, f"2 position={position} itemdict={itemdict} in_char={in_char}")
 
-            out_char = mdict[M.OUT]
-            logger.log(SPAM, f"3 pos={pos} mdict={mdict} out_char={out_char}")
+            out_char = itemdict[M.OUT]
+            logger.log(SPAM, f"3 position={position} itemdict={itemdict} out_char={out_char}")
             for k, v in self.menu.items():
-                if k == pos or k == M.CONFIG:
+                if k == position or k == M.CONFIG:
                     pass
                 elif v[M.IN] == out_char:
-                    self.menu[pos][M.CONXNS][M.OUT][k] = M.IN
+                    self.menu[position][M.CONXNS][M.OUT][k] = M.IN
                 elif v[M.OUT] == out_char:
-                    self.menu[pos][M.CONXNS][M.OUT][k] = M.OUT
-            logger.log(SPAM, f"4 pos={pos} mdict={mdict} out_char={out_char}")
+                    self.menu[position][M.CONXNS][M.OUT][k] = M.OUT
+            logger.log(SPAM, f"4 position={position} itemdict={itemdict} out_char={out_char}")
 
     def network_graph(self, reset_pos=True):
         """Using networkx package to display connections of menu letters"""
