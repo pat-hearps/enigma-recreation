@@ -1,6 +1,35 @@
 
 from enigma.constants import MENU as M
 
+BASIC_3CH = {
+    0: {M.IN: 'B',
+        M.OUT: 'A',
+        M.LINK: 'ZZZ',
+        M.CONXNS: {M.IN: {1: M.OUT, 3: M.IN}, M.OUT: {2: M.IN}}},
+    2: {M.IN: 'A',
+        M.OUT: 'C',
+        M.LINK: 'ZZB',
+        M.CONXNS: {M.IN: {0: M.OUT}, M.OUT: {1: M.IN}}},
+    1: {M.IN: 'C',
+        M.OUT: 'B',
+        M.LINK: 'ZZA',
+        M.CONXNS: {M.IN: {2: M.OUT}, M.OUT: {0: M.IN, 3: M.IN}}},
+    3: {M.IN: 'B',
+        M.OUT: 'D',
+        M.LINK: 'ZZC',
+        M.CONXNS: {M.IN: {0: M.IN, 1: M.OUT}, M.OUT: {4: M.IN}}},
+    4: {M.IN: 'D',
+        M.OUT: 'E',
+        M.LINK: 'ZZD',
+        M.CONXNS: {M.IN: {3: M.OUT}, M.OUT: {}}},
+    M.CONFIG: {M.TEST_CHAR: 'B',
+               M.LINK: 'QQQ',
+               M.IN: 'B',
+               M.OUT: 'B',
+               M.CONXNS: {M.IN: {0: M.IN, 1: M.OUT, 3: M.IN},
+                          M.OUT: {0: M.IN, 1: M.OUT, 3: M.IN}}}
+}
+
 BASIC_4CH = {
     0: {M.CONXNS: {M.IN: {2: M.IN, 5: M.OUT}, M.OUT: {}},
         M.IN: 'B',

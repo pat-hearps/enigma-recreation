@@ -3,7 +3,7 @@ from typing import Tuple
 import pytest
 
 from enigma.menu import MenuMaker
-from tests.menu_test_data import BASIC_4CH
+from tests.menu_test_data import BASIC_3CH, BASIC_4CH
 
 CRIBS = {
     "basic": {
@@ -117,6 +117,7 @@ def test_find_loops(crib_set_name: str, best_chars: tuple, expected: dict) -> No
 
 
 menu_data = [
+    ("basic_3ch_loop", 6, BASIC_3CH),
     ("basic_4ch_loop", 7, BASIC_4CH),
 ]
 
