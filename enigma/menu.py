@@ -219,18 +219,12 @@ class MenuMaker:
         for char, next_char in zip(mainloop[:-1], mainloop[1:]):
             self.add_item_to_menu(char, next_char)
 
-    def add_deadends_to_menu(self, length_of_menu=12):
+    def add_deadends_to_menu(self):
         for ends in sorted(list(self.dead_ends.values()), reverse=True):
             logger.log(SPAM, f"adding from deadend {ends}")
-            # current_len = len(self.menu)
-            #     print(current_len)
             for i, char in enumerate(ends[:-1]):
-                if len(self.menu) >= length_of_menu:
-                    pass
-                else:
-                    next_char = ends[i + 1]
-                    #         print(i,char,next_char)
-                    self.add_item_to_menu(char, next_char)
+                next_char = ends[i + 1]
+                self.add_item_to_menu(char, next_char)
 
     def add_item_to_menu(self, char: str, next_char: str):
         link_idx_rev = {_char: pos for pos, _char in self.link_index[char].items()}
