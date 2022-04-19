@@ -181,5 +181,6 @@ def test_menu_prep(crib_set_name: str, menu_length: int, expected: dict) -> None
         act_conxns = set([i for k, v in act_val[M.CONXNS].items() for i in v.keys()])
         exp_conxns = set([i for k, v in exp_val[M.CONXNS].items() for i in v.keys()])
         assert act_conxns == exp_conxns, f"key={key} connections not equal"
+    print("===easy/non-precise menu checks passed===")
     # hard check - looking for identical dicts
     assert menu_mkr.menu == expected
