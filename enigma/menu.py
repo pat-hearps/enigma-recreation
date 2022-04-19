@@ -250,13 +250,7 @@ class MenuMaker:
         """Adds extra item to menu as the bombe entrypoint, using a character
         that is linked to the most other characters"""
         test_char = self.best_characters[0]
-
-        self.menu[M.CONFIG] = {}
-        self.menu[M.CONFIG][M.TEST_CHAR] = test_char
-        self.menu[M.CONFIG][M.LINK] = 'QQQ'
-        self.menu[M.CONFIG][M.IN] = test_char
-        self.menu[M.CONFIG][M.OUT] = test_char
-        self.menu[M.CONFIG][M.CONXNS] = {M.IN: {}, M.OUT: {}}
+        self.menu[M.CONFIG] = {M.TEST_CHAR: test_char, M.LINK: 'QQQ', M.IN: test_char, M.OUT: test_char}
 
     def connections_add_to_menu(self):
         """For each character / position for each node in menu, define which other nodes connect to this one.
