@@ -147,11 +147,17 @@ class MenuMaker:
             chars_chain_end_links_to = self.link_index[chain_end]
             logger.log(SPAM, f"{self.pfx} chain={iD, chain} | end ({chain_end}) links to {chars_chain_end_links_to}")
 
-            if len(chars_chain_end_links_to) == 1 and list(chars_chain_end_links_to.values())[0] == chain[-2]:
+            # check for deadends before trying to grow
+            chain_only_links_to_one_char = len(chars_chain_end_links_to) == 1
+            linked_char = list(chars_chain_end_links_to.values())[0]
+            penultimate_char = chain[-2]
+            if chain_only_links_to_one_char and linked_char == penultimate_char:
                 logger.log(SPAM, f"{self.pfx} {chain} is a deadend")
                 self.dead_ends[chain_end] = chain
                 del new_working_dict[iD]
+
             else:
+                # grow chain, creating new chain for each additional linked character
                 for position_iD, conxn in enumerate(chars_chain_end_links_to.values()):
                     # adds fractional float value to new_key, smaller for each iteration, for tracking purposes
                     new_key = round(iD + position_iD / 10 ** loop_count, 5)
