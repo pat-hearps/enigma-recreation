@@ -265,11 +265,12 @@ class MenuMaker:
                 pass
             else:
                 self.menu[k][M.CONXNS] = {M.IN: {}, M.OUT: {}}
-        #                 self.menu[k]['conx_out'] = {}
         logger.log(SPAM, f"initial process, menu=\n{pformat(self.menu)}")
+
         # this part does the heavy lifting of populating the connections for each menu item
         for pos, mdict in self.menu.items():
             sin = mdict[M.IN]
+            logger.log(SPAM, f"1 pos={pos} mdict={mdict} sin={sin}")
             for k, v in self.menu.items():
                 if k == pos or k == M.CONFIG:
                     pass
@@ -277,8 +278,10 @@ class MenuMaker:
                     self.menu[pos][M.CONXNS][M.IN][k] = M.IN
                 elif v[M.OUT] == sin:
                     self.menu[pos][M.CONXNS][M.IN][k] = M.OUT
+            logger.log(SPAM, f"2 pos={pos} mdict={mdict} sin={sin}")
 
             sout = mdict[M.OUT]
+            logger.log(SPAM, f"3 pos={pos} mdict={mdict} sout={sout}")
             for k, v in self.menu.items():
                 if k == pos or k == M.CONFIG:
                     pass
@@ -286,6 +289,7 @@ class MenuMaker:
                     self.menu[pos][M.CONXNS][M.OUT][k] = M.IN
                 elif v[M.OUT] == sout:
                     self.menu[pos][M.CONXNS][M.OUT][k] = M.OUT
+            logger.log(SPAM, f"4 pos={pos} mdict={mdict} sout={sout}")
 
     def network_graph(self, reset_pos=True):
         """Using networkx package to display connections of menu letters"""
