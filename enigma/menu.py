@@ -313,7 +313,7 @@ class MenuMaker:
     def configure_menu(self):
         try:
             test_char = self.found_loops[0][0]
-        except BaseException:
+        except Exception:
             dend_string = "".join(m for m in self.dead_ends)
             count_of_dead_ends = {}
             for d in dend_string:
@@ -374,7 +374,7 @@ class MenuMaker:
         try:
             for loop in self.found_loops:
                 self.loop_to_menu(mainloop=loop)
-        except BaseException:
+        except Exception:
             pass
         self.add_deadends_to_menu(length_of_menu=length_of_menu)
         self.configure_menu()
