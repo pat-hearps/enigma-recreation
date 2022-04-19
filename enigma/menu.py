@@ -216,20 +216,12 @@ class MenuMaker:
 
     def loop_to_menu(self, mainloop):
         logger.log(SPAM, f"entry, mainloop={mainloop}")
-
         for char, next_char in zip(mainloop[:-1], mainloop[1:]):
-            link_idx_rev = {_char: pos for pos, _char in self.link_index[char].items()}
-            logger.log(SPAM, f"char={char}, next={next_char}, link_idx_rev={link_idx_rev}")
-            position_next_char = link_idx_rev[next_char]
-            # note that I'm just picking the first one where there are double (or more) linkages
-            # not sure if this matters for now or if its better to somehow include both linkages in the menu
-            # revisit later depending on bombe methodology
-            menu_val = {'in': char, 'out': next_char, 'menu_link': position_next_char}
-            self.menu[position_next_char] = menu_val
-            logger.log(SPAM, f"added item from loop '{mainloop}' to menu {position_next_char} : {menu_val}")
+            self.add_item_to_menu(char, next_char)
 
     def add_deadends_to_menu(self, length_of_menu=12):
         for ends in sorted(list(self.dead_ends.values()), reverse=True):
+            logger.log(SPAM, f"adding from deadend {ends}")
             # current_len = len(self.menu)
             #     print(current_len)
             for i, char in enumerate(ends[:-1]):
@@ -238,10 +230,17 @@ class MenuMaker:
                 else:
                     next_char = ends[i + 1]
                     #         print(i,char,next_char)
-                    wdict = self.link_index[char]
-                    position = [k for k, v in wdict.items() if v == next_char][0]
-                    self.menu[position] = {'in': char, 'out': next_char, 'menu_link': position}
-                    logger.log(SPAM, f"added item from deadend '{ends}' to menu {position} : {self.menu[position]}")
+                    self.add_item_to_menu(char, next_char)
+
+    def add_item_to_menu(self, char: str, next_char: str):
+        link_idx_rev = {_char: pos for pos, _char in self.link_index[char].items()}
+        position_next_char = link_idx_rev[next_char]
+        # note that I'm just picking the first one where there are double (or more) linkages
+        # not sure if this matters for now or if its better to somehow include both linkages in the menu
+        # revisit later depending on bombe methodology
+        menu_val = {'in': char, 'out': next_char, 'menu_link': position_next_char}
+        self.menu[position_next_char] = menu_val
+        logger.log(SPAM, f"added item to menu at {position_next_char} : {menu_val}")
 
     def configure_menu(self):
         try:
