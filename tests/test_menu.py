@@ -169,7 +169,7 @@ def test_menu_prep(crib_set_name: str, menu_length: int, expected: dict) -> None
     menu_mkr = MenuMaker(crib=crib_guess, encoded_crib=crib_cypher)
     menu_mkr.search_menu_structure()
     menu_mkr.prep_menu(length_of_menu=menu_length)
-
+    print("===start of menu test===")
     # easy check - not looking for identical ordering of in/out pairs, keys
     for key, exp_val in expected.items():
         if key == M.CONFIG:
