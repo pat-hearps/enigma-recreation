@@ -272,14 +272,11 @@ class MenuMaker:
 
             self.menu[position][M.CONXNS] = {M.IN: ins, M.OUT: outs}
 
-    def define_connections(self, char: str, position: int) -> dict:
-        connections = {}
-        for pos, item in self.menu.items():
-            if pos in (position, M.CONFIG):
-                continue
-            for io in (M.IN, M.OUT):
-                if item[io] == char:
-                    connections[pos] = io
+    def define_connections(self, char: str, char_position: int) -> dict:
+        """For a given character (at a char_position), compare against all other menu items excluding config
+        Return dict of position: 'in'|'out' for each node in menu that connects to this char"""
+        comparison_dict = {pos: node for pos, node in self.menu.items() if pos not in (char_position, M.CONFIG)}
+        connections = {pos: io for pos, node in comparison_dict.items() for io in (M.IN, M.OUT) if node[io] == char}
         return connections
 
     def network_graph(self, reset_pos=True):
