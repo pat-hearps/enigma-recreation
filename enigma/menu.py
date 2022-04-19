@@ -220,6 +220,7 @@ class MenuMaker:
         for i, char in enumerate(mainloop[:-1]):
             next_char = mainloop[i + 1]
             wdict = self.link_index[char]
+            logger.log(SPAM, f"char={char}, next={next_char}, wdict={wdict}")
             position = [k for k, v in wdict.items() if v == next_char][0]
             # note that I'm just picking the first one where there are double (or more) linkages
             # not sure if this matters for now or if its better to somehow include both linkages in the menu
