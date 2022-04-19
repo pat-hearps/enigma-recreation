@@ -6,6 +6,7 @@ from typing import Dict, List
 import matplotlib.pyplot as plt
 import networkx as nx
 
+from enigma.constants import MENU as M
 from enigma.design import ENTRY
 from enigma.utils import SPAM, VERBOSE, get_logger, spaces
 
@@ -233,7 +234,7 @@ class MenuMaker:
         # not sure if this matters for now or if its better to somehow include both linkages in the menu
         # revisit later depending on bombe methodology
         if position_next_char not in self.menu.keys():
-            menu_val = {'in': char, 'out': next_char, 'menu_link': position_next_char}
+            menu_val = {M.IN: char, M.OUT: next_char, M.LINK: position_next_char}
             self.menu[position_next_char] = menu_val
             logger.log(SPAM, f"added item to menu at {position_next_char} : {menu_val}")
 
@@ -242,46 +243,46 @@ class MenuMaker:
         that is linked to the most other characters"""
         test_char = self.best_characters[0]
 
-        self.menu['config'] = {}
-        self.menu['config']['test_char'] = test_char
-        self.menu['config']['menu_link'] = 'QQQ'
-        self.menu['config']['in'] = test_char
-        self.menu['config']['out'] = test_char
-        self.menu['config']['conxns'] = {'in': {}, 'out': {}}
+        self.menu[M.CONFIG] = {}
+        self.menu[M.CONFIG][M.TEST_CHAR] = test_char
+        self.menu[M.CONFIG][M.LINK] = 'QQQ'
+        self.menu[M.CONFIG][M.IN] = test_char
+        self.menu[M.CONFIG][M.OUT] = test_char
+        self.menu[M.CONFIG][M.CONXNS] = {M.IN: {}, M.OUT: {}}
 
     def connections_add_to_menu(self):
         # this part adds in blank conx_in/out dicts and converts position to menulink 3-letter ZZ code
         for k, m in self.menu.items():
-            if k == 'config':
+            if k == M.CONFIG:
                 pass
             else:
-                l = m['menu_link']  # noqa: E741
+                l = m[M.LINK]  # noqa: E741
                 l1 = ENTRY[l - 1]
                 l2 = 'ZZ' + l1
                 #     print(l)
-                self.menu[k]['menu_link'] = l2
-                self.menu[k]['conxns'] = {'in': {}, 'out': {}}
+                self.menu[k][M.LINK] = l2
+                self.menu[k][M.CONXNS] = {M.IN: {}, M.OUT: {}}
         #                 self.menu[k]['conx_out'] = {}
 
         # this part does the heavy lifting of populating the connections for each menu item
         for pos, mdict in self.menu.items():
-            sin = mdict['in']
+            sin = mdict[M.IN]
             for k, v in self.menu.items():
-                if k == pos or k == 'config':
+                if k == pos or k == M.CONFIG:
                     pass
-                elif v['in'] == sin:
-                    self.menu[pos]['conxns']['in'][k] = 'in'
-                elif v['out'] == sin:
-                    self.menu[pos]['conxns']['in'][k] = 'out'
+                elif v[M.IN] == sin:
+                    self.menu[pos][M.CONXNS][M.IN][k] = M.IN
+                elif v[M.OUT] == sin:
+                    self.menu[pos][M.CONXNS][M.IN][k] = M.OUT
 
-            sout = mdict['out']
+            sout = mdict[M.OUT]
             for k, v in self.menu.items():
-                if k == pos or k == 'config':
+                if k == pos or k == M.CONFIG:
                     pass
-                elif v['in'] == sout:
-                    self.menu[pos]['conxns']['out'][k] = 'in'
-                elif v['out'] == sout:
-                    self.menu[pos]['conxns']['out'][k] = 'out'
+                elif v[M.IN] == sout:
+                    self.menu[pos][M.CONXNS][M.OUT][k] = M.IN
+                elif v[M.OUT] == sout:
+                    self.menu[pos][M.CONXNS][M.OUT][k] = M.OUT
 
     def network_graph(self, reset_pos=True):
         """Using networkx package to display connections of menu letters"""
