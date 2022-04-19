@@ -1,7 +1,9 @@
+from pprint import pformat
 from typing import Tuple
 
 import pytest
 
+from enigma.constants import MENU as M
 from enigma.menu import MenuMaker
 from tests.menu_test_data import BASIC_3CH, BASIC_4CH, WELCHMAN_1L
 
@@ -167,5 +169,17 @@ def test_menu_prep(crib_set_name: str, menu_length: int, expected: dict) -> None
     menu_mkr = MenuMaker(crib=crib_guess, encoded_crib=crib_cypher)
     menu_mkr.search_menu_structure()
     menu_mkr.prep_menu(length_of_menu=menu_length)
-    check_recursive(menu_mkr.menu, expected)
+
+    # easy check - not looking for identical ordering of in/out pairs, keys
+    for key, exp_val in expected.items():
+        if key == M.CONFIG:
+            continue
+        act_val = menu_mkr.menu[key]
+        print(f"actual  ={pformat(act_val)}\nexpected={exp_val}\n-----")
+        assert {act_val[M.IN], act_val[M.OUT]} == {exp_val[M.IN], exp_val[M.OUT]}, f"key={key} in/out not equal"
+        assert act_val[M.LINK] == exp_val[M.LINK], f"key={key} menu_link not equal"
+        act_conxns = set([i for k, v in act_val[M.CONXNS].items() for i in v.keys()])
+        exp_conxns = set([i for k, v in exp_val[M.CONXNS].items() for i in v.keys()])
+        assert act_conxns == exp_conxns, f"key={key} connections not equal"
+    # hard check - looking for identical dicts
     assert menu_mkr.menu == expected
