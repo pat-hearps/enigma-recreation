@@ -128,10 +128,12 @@ class MenuMaker:
         spc50 = spaces(50)
 
         grown_working_dict = self.grow_chains(start_working_dict, loop_count)
-        logger.log(VERBOSE, f"{self.pfx} chains grown,\n{spc50}in={start_working_dict}\n{spc50}wd={grown_working_dict}")
+        logger.log(VERBOSE, f"{self.pfx} chains grown,\n{spc50}in={start_working_dict}\n{spc50}wd={grown_working_dict}"
+                            f"\nfound_loops={self.found_loops}, deadends={self.dead_ends}")
 
         parsed_working_dict = self.parse_chains(grown_working_dict)
-        logger.log(VERBOSE, f"{self.pfx} parsed,\n{spc50}in={grown_working_dict}\n{spc50}out={parsed_working_dict}")
+        logger.log(VERBOSE, f"{self.pfx} parsed,\n{spc50}in={grown_working_dict}\n{spc50}out={parsed_working_dict}"
+                            f"\nfound_loops={self.found_loops}, deadends={self.dead_ends}")
 
         return parsed_working_dict
 
