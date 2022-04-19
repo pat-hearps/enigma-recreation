@@ -238,22 +238,20 @@ class MenuMaker:
             logger.log(SPAM, f"added item to menu at {position_next_char} : {menu_val}")
 
     def configure_menu(self):
-        try:
-            test_char = self.found_loops[0][0]
-        except Exception:
-            dend_string = "".join(m for m in self.dead_ends)
-            count_of_dead_ends = {}
-            for d in dend_string:
-                if d not in count_of_dead_ends.keys():
-                    count_of_dead_ends[d] = 1
-                else:
-                    count_of_dead_ends[d] += 1
 
-            test_char = [
-                k for k,
-                v in count_of_dead_ends.items() if v == sorted(
-                    count_of_dead_ends.values(),
-                    reverse=True)[0]][0]
+        dend_string = "".join(m for m in self.dead_ends)
+        count_of_dead_ends = {}
+        for d in dend_string:
+            if d not in count_of_dead_ends.keys():
+                count_of_dead_ends[d] = 1
+            else:
+                count_of_dead_ends[d] += 1
+
+        test_char = [
+            k for k,
+            v in count_of_dead_ends.items() if v == sorted(
+                count_of_dead_ends.values(),
+                reverse=True)[0]][0]
 
         self.menu['config'] = {}
         self.menu['config']['test_char'] = test_char
