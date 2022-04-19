@@ -259,8 +259,9 @@ class MenuMaker:
         self.menu[M.CONFIG][M.CONXNS] = {M.IN: {}, M.OUT: {}}
 
     def connections_add_to_menu(self):
-        # this part does the heavy lifting of populating the connections for each menu item
-
+        """For each character / position for each node in menu, define which other nodes connect to this one.
+        Connections are defined directionally, i.e. an 'in' connection is different to an 'out' one.
+        """
         for position, itemdict in self.menu.items():
             in_char = itemdict[M.IN]
             ins = self.define_connections(in_char, position)
