@@ -213,11 +213,8 @@ class MenuMaker:
         self.connections_add_to_menu()
         logger.log(VERBOSE, f"post connections_add_to_menu,\nmenu={pformat(self.menu)}")
 
-    def loop_to_menu(self, mainloop=0):
+    def loop_to_menu(self, mainloop):
         logger.log(SPAM, f"entry, mainloop={mainloop}")
-        if mainloop == 0:
-            mainloop = self.found_loops[0]
-        logger.log(SPAM, f"set,   mainloop={mainloop}")
 
         for i, char in enumerate(mainloop[:-1]):
             next_char = mainloop[i + 1]
