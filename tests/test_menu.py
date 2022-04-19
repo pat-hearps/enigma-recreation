@@ -145,10 +145,27 @@ menu_data = [
 ]
 
 
+def check_recursive(actual, expected):
+    if isinstance(expected, dict):
+        for k, v in expected.items():
+            if k not in actual.keys():
+                print(f"{k} missing from actual keys")
+                continue
+            if v == actual[k]:
+                pass
+            else:
+                print(f"key={k}")
+                check_recursive(actual[k], v)
+    else:
+        if actual != expected:
+            print(actual, " != ", expected)
+
+
 @pytest.mark.parametrize("crib_set_name, menu_length, expected", menu_data)
 def test_menu_prep(crib_set_name: str, menu_length: int, expected: dict) -> None:
     crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
     menu_mkr = MenuMaker(crib=crib_guess, encoded_crib=crib_cypher)
     menu_mkr.search_menu_structure()
     menu_mkr.prep_menu(length_of_menu=menu_length)
+    check_recursive(menu_mkr.menu, expected)
     assert menu_mkr.menu == expected
