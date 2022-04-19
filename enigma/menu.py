@@ -264,7 +264,6 @@ class MenuMaker:
         for position, itemdict in self.menu.items():
             ins = {}
             in_char = itemdict[M.IN]
-            logger.log(SPAM, f"1 position={position} itemdict={itemdict} in_char={in_char}")
             for k, v in self.menu.items():
                 if k == position or k == M.CONFIG:
                     pass
@@ -272,11 +271,10 @@ class MenuMaker:
                     ins[k] = M.IN
                 elif v[M.OUT] == in_char:
                     ins[k] = M.OUT
-            logger.log(SPAM, f"2 position={position} ins={ins} in_char={in_char}")
+            logger.log(SPAM, f"position={position} in_char ={in_char} ins ={ins}")
 
             outs = {}
             out_char = itemdict[M.OUT]
-            logger.log(SPAM, f"3 position={position} itemdict={itemdict} out_char={out_char}")
             for k, v in self.menu.items():
                 if k == position or k == M.CONFIG:
                     pass
@@ -284,7 +282,7 @@ class MenuMaker:
                     outs[k] = M.IN
                 elif v[M.OUT] == out_char:
                     outs[k] = M.OUT
-            logger.log(SPAM, f"4 position={position} outs={outs} out_char={out_char}")
+            logger.log(SPAM, f"position={position} out_char={out_char} outs={outs}")
 
             self.menu[position][M.CONXNS] = {M.IN: ins, M.OUT: outs}
 
