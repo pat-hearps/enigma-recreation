@@ -220,9 +220,10 @@ class MenuMaker:
             self.add_item_to_menu(char, next_char)
 
     def add_deadends_to_menu(self):
-        for ends in sorted(list(self.dead_ends.values()), reverse=True):
-            logger.log(SPAM, f"adding from deadend {ends}")
-            for char, next_char in zip(ends[:-1], ends[1:]):
+        for _end in self.dead_ends.values():
+            end = _end[::-1]  # reverse to start from the end
+            logger.log(SPAM, f"adding from deadend {end}")
+            for char, next_char in zip(end[:-1], end[1:]):
                 self.add_item_to_menu(char, next_char)
 
     def add_item_to_menu(self, char: str, next_char: str):
