@@ -231,9 +231,10 @@ class MenuMaker:
         # note that I'm just picking the first one where there are double (or more) linkages
         # not sure if this matters for now or if its better to somehow include both linkages in the menu
         # revisit later depending on bombe methodology
-        menu_val = {'in': char, 'out': next_char, 'menu_link': position_next_char}
-        self.menu[position_next_char] = menu_val
-        logger.log(SPAM, f"added item to menu at {position_next_char} : {menu_val}")
+        if position_next_char not in self.menu.keys():
+            menu_val = {'in': char, 'out': next_char, 'menu_link': position_next_char}
+            self.menu[position_next_char] = menu_val
+            logger.log(SPAM, f"added item to menu at {position_next_char} : {menu_val}")
 
     def configure_menu(self):
         try:
