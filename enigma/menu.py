@@ -201,7 +201,7 @@ class MenuMaker:
         """Second main entrypoint function, creates menu from found loops and deadends"""
 
         try:
-            for loop in self.found_loops:
+            for loop in self.found_loops.values():
                 self.loop_to_menu(mainloop=loop)
         except Exception:
             pass
@@ -230,7 +230,7 @@ class MenuMaker:
             logger.log(SPAM, f"added item from loop '{mainloop}' to menu {position} : {self.menu[position]}")
 
     def add_deadends_to_menu(self, length_of_menu=12):
-        for ends in sorted(self.dead_ends, reverse=True):
+        for ends in sorted(list(self.dead_ends.values()), reverse=True):
             # current_len = len(self.menu)
             #     print(current_len)
             for i, char in enumerate(ends[:-1]):
