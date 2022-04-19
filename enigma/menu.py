@@ -147,11 +147,16 @@ class MenuMaker:
             chars_chain_end_links_to = self.link_index[chain_end]
             logger.log(SPAM, f"{self.pfx} chain={iD, chain} | end ({chain_end}) links to {chars_chain_end_links_to}")
 
-            for position_iD, conxn in enumerate(chars_chain_end_links_to.values()):
-                # adds fractional float value to new_key, smaller for each iteration, for tracking purposes
-                new_key = round(iD + position_iD / 10 ** loop_count, 5)
-                logger.log(SPAM, f"{self.pfx} saving key={new_key} = {chain}+{conxn}")
-                new_working_dict[new_key] = chain + conxn
+            if len(chars_chain_end_links_to) == 1 and list(chars_chain_end_links_to.values())[0] == chain[-2]:
+                logger.log(SPAM, f"{self.pfx} {chain} is a deadend")
+                self.dead_ends[chain_end] = chain
+                del new_working_dict[iD]
+            else:
+                for position_iD, conxn in enumerate(chars_chain_end_links_to.values()):
+                    # adds fractional float value to new_key, smaller for each iteration, for tracking purposes
+                    new_key = round(iD + position_iD / 10 ** loop_count, 5)
+                    logger.log(SPAM, f"{self.pfx} saving key={new_key} = {chain}+{conxn}")
+                    new_working_dict[new_key] = chain + conxn
 
         return new_working_dict
 
@@ -164,40 +169,43 @@ class MenuMaker:
             chain_count = Counter(chain)
             commonest_letter, occurrence_count = chain_count.most_common(1)[0]
 
-            if occurrence_count == 1:  # just keep growing to see where it goes
+            if chain[-1] in self.dead_ends.keys():
+                pass
+            elif occurrence_count == 1:  # just keep growing to see where it goes
                 logger.log(SPAM, f"{self.pfx} keep going for {chain}")
                 parsed_working_dict[iD] = chain
 
             elif occurrence_count == 2:
-                if commonest_letter == chain[-1] == chain[-3]:
-                    logger.log(SPAM, f"{self.pfx} {chain} is a deadend")
-                    self.dead_ends[iD] = chain[:-1]
-                elif len(chain) > 3:  # ie we're legit back to the start after a loop
-                    self.add_to_found_loops(chain, commonest_letter)
+                # e.g. turns EINTON --> NTON, with knowledge that 2nd occurrence of commonest letter will be at the end
+                only_loop_section = chain[chain.index(commonest_letter):]
+                if len(only_loop_section) > 3:  # ie we're legit back to the start after a loop
+                    self.add_to_found_loops(only_loop_section)
             else:
-                raise ValueError(f"error parsing chain = {chain}, too many repeated characters")
+                raise ValueError(f"error parsing chain = {chain}, too many repeated characters: {chain_count}")
 
         return parsed_working_dict
 
-    def add_to_found_loops(self, new_loop: str, commonest_letter: str) -> None:
+    def add_to_found_loops(self, new_loop: str) -> None:
         """Makes sure candidate new loop is genuinely new. Selects only the portion of the chain representing the loop
          through a cycle of characters. This loop is converted to a frozenset for comparison against existing found
          loops, and for use as the key in dictionary of found_loops"""
-        # e.g. turns EINTON --> NTON, with knowledge that second occurrence of commonest letter will be at the end
-        only_loop_section = new_loop[new_loop.index(commonest_letter):]
-        new_loop_set = frozenset(only_loop_section)
+        new_loop_set = frozenset(new_loop)
 
         already_found = False
+        to_delete = []
         for found_loop in self.found_loops.keys():
             if found_loop.issubset(new_loop_set):
                 already_found = True
             elif new_loop_set.issubset(found_loop):
                 logger.log(VERBOSE, f"{self.pfx} previously found loop {found_loop} to be replaced by {new_loop_set}")
-                del self.found_loops[found_loop]
+                to_delete.append(found_loop)
+
+        for old_found_loop in to_delete:
+            del self.found_loops[old_found_loop]
 
         if not already_found:
-            self.found_loops[new_loop_set] = only_loop_section
-            logger.debug(f"{self.pfx} loop found = {only_loop_section}")
+            self.found_loops[new_loop_set] = new_loop
+            logger.debug(f"{self.pfx} loop found = {new_loop}")
 
     def rationalise_to_list(self, indict):
         """goes through list values of results from find_loops, turns into single large list,
