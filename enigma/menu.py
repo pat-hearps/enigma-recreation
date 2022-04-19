@@ -38,24 +38,6 @@ class MenuMaker:
         for char in self.best_characters:
             logger.debug(f"finding loops for char {char}")
             self.find_loops(char)
-        logger.debug(f'num dead ends b4 rationalising= {len(self.dead_ends)}')
-        """TODO:
-         - rationalise_to_list, unsub_list and get_smallest_loop appear to be dumb inefficient ways of picking
-           out the unique loops from the many possible ways of defining them. Replace with something shorter and more
-           intelligent based on using sets
-         - why am I keeping the deadends, what are they for?"""
-        self.dead_ends = self.rationalise_to_list(self.dead_ends)
-        logger.debug(f'num dead ends after ration, b4 unsub= {len(self.dead_ends)}')
-        self.dead_ends = self.unsub_list(self.dead_ends)
-        logger.debug(f'num dead ends after unsub= {len(self.dead_ends)}')
-        logger.debug(f'num loops b4 rationalising= {len(self.dead_ends)}')
-        self.found_loops = self.rationalise_to_list(self.found_loops)
-        logger.debug(f'num loops after ration, b4 unsub= {len(self.found_loops)}')
-        self.found_loops = self.get_smallest_loop(self.found_loops)
-        logger.debug(f'num loops after unsub= {len(self.found_loops)}')
-        logger.debug(f'num dead ends b4 lose_redundant= {len(self.dead_ends)}')
-        self.lose_redundant_deadends()
-        logger.debug(f'num dead ends after lose_redundant= {len(self.dead_ends)}')
 
     def count_characters(self):
         """Create two attribute dictionaries:
@@ -212,88 +194,6 @@ class MenuMaker:
         if not already_found:
             self.found_loops[new_loop_set] = new_loop
             logger.debug(f"{self.pfx} loop found = {new_loop}")
-
-    def rationalise_to_list(self, indict):
-        """goes through list values of results from find_loops, turns into single large list,
-        gets rid of any elements that are mirror images of each other (keeping one unique)"""
-        # logger.log(SPAM, f"rationalising {indict}")
-        invals = list(set(indict.values()))
-        # logger.log(SPAM, f"invals = {invals}")
-        for i, loop in enumerate(invals):
-            test = deepcopy(invals)
-            # logger.log(SPAM, f"setting pos {i} to {loop[::-1]}")
-            test[i] = loop[::-1]
-            test = list(set(test))
-            # logger.log(SPAM, f"test is now {test}")
-            if len(test) != len(invals):
-                invals[i] = loop[::-1]
-                # logger.log(SPAM, f"lens unequal")
-        invals = list(set(invals))
-        # logger.log(SPAM, f"invals is now {invals}")
-        return invals
-
-    def unsub_list(self, inlist):
-        """when given a list of strings from rationalise_to_list, will get rid of any elements which are a
-        subset of another larger element, leaving only the unique strings"""
-        inlist.sort()
-        # logger.log(SPAM, f"into unsub= {inlist}")
-        unique = []
-        for i in range(len(inlist) - 1):
-            chain = inlist[i]
-            nxt_chain = inlist[i + 1]
-            if chain not in nxt_chain:
-                unique.append(chain)
-                # logger.log(SPAM, f"{chain} NOT in {nxt_chain}")
-            # else:
-                # logger.log(SPAM, f"{chain} IS  in {nxt_chain}")
-        unique.append(inlist[-1])
-        # logger.log(SPAM, f"out of unsub= {unique}")
-        return unique
-
-    def get_smallest_loop(self, inlist):
-        """like unsub list but in reverse, for loops"""
-        inlist = sorted(inlist, reverse=True)
-        logger.log(SPAM, f"into get_smallest_loop= {inlist}")
-        dropped = []
-        unique = deepcopy(inlist)
-        for chain in inlist:
-            for other_chain in inlist:
-                if len(chain) < len(other_chain):
-                    smaller = chain
-                    bigger = other_chain
-                else:
-                    smaller = other_chain
-                    bigger = chain
-                test = ((smaller in bigger) or (smaller[::-1] in bigger))
-                if smaller == bigger:
-                    test = False
-                # logger.log(SPAM, (smaller, bigger, test))
-                if test and bigger in unique and smaller in unique:
-                    dropped.append(bigger)
-                    unique.remove(bigger)
-                    # logger.log(VERBOSE, f'removed {bigger}')
-        logger.log(SPAM, f"dropped  = {dropped}")
-        logger.log(SPAM, f"out of get_smallest_loop= {unique}")
-        return unique
-
-    def lose_redundant_deadends(self):
-        """should be applied after dead ends have been rationalised and unsubbed"""
-        check_against_these_loops = set(self.found_loops)
-        final_uniq_dends = deepcopy(self.dead_ends)
-        dropped = []
-        for uchain in self.dead_ends:
-            for eachloop in check_against_these_loops:
-                if uchain in final_uniq_dends and (
-                        uchain in eachloop
-                        or uchain[::-1] in eachloop
-                        or eachloop in uchain
-                        or eachloop[::-1] in uchain
-                ):
-                    dropped.append(uchain)
-                    # logger.log(SPAM, f"dropping {uchain} as related to {eachloop}")
-                    final_uniq_dends.remove(uchain)
-        logger.log(SPAM, f"dropped deadends = {dropped}")
-        self.dead_ends = final_uniq_dends
 
     def loop_to_menu(self, mainloop=0):
         if mainloop == 0:
