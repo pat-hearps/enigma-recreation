@@ -15,6 +15,14 @@ logger = get_logger(__name__)
 LoopDict = Dict[float, str]
 
 
+def convert_to_ZZ_code(position: int) -> str:
+    """Convert a menu link position integer to a 3-letter ZZ code,
+    with the 3rd letter equal to the letter prior to the given position index
+    in the alphabet"""
+    char_before_this_position = ENTRY[position - 1]
+    return f"ZZ{char_before_this_position}"
+
+
 class MenuMaker:
 
     def __init__(self, crib, encoded_crib):
@@ -234,7 +242,7 @@ class MenuMaker:
         # not sure if this matters for now or if its better to somehow include both linkages in the menu
         # revisit later depending on bombe methodology
         if position_next_char not in self.menu.keys():
-            menu_val = {M.IN: char, M.OUT: next_char, M.LINK: position_next_char}
+            menu_val = {M.IN: char, M.OUT: next_char, M.LINK: convert_to_ZZ_code(position_next_char)}
             self.menu[position_next_char] = menu_val
             logger.log(SPAM, f"added item to menu at {position_next_char} : {menu_val}")
 
@@ -256,14 +264,9 @@ class MenuMaker:
             if k == M.CONFIG:
                 pass
             else:
-                l = m[M.LINK]  # noqa: E741
-                l1 = ENTRY[l - 1]
-                l2 = 'ZZ' + l1
-                #     print(l)
-                self.menu[k][M.LINK] = l2
                 self.menu[k][M.CONXNS] = {M.IN: {}, M.OUT: {}}
         #                 self.menu[k]['conx_out'] = {}
-
+        logger.log(SPAM, f"initial process, menu=\n{pformat(self.menu)}")
         # this part does the heavy lifting of populating the connections for each menu item
         for pos, mdict in self.menu.items():
             sin = mdict[M.IN]
