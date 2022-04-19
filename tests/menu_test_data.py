@@ -31,10 +31,14 @@ BASIC_3CH = {
 }
 
 BASIC_4CH = {
-    0: {M.CONXNS: {M.IN: {2: M.IN, 5: M.OUT}, M.OUT: {}},
+    0: {M.CONXNS: {M.IN: {2: M.IN, 5: M.OUT}, M.OUT: {1: M.IN}},
         M.IN: 'B',
         M.LINK: 'ZZZ',
         M.OUT: 'C'},
+    1: {M.IN: 'C',
+        M.OUT: 'A',
+        M.LINK: 'ZZA',
+        M.CONXNS: {M.IN: {0: M.OUT}, M.OUT: {}}},
     2: {M.CONXNS: {M.IN: {0: M.IN, 5: M.OUT}, M.OUT: {3: M.IN}},
         M.IN: 'B',
         M.LINK: 'ZZB',
