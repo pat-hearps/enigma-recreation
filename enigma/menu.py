@@ -259,37 +259,34 @@ class MenuMaker:
         self.menu[M.CONFIG][M.CONXNS] = {M.IN: {}, M.OUT: {}}
 
     def connections_add_to_menu(self):
-        # this part adds in blank conx_in/out dicts and converts position to menulink 3-letter ZZ code
-        for k, m in self.menu.items():
-            if k == M.CONFIG:
-                pass
-            else:
-                self.menu[k][M.CONXNS] = {M.IN: {}, M.OUT: {}}
-        logger.log(SPAM, f"initial process, menu=\n{pformat(self.menu)}")
-
         # this part does the heavy lifting of populating the connections for each menu item
+
         for position, itemdict in self.menu.items():
+            ins = {}
             in_char = itemdict[M.IN]
             logger.log(SPAM, f"1 position={position} itemdict={itemdict} in_char={in_char}")
             for k, v in self.menu.items():
                 if k == position or k == M.CONFIG:
                     pass
                 elif v[M.IN] == in_char:
-                    self.menu[position][M.CONXNS][M.IN][k] = M.IN
+                    ins[k] = M.IN
                 elif v[M.OUT] == in_char:
-                    self.menu[position][M.CONXNS][M.IN][k] = M.OUT
-            logger.log(SPAM, f"2 position={position} itemdict={itemdict} in_char={in_char}")
+                    ins[k] = M.OUT
+            logger.log(SPAM, f"2 position={position} ins={ins} in_char={in_char}")
 
+            outs = {}
             out_char = itemdict[M.OUT]
             logger.log(SPAM, f"3 position={position} itemdict={itemdict} out_char={out_char}")
             for k, v in self.menu.items():
                 if k == position or k == M.CONFIG:
                     pass
                 elif v[M.IN] == out_char:
-                    self.menu[position][M.CONXNS][M.OUT][k] = M.IN
+                    outs[k] = M.IN
                 elif v[M.OUT] == out_char:
-                    self.menu[position][M.CONXNS][M.OUT][k] = M.OUT
-            logger.log(SPAM, f"4 position={position} itemdict={itemdict} out_char={out_char}")
+                    outs[k] = M.OUT
+            logger.log(SPAM, f"4 position={position} outs={outs} out_char={out_char}")
+
+            self.menu[position][M.CONXNS] = {M.IN: ins, M.OUT: outs}
 
     def network_graph(self, reset_pos=True):
         """Using networkx package to display connections of menu letters"""
