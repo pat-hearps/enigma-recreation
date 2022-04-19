@@ -275,7 +275,7 @@ class MenuMaker:
     def define_connections(self, char: str, position: int) -> dict:
         connections = {}
         for pos, item in self.menu.items():
-            if pos == position or pos == M.CONFIG:
+            if pos in (position, M.CONFIG):
                 continue
             for io in (M.IN, M.OUT):
                 if item[io] == char:
