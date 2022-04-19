@@ -195,6 +195,18 @@ class MenuMaker:
             self.found_loops[new_loop_set] = new_loop
             logger.debug(f"{self.pfx} loop found = {new_loop}")
 
+    def prep_menu(self, length_of_menu=12):
+        """Second main entrypoint function, creates menu from found loops and deadends"""
+        self.menu = {}
+        try:
+            for loop in self.found_loops:
+                self.loop_to_menu(mainloop=loop)
+        except Exception:
+            pass
+        self.add_deadends_to_menu(length_of_menu=length_of_menu)
+        self.configure_menu()
+        self.connections_add_to_menu()
+
     def loop_to_menu(self, mainloop=0):
         if mainloop == 0:
             mainloop = self.found_loops[0]
@@ -282,17 +294,6 @@ class MenuMaker:
                     self.menu[pos]['conxns']['out'][k] = 'in'
                 elif v['out'] == sout:
                     self.menu[pos]['conxns']['out'][k] = 'out'
-
-    def prep_menu(self, length_of_menu=12):
-        self.menu = {}
-        try:
-            for loop in self.found_loops:
-                self.loop_to_menu(mainloop=loop)
-        except Exception:
-            pass
-        self.add_deadends_to_menu(length_of_menu=length_of_menu)
-        self.configure_menu()
-        self.connections_add_to_menu()
 
     def network_graph(self, reset_pos=True):
         """Using networkx package to display connections of menu letters"""
