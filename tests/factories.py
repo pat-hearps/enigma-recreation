@@ -1,7 +1,7 @@
 from factory import Factory
 from faker import Faker, providers
 
-from enigma.tests.models import Window3
+from tests.models import Window3
 
 fake = Faker()
 fake.add_provider(providers.BaseProvider)

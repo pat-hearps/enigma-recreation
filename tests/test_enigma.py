@@ -13,7 +13,7 @@ from enigma.enigma import (
     full_scramble,
     once_thru_scramble,
 )
-from enigma.tests.factories import WindowFactory
+from tests.factories import WindowFactory
 
 
 def test_rotor_basic() -> None:
