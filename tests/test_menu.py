@@ -59,6 +59,27 @@ def test_menumaker_loops(crib_set_name: str, expected: set) -> None:
     assert found_loops == expected
 
 
+# I want deadends to be keys representing the individual character nodes that are truly
+# the 'end' of a deadend chain. Values at the moment are just the shortest path from the most
+# common letter to the deadend char, but this could change. Also not sure how to deal with
+# shortest path when multiple 'most_common' letters e.g. dermot where both E & G have 4 connections
+deadend_data = [
+    ("basic_3ch_loop", {'E': 'BDE'}),
+    ("basic_4ch_loop", {'A': 'BCA'}),
+    ("welchman_1_loop", {'C': 'EINTC', 'D': 'ED', 'K': 'EINTK', 'U': 'EU', 'V': 'EPV'}),
+    ("dermot", {'H': 'EGRZH', 'L': 'EGL', 'N': 'EN', 'U': 'EU', 'W': 'EVSW'})
+
+]
+
+
+@pytest.mark.parametrize("crib_set_name, expected", deadend_data)
+def test_menumaker_deadends(crib_set_name: str, expected: dict) -> None:
+    crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
+    menu_mkr = MenuMaker(crib=crib_guess, encoded_crib=crib_cypher)
+    menu_mkr.search_menu_structure()
+    assert menu_mkr.dead_ends.keys() == expected.keys()
+
+
 # fmt: off
 basic_link_idx = {'A': {0: 'B', 2: 'C'}, 'B': {0: 'A', 1: 'C', 3: 'D'}, 'C': {1: 'B', 2: 'A'}, 'D': {3: 'B', 4: 'E'}, 'E': {4: 'D'}}
 w_14_link_idx = {'C': {0: 'T'}, 'D': {10: 'E'}, 'E': {4: 'P', 7: 'I', 10: 'D', 11: 'U'}, 'H': {3: 'Z'}, 'I': {7: 'E', 9: 'P', 12: 'N'}, 'K': {13: 'T'}, 'L': {6: 'R', 8: 'S'}, 'N': {2: 'T', 12: 'I'}, 'O': {1: 'Q'}, 'P': {4: 'E', 5: 'V', 9: 'I'}, 'Q': {1: 'O'}, 'R': {6: 'L'}, 'S': {8: 'L'}, 'T': {0: 'C', 2: 'N', 13: 'K'}, 'U': {11: 'E'}, 'V': {5: 'P'}, 'Z': {3: 'H'}}
