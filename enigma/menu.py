@@ -40,8 +40,13 @@ class MenuMaker:
         self.pfx: str = ""
         self.menu: dict = {}
 
+    def run(self):
+        """MAIN ENTRYPOINT FUNCTION - find all loops & deadends, then add connections to menu"""
+        self.search_menu_structure()
+        self.prep_menu()
+
     def search_menu_structure(self):
-        """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
+        """First orchestration method, for finding all loops in a given crib"""
         self.count_characters()
         self.create_link_index()
         self.find_best_characters()
@@ -208,8 +213,7 @@ class MenuMaker:
             logger.debug(f"{self.pfx} loop found = {new_loop}")
 
     def prep_menu(self, length_of_menu=12):
-        """Second main entrypoint function, creates menu from found loops and deadends"""
-
+        """Second main orchestration method, creates menu from found loops and deadends"""
         self.add_characters_to_menu()
         logger.log(VERBOSE, f"post adding characters to menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
         self.configure_menu()
