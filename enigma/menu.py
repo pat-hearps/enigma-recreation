@@ -1,5 +1,6 @@
 from collections import Counter, defaultdict
 from copy import deepcopy
+from functools import cache
 from pprint import pformat
 from typing import Dict, List
 
@@ -224,8 +225,12 @@ class MenuMaker:
             for char, next_char in zip(chain[:-1], chain[1:]):
                 self.add_item_to_menu(char, next_char)
 
+    @cache
+    def get_reverse_link_index(self, char):
+        return {_char: pos for pos, _char in self.link_index[char].items()}
+
     def add_item_to_menu(self, char: str, next_char: str):
-        link_idx_rev = {_char: pos for pos, _char in self.link_index[char].items()}
+        link_idx_rev = self.get_reverse_link_index(char)
         position_next_char = link_idx_rev[next_char]
         # note that I'm just picking the first one where there are double (or more) linkages
         # not sure if this matters for now or if its better to somehow include both linkages in the menu
