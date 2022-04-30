@@ -141,9 +141,9 @@ def test_find_loops(crib_set_name: str, best_chars: tuple, expected: dict) -> No
 
 
 menu_data = [
-    ("basic_3ch_loop", 6, BASIC_3CH),
-    ("basic_4ch_loop", 7, BASIC_4CH),
-    ("welchman_1_loop", 11, WELCHMAN_1L)
+    ("basic_3ch_loop", BASIC_3CH),
+    ("basic_4ch_loop", BASIC_4CH),
+    ("welchman_1_loop", WELCHMAN_1L)
 ]
 
 
@@ -163,8 +163,8 @@ def check_recursive(actual, expected):
             print(actual, " != ", expected)
 
 
-@pytest.mark.parametrize("crib_set_name, menu_length, expected", menu_data)
-def test_menu_prep(crib_set_name: str, menu_length: int, expected: dict) -> None:
+@pytest.mark.parametrize("crib_set_name, expected", menu_data)
+def test_menu_prep(crib_set_name: str, expected: dict) -> None:
     crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
     menu_mkr = MenuMaker(crib=crib_guess, encoded_crib=crib_cypher)
     menu_mkr.run()

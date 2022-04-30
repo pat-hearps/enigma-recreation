@@ -212,7 +212,7 @@ class MenuMaker:
             self.found_loops[new_loop_set] = new_loop
             logger.debug(f"{self.pfx} loop found = {new_loop}")
 
-    def prep_menu(self, length_of_menu=12):
+    def prep_menu(self):
         """Second main orchestration method, creates menu from found loops and deadends"""
         self.add_characters_to_menu()
         logger.log(VERBOSE, f"post adding characters to menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
