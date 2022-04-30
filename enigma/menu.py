@@ -146,7 +146,7 @@ class MenuMaker:
             penultimate_char = chain[-2]
             if chain_only_links_to_one_char and linked_char == penultimate_char:
                 logger.log(SPAM, f"{self.pfx} {chain} is a deadend")
-                self.dead_ends[chain_end] = chain
+                self.dead_ends[chain_end] = chain[::-1]  # reverse so deadend char is at start
                 del new_working_dict[iD]
 
             else:
