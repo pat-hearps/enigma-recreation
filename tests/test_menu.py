@@ -1,7 +1,9 @@
+from pprint import pformat
 from typing import Tuple
 
 import pytest
 
+from enigma.constants import MENU as M
 from enigma.menu import MenuMaker
 from tests.menu_test_data import BASIC_3CH, BASIC_4CH, WELCHMAN_1L
 
@@ -139,16 +141,45 @@ def test_find_loops(crib_set_name: str, best_chars: tuple, expected: dict) -> No
 
 
 menu_data = [
-    ("basic_3ch_loop", 6, BASIC_3CH),
-    ("basic_4ch_loop", 7, BASIC_4CH),
-    ("welchman_1_loop", 11, WELCHMAN_1L)
+    ("basic_3ch_loop", BASIC_3CH),
+    ("basic_4ch_loop", BASIC_4CH),
+    ("welchman_1_loop", WELCHMAN_1L)
 ]
 
 
-@pytest.mark.parametrize("crib_set_name, menu_length, expected", menu_data)
-def test_menu_prep(crib_set_name: str, menu_length: int, expected: dict) -> None:
+def check_recursive(actual, expected):
+    if isinstance(expected, dict):
+        for k, v in expected.items():
+            if k not in actual.keys():
+                print(f"{k} missing from actual keys")
+                continue
+            if v == actual[k]:
+                pass
+            else:
+                print(f"key={k}")
+                check_recursive(actual[k], v)
+    else:
+        if actual != expected:
+            print(actual, " != ", expected)
+
+
+@pytest.mark.parametrize("crib_set_name, expected", menu_data)
+def test_menu_prep(crib_set_name: str, expected: dict) -> None:
     crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
     menu_mkr = MenuMaker(crib=crib_guess, encoded_crib=crib_cypher)
-    menu_mkr.search_menu_structure()
-    menu_mkr.prep_menu(length_of_menu=menu_length)
-    assert menu_mkr.menu == expected
+    menu_mkr.run()
+    print("===start of menu test===")
+    # easy check - not looking for identical ordering of in/out pairs, keys
+    for key, exp_val in expected.items():
+        if key == M.CONFIG:
+            continue
+        act_val = menu_mkr.menu[key]
+        print(f"actual  ={pformat(act_val)}\nexpected={exp_val}\n-----")
+        assert {act_val[M.IN], act_val[M.OUT]} == {exp_val[M.IN], exp_val[M.OUT]}, f"key={key} in/out not equal"
+        assert act_val[M.LINK] == exp_val[M.LINK], f"key={key} menu_link not equal"
+        act_conxns = set([i for k, v in act_val[M.CONXNS].items() for i in v.keys()])
+        exp_conxns = set([i for k, v in exp_val[M.CONXNS].items() for i in v.keys()])
+        assert act_conxns == exp_conxns, f"key={key} connections not equal"
+    print("===easy/non-precise menu checks passed===")
+    # hard check - looking for identical dicts
+    assert menu_mkr.menu == expected, "menu not identical to expected"

@@ -1,16 +1,27 @@
 from collections import Counter, defaultdict
 from copy import deepcopy
+from functools import cache
+from pprint import pformat
 from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import networkx as nx
 
+from enigma.constants import MENU as M
 from enigma.design import ENTRY
 from enigma.utils import SPAM, VERBOSE, get_logger, spaces
 
 logger = get_logger(__name__)
 
 LoopDict = Dict[float, str]
+
+
+def convert_to_ZZ_code(position: int) -> str:
+    """Convert a menu link position integer to a 3-letter ZZ code,
+    with the 3rd letter equal to the letter prior to the given position index
+    in the alphabet"""
+    char_before_this_position = ENTRY[position - 1]
+    return f"ZZ{char_before_this_position}"
 
 
 class MenuMaker:
@@ -27,9 +38,15 @@ class MenuMaker:
         self.found_loops: Dict[frozenset, str] = {}
         self.dead_ends: Dict = {}
         self.pfx: str = ""
+        self.menu: dict = {}
+
+    def run(self):
+        """MAIN ENTRYPOINT FUNCTION - find all loops & deadends, then add connections to menu"""
+        self.search_menu_structure()
+        self.prep_menu()
 
     def search_menu_structure(self):
-        """MAIN ENTRYPOINT METHOD for finding all loops in a given crib"""
+        """First orchestration method, for finding all loops in a given crib"""
         self.count_characters()
         self.create_link_index()
         self.find_best_characters()
@@ -38,24 +55,6 @@ class MenuMaker:
         for char in self.best_characters:
             logger.debug(f"finding loops for char {char}")
             self.find_loops(char)
-        logger.debug(f'num dead ends b4 rationalising= {len(self.dead_ends)}')
-        """TODO:
-         - rationalise_to_list, unsub_list and get_smallest_loop appear to be dumb inefficient ways of picking
-           out the unique loops from the many possible ways of defining them. Replace with something shorter and more
-           intelligent based on using sets
-         - why am I keeping the deadends, what are they for?"""
-        self.dead_ends = self.rationalise_to_list(self.dead_ends)
-        logger.debug(f'num dead ends after ration, b4 unsub= {len(self.dead_ends)}')
-        self.dead_ends = self.unsub_list(self.dead_ends)
-        logger.debug(f'num dead ends after unsub= {len(self.dead_ends)}')
-        logger.debug(f'num loops b4 rationalising= {len(self.dead_ends)}')
-        self.found_loops = self.rationalise_to_list(self.found_loops)
-        logger.debug(f'num loops after ration, b4 unsub= {len(self.found_loops)}')
-        self.found_loops = self.get_smallest_loop(self.found_loops)
-        logger.debug(f'num loops after unsub= {len(self.found_loops)}')
-        logger.debug(f'num dead ends b4 lose_redundant= {len(self.dead_ends)}')
-        self.lose_redundant_deadends()
-        logger.debug(f'num dead ends after lose_redundant= {len(self.dead_ends)}')
 
     def count_characters(self):
         """Create two attribute dictionaries:
@@ -153,7 +152,7 @@ class MenuMaker:
             penultimate_char = chain[-2]
             if chain_only_links_to_one_char and linked_char == penultimate_char:
                 logger.log(SPAM, f"{self.pfx} {chain} is a deadend")
-                self.dead_ends[chain_end] = chain
+                self.dead_ends[chain_end] = chain[::-1]  # reverse so deadend char is at start
                 del new_working_dict[iD]
 
             else:
@@ -213,186 +212,65 @@ class MenuMaker:
             self.found_loops[new_loop_set] = new_loop
             logger.debug(f"{self.pfx} loop found = {new_loop}")
 
-    def rationalise_to_list(self, indict):
-        """goes through list values of results from find_loops, turns into single large list,
-        gets rid of any elements that are mirror images of each other (keeping one unique)"""
-        # logger.log(SPAM, f"rationalising {indict}")
-        invals = list(set(indict.values()))
-        # logger.log(SPAM, f"invals = {invals}")
-        for i, loop in enumerate(invals):
-            test = deepcopy(invals)
-            # logger.log(SPAM, f"setting pos {i} to {loop[::-1]}")
-            test[i] = loop[::-1]
-            test = list(set(test))
-            # logger.log(SPAM, f"test is now {test}")
-            if len(test) != len(invals):
-                invals[i] = loop[::-1]
-                # logger.log(SPAM, f"lens unequal")
-        invals = list(set(invals))
-        # logger.log(SPAM, f"invals is now {invals}")
-        return invals
+    def prep_menu(self):
+        """Second main orchestration method, creates menu from found loops and deadends"""
+        self.add_characters_to_menu()
+        logger.log(VERBOSE, f"post adding characters to menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
+        self.configure_menu()
+        logger.log(VERBOSE, f"post configure_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
+        self.connections_add_to_menu()
+        logger.log(VERBOSE, f"post connections_add_to_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
 
-    def unsub_list(self, inlist):
-        """when given a list of strings from rationalise_to_list, will get rid of any elements which are a
-        subset of another larger element, leaving only the unique strings"""
-        inlist.sort()
-        # logger.log(SPAM, f"into unsub= {inlist}")
-        unique = []
-        for i in range(len(inlist) - 1):
-            chain = inlist[i]
-            nxt_chain = inlist[i + 1]
-            if chain not in nxt_chain:
-                unique.append(chain)
-                # logger.log(SPAM, f"{chain} NOT in {nxt_chain}")
-            # else:
-                # logger.log(SPAM, f"{chain} IS  in {nxt_chain}")
-        unique.append(inlist[-1])
-        # logger.log(SPAM, f"out of unsub= {unique}")
-        return unique
+    def add_characters_to_menu(self):
+        """For each character in the menu network (obtained by combining loops and deadends),
+        add each character's connections to other characters to the menu"""
+        for chain in list(self.found_loops.values()) + list(self.dead_ends.values()):
+            logger.log(SPAM, f"adding characters from {chain}")
+            for char, next_char in zip(chain[:-1], chain[1:]):
+                self.add_item_to_menu(char, next_char)
 
-    def get_smallest_loop(self, inlist):
-        """like unsub list but in reverse, for loops"""
-        inlist = sorted(inlist, reverse=True)
-        logger.log(SPAM, f"into get_smallest_loop= {inlist}")
-        dropped = []
-        unique = deepcopy(inlist)
-        for chain in inlist:
-            for other_chain in inlist:
-                if len(chain) < len(other_chain):
-                    smaller = chain
-                    bigger = other_chain
-                else:
-                    smaller = other_chain
-                    bigger = chain
-                test = ((smaller in bigger) or (smaller[::-1] in bigger))
-                if smaller == bigger:
-                    test = False
-                # logger.log(SPAM, (smaller, bigger, test))
-                if test and bigger in unique and smaller in unique:
-                    dropped.append(bigger)
-                    unique.remove(bigger)
-                    # logger.log(VERBOSE, f'removed {bigger}')
-        logger.log(SPAM, f"dropped  = {dropped}")
-        logger.log(SPAM, f"out of get_smallest_loop= {unique}")
-        return unique
+    @cache
+    def get_reverse_link_index(self, char):
+        return {_char: pos for pos, _char in self.link_index[char].items()}
 
-    def lose_redundant_deadends(self):
-        """should be applied after dead ends have been rationalised and unsubbed"""
-        check_against_these_loops = set(self.found_loops)
-        final_uniq_dends = deepcopy(self.dead_ends)
-        dropped = []
-        for uchain in self.dead_ends:
-            for eachloop in check_against_these_loops:
-                if uchain in final_uniq_dends and (
-                        uchain in eachloop
-                        or uchain[::-1] in eachloop
-                        or eachloop in uchain
-                        or eachloop[::-1] in uchain
-                ):
-                    dropped.append(uchain)
-                    # logger.log(SPAM, f"dropping {uchain} as related to {eachloop}")
-                    final_uniq_dends.remove(uchain)
-        logger.log(SPAM, f"dropped deadends = {dropped}")
-        self.dead_ends = final_uniq_dends
-
-    def loop_to_menu(self, mainloop=0):
-        if mainloop == 0:
-            mainloop = self.found_loops[0]
-
-        for i, char in enumerate(mainloop[:-1]):
-            next_char = mainloop[i + 1]
-            wdict = self.link_index[char]
-            position = [k for k, v in wdict.items() if v == next_char][0]
-            # note that I'm just picking the first one where there are double (or more) linkages
-            # not sure if this matters for now or if its better to somehow include both linkages in the menu
-            # revisit later depending on bombe methodology
-            self.menu[position] = {'in': char, 'out': next_char, 'menu_link': position}
-            print(f"added item from loop '{mainloop}' to menu {position} : {self.menu[position]}")
-
-    def add_deadends_to_menu(self, length_of_menu=12):
-        for ends in sorted(self.dead_ends, reverse=True):
-            # current_len = len(self.menu)
-            #     print(current_len)
-            for i, char in enumerate(ends[:-1]):
-                if len(self.menu) >= length_of_menu:
-                    pass
-                else:
-                    next_char = ends[i + 1]
-                    #         print(i,char,next_char)
-                    wdict = self.link_index[char]
-                    position = [k for k, v in wdict.items() if v == next_char][0]
-                    self.menu[position] = {'in': char, 'out': next_char, 'menu_link': position}
-                    logger.debug(f"added item from deadend '{ends}' to menu {position} : {self.menu[position]}")
+    def add_item_to_menu(self, char: str, next_char: str):
+        link_idx_rev = self.get_reverse_link_index(char)
+        position_next_char = link_idx_rev[next_char]
+        # note that I'm just picking the first one where there are double (or more) linkages
+        # not sure if this matters for now or if its better to somehow include both linkages in the menu
+        # revisit later depending on bombe methodology
+        if position_next_char not in self.menu.keys():
+            menu_val = {M.IN: char, M.OUT: next_char, M.LINK: convert_to_ZZ_code(position_next_char)}
+            self.menu[position_next_char] = menu_val
+            logger.log(SPAM, f"added item to menu at {position_next_char} : {menu_val}")
 
     def configure_menu(self):
-        try:
-            test_char = self.found_loops[0][0]
-        except Exception:
-            dend_string = "".join(m for m in self.dead_ends)
-            count_of_dead_ends = {}
-            for d in dend_string:
-                if d not in count_of_dead_ends.keys():
-                    count_of_dead_ends[d] = 1
-                else:
-                    count_of_dead_ends[d] += 1
-
-            test_char = [
-                k for k,
-                v in count_of_dead_ends.items() if v == sorted(
-                    count_of_dead_ends.values(),
-                    reverse=True)[0]][0]
-
-        self.menu['config'] = {}
-        self.menu['config']['test_char'] = test_char
-        self.menu['config']['menu_link'] = 'QQQ'
-        self.menu['config']['in'] = test_char
-        self.menu['config']['out'] = test_char
-        self.menu['config']['conxns'] = {'in': {}, 'out': {}}
+        """Adds extra item to menu as the bombe entrypoint, using a character
+        that is linked to the most other characters"""
+        test_char = self.best_characters[0]
+        self.menu[M.CONFIG] = {M.TEST_CHAR: test_char, M.LINK: 'QQQ', M.IN: test_char, M.OUT: test_char}
 
     def connections_add_to_menu(self):
-        # this part adds in blank conx_in/out dicts and converts position to menulink 3-letter ZZ code
-        for k, m in self.menu.items():
-            if k == 'config':
-                pass
-            else:
-                l = m['menu_link']  # noqa: E741
-                l1 = ENTRY[l - 1]
-                l2 = 'ZZ' + l1
-                #     print(l)
-                self.menu[k]['menu_link'] = l2
-                self.menu[k]['conxns'] = {'in': {}, 'out': {}}
-        #                 self.menu[k]['conx_out'] = {}
+        """For each character / position for each node in menu, define which other nodes connect to this one.
+        Connections are defined directionally, i.e. an 'in' connection is different to an 'out' one.
+        """
+        for position, itemdict in self.menu.items():
+            in_char = itemdict[M.IN]
+            ins = self.define_connections(in_char, position)
+            logger.log(SPAM, f"position={position} in_char ={in_char} ins ={ins}")
 
-        # this part does the heavy lifting of populating the connections for each menu item
-        for pos, mdict in self.menu.items():
-            sin = mdict['in']
-            for k, v in self.menu.items():
-                if k == pos or k == 'config':
-                    pass
-                elif v['in'] == sin:
-                    self.menu[pos]['conxns']['in'][k] = 'in'
-                elif v['out'] == sin:
-                    self.menu[pos]['conxns']['in'][k] = 'out'
+            out_char = itemdict[M.OUT]
+            outs = self.define_connections(out_char, position)
+            logger.log(SPAM, f"position={position} out_char={out_char} outs={outs}")
 
-            sout = mdict['out']
-            for k, v in self.menu.items():
-                if k == pos or k == 'config':
-                    pass
-                elif v['in'] == sout:
-                    self.menu[pos]['conxns']['out'][k] = 'in'
-                elif v['out'] == sout:
-                    self.menu[pos]['conxns']['out'][k] = 'out'
+            self.menu[position][M.CONXNS] = {M.IN: ins, M.OUT: outs}
 
-    def prep_menu(self, length_of_menu=12):
-        self.menu = {}
-        try:
-            for loop in self.found_loops:
-                self.loop_to_menu(mainloop=loop)
-        except Exception:
-            pass
-        self.add_deadends_to_menu(length_of_menu=length_of_menu)
-        self.configure_menu()
-        self.connections_add_to_menu()
+    def define_connections(self, char: str, char_position: int) -> dict:
+        """For a given character (at a char_position), compare against all other menu items excluding config
+        Return dict of position: 'in'|'out' for each node in menu that connects to this char"""
+        comparison_dict = {pos: node for pos, node in self.menu.items() if pos not in (char_position, M.CONFIG)}
+        connections = {pos: io for pos, node in comparison_dict.items() for io in (M.IN, M.OUT) if node[io] == char}
+        return connections
 
     def network_graph(self, reset_pos=True):
         """Using networkx package to display connections of menu letters"""
