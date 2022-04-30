@@ -209,27 +209,19 @@ class MenuMaker:
     def prep_menu(self, length_of_menu=12):
         """Second main entrypoint function, creates menu from found loops and deadends"""
 
-        for loop in self.found_loops.values():
-            self.loop_to_menu(mainloop=loop)
-
-        logger.log(VERBOSE, f"post loop_to_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
-        self.add_deadends_to_menu()
-        logger.log(VERBOSE, f"post add_deadends_to_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
+        self.add_characters_to_menu()
+        logger.log(VERBOSE, f"post adding characters to menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
         self.configure_menu()
         logger.log(VERBOSE, f"post configure_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
         self.connections_add_to_menu()
         logger.log(VERBOSE, f"post connections_add_to_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
 
-    def loop_to_menu(self, mainloop):
-        logger.log(SPAM, f"entry, mainloop={mainloop}")
-        for char, next_char in zip(mainloop[:-1], mainloop[1:]):
-            self.add_item_to_menu(char, next_char)
-
-    def add_deadends_to_menu(self):
-        for _end in self.dead_ends.values():
-            end = _end[::-1]  # reverse to start from the end
-            logger.log(SPAM, f"adding from deadend {end}")
-            for char, next_char in zip(end[:-1], end[1:]):
+    def add_characters_to_menu(self):
+        """For each character in the menu network (obtained by combining loops and deadends),
+        add each character's connections to other characters to the menu"""
+        for chain in list(self.found_loops.values()) + list(self.dead_ends.values()):
+            logger.log(SPAM, f"adding characters from {chain}")
+            for char, next_char in zip(chain[:-1], chain[1:]):
                 self.add_item_to_menu(char, next_char)
 
     def add_item_to_menu(self, char: str, next_char: str):
