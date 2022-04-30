@@ -210,11 +210,8 @@ class MenuMaker:
         """Second main entrypoint function, creates menu from found loops and deadends"""
 
         for loop in self.found_loops.values():
-            try:
-                self.loop_to_menu(mainloop=loop)
-            except Exception as exc:
-                logger.exception(f"error in loop_to_menu for {loop}")
-                raise exc
+            self.loop_to_menu(mainloop=loop)
+
         logger.log(VERBOSE, f"post loop_to_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
         self.add_deadends_to_menu()
         logger.log(VERBOSE, f"post add_deadends_to_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
