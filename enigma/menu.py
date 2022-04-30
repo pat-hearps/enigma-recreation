@@ -215,13 +215,13 @@ class MenuMaker:
             except Exception as exc:
                 logger.exception(f"error in loop_to_menu for {loop}")
                 raise exc
-        logger.log(VERBOSE, f"post loop_to_menu,\nmenu={pformat(self.menu)}")
+        logger.log(VERBOSE, f"post loop_to_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
         self.add_deadends_to_menu()
-        logger.log(VERBOSE, f"post add_deadends_to_menu,\nmenu={pformat(self.menu)}")
+        logger.log(VERBOSE, f"post add_deadends_to_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
         self.configure_menu()
-        logger.log(VERBOSE, f"post configure_menu,\nmenu={pformat(self.menu)}")
+        logger.log(VERBOSE, f"post configure_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
         self.connections_add_to_menu()
-        logger.log(VERBOSE, f"post connections_add_to_menu,\nmenu={pformat(self.menu)}")
+        logger.log(VERBOSE, f"post connections_add_to_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
 
     def loop_to_menu(self, mainloop):
         logger.log(SPAM, f"entry, mainloop={mainloop}")
