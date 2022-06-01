@@ -357,17 +357,17 @@ class Scrambler:
         fst_pos_modifier = (26 + pos1 - 0) % 26
         fst_in = (entry_pos + fst_pos_modifier) % 26
         fst_out = usedict[first_rotor][fst_in]
-        ch1o = ENTRY[fst_out]
+        # ch1o = ENTRY[fst_out]
 
         scd_pos_modifier = (26 + pos2 - pos1) % 26
         scd_in = (fst_out + scd_pos_modifier) % 26
-        ch2i = ENTRY[scd_in]
+        # ch2i = ENTRY[scd_in]
         scd_out = usedict[second_rotor][scd_in]
-        ch2o = ENTRY[scd_out]
+        # ch2o = ENTRY[scd_out]
 
         thd_pos_modifier = (26 + pos3 - pos2) % 26
         thd_in = (scd_out + thd_pos_modifier) % 26
-        ch3i = ENTRY[thd_in]
+        # ch3i = ENTRY[thd_in]
         thd_out = usedict[third_rotor][thd_in]
         ch3o = ENTRY[thd_out]
         return ch3o
