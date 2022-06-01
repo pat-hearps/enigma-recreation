@@ -5,7 +5,18 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
-from enigma.design import ENTRY, REFLECTORS_CYPHER, notches
+from enigma.design import (
+    ENTRY,
+    FORWARD_ROTORS,
+    REFLECTORS_CYPHER,
+    REVERSE_ROTORS,
+    grey,
+    invsoutmap,
+    iomap,
+    notches,
+    orange,
+    red,
+)
 
 
 class Bombe:
@@ -334,9 +345,9 @@ class Scrambler:
         """ start_character must be single ASCII character A-Z
         direction is either 'forward' or 'back' """
         if direction == 'forward':
-            usedict = {k: v for k, v in forward_rotors.items()}
+            usedict = {k: v for k, v in FORWARD_ROTORS.items()}
         elif direction == 'back':
-            usedict = {k: v for k, v in rev_rotors.items()}
+            usedict = {k: v for k, v in REVERSE_ROTORS.items()}
         else:
             print("direction can only be 'forward' or 'back'")
             return 'wtf'
