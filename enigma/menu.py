@@ -20,7 +20,7 @@ def convert_to_ZZ_code(position: int) -> str:
     """Convert a menu link position integer to a 3-letter ZZ code,
     with the 3rd letter equal to the letter prior to the given position index
     in the alphabet"""
-    char_before_this_position = ENTRY[position - 1]
+    char_before_this_position = ENTRY[position % 26 - 1]
     return f"ZZ{char_before_this_position}"
 
 
