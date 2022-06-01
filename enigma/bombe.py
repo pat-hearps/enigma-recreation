@@ -181,7 +181,7 @@ class Bombe:
         """For creating NetworkX graphs. Setting up base graph (BG), detailed graph (TG), figure and axes for displaying scrambler connections
         Will also effectively reset the nx Graphs"""
         self.BG = nx.Graph()
-        scramblers_in_menu = [k if isinstance(k, int) else 'REG' for k in menu.keys()]
+        scramblers_in_menu = [k if isinstance(k, int) else 'REG' for k in self.menu.keys()]
         self.BG.add_nodes_from(scramblers_in_menu)
 
         base_edges = set()
