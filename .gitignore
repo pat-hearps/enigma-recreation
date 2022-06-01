@@ -16,3 +16,10 @@ images/*
 .vscode
 
 scratch
+
+*.png
+*.pickle
+*.pkl
+*.pdf
+*.docx
+*.xlsx

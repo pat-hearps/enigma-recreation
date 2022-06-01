@@ -292,4 +292,5 @@ class MenuMaker:
         # labels = {(k[0], k[1]): v for k, v in
         #           labels.items()}  # doesnt' seem to be able to deal with labels for multiples edges
         # edge_labels = nx.draw_networkx_edge_labels(self.MultiGraph, pos=self.pos, edge_labels=labels)
-        plt.show(fig)
+        # plt.show(fig)
+        plt.savefig("./images/menu.png")
