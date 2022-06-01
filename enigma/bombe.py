@@ -51,21 +51,21 @@ class Bombe:
         self.lowest_scrambler_order = min([key for key in self.scramblers.keys()])
         self.identity_scrambler = self.scramblers[self.lowest_scrambler_order]
 
-        """Diagonal Board setup, could possible integrate into Scrambler setup loop above"""
-        self.diagonal_board_wiring = {}
-        for scr_id, descriptor_dict in self.menu.items():
-            if scr_id == 'config':
-                pass
-            else:
-                for inorout in ['in', 'out']:
-                    thisletter = descriptor_dict[inorout]
-                    if thisletter not in self.diagonal_board_wiring.keys():
-                        self.diagonal_board_wiring[thisletter] = {scr_id: inorout}
-                    else:
-                        self.diagonal_board_wiring[thisletter][scr_id] = inorout
-        # identity scrambler is just the first one in the sequence of letters used from the crib.
-        # will probably be 0/ZZZ unless that particular letter pair from the crib/cypher has not been
-        # used in the menu
+        # """Diagonal Board setup, could possible integrate into Scrambler setup loop above"""
+        # self.diagonal_board_wiring = {}
+        # for scr_id, descriptor_dict in self.menu.items():
+        #     if scr_id == 'config':
+        #         pass
+        #     else:
+        #         for inorout in ['in', 'out']:
+        #             thisletter = descriptor_dict[inorout]
+        #             if thisletter not in self.diagonal_board_wiring.keys():
+        #                 self.diagonal_board_wiring[thisletter] = {scr_id: inorout}
+        #             else:
+        #                 self.diagonal_board_wiring[thisletter][scr_id] = inorout
+        # # identity scrambler is just the first one in the sequence of letters used from the crib.
+        # # will probably be 0/ZZZ unless that particular letter pair from the crib/cypher has not been
+        # # used in the menu
 
     def pulse_connections(self):
         """Goes through every scrambler (once only), and updates in and out terminals with live feeds via conx_in and
@@ -83,16 +83,16 @@ class Bombe:
                         if io == 1:   # and if it has a live wire
                             scrambler.status[ior][ch] = 1  # set the corresponding character in the conxns dict of the
 
-    def sync_diagonal_board(self):
-        """Current theory is ???"""
-        for scr1id, scrambler in self.scramblers.items():
-            for inorout in ['in', 'out']:
-                # ie the single letter 'A', 'M' etc that is the menu connection
-                connection_character = self.menu[scr1id][inorout]
-                for character in self.diagonal_board_wiring.keys():
-                    if scrambler.status[inorout][character] == 1:
-                        for scr2id, side in self.diagonal_board_wiring[character].items():
-                            self.scramblers[scr2id].status[side][connection_character] = 1
+    # def sync_diagonal_board(self):
+    #     """Current theory is ???"""
+    #     for scr1id, scrambler in self.scramblers.items():
+    #         for inorout in ['in', 'out']:
+    #             # ie the single letter 'A', 'M' etc that is the menu connection
+    #             connection_character = self.menu[scr1id][inorout]
+    #             for character in self.diagonal_board_wiring.keys():
+    #                 if scrambler.status[inorout][character] == 1:
+    #                     for scr2id, side in self.diagonal_board_wiring[character].items():
+    #                         self.scramblers[scr2id].status[side][connection_character] = 1
 
     def sync_test_register(self):
         """similar to pulse_connections in that it updates terminals of scramblers, but is solely about the
