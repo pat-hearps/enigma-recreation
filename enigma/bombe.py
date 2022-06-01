@@ -172,8 +172,8 @@ class Bombe:
         bigdict = {}
         bigdict['REG'] = {k: ('X' if v == 1 else '') for k, v in self.register['status'].items()}
         for scr_id, scrambler in self.scramblers.items():
-            littledict = {k: {l: (k[0].upper() if r == 1 else '') for l, r in v.items()}
-                          for k, v in scrambler.status.items()}
+            littledict = {inorout: {char: (inorout[0].upper() if io == 1 else '') for char, io in letters.items()}
+                          for inorout, letters in scrambler.status.items()}
             bigdict[scr_id] = {k1: v1 + littledict['out'][k1] for k1, v1 in littledict['in'].items()}
         self.flash_scrambler_statuses = pd.DataFrame(bigdict).T
 
