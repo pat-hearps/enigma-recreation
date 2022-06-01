@@ -243,7 +243,7 @@ class Bombe:
             scr_id, io, ch = node.split('-')
             try:
                 scr_id = int(scr_id)
-            except BaseException:
+            except ValueError:
                 pass
             x, y = self.base_pos_for_nx[scr_id]
 
@@ -290,7 +290,7 @@ class Bombe:
                             try:
                                 if self.TG.edges[(first_live_node, second_live_node)]['color'] == grey:
                                     self.TG.edges[(first_live_node, second_live_node)]['color'] = red
-                            except BaseException:
+                            except IndexError:
                                 if self.TG.edges[(second_live_node, first_live_node)]['color'] == grey:
                                     self.TG.edges[(second_live_node, first_live_node)]['color'] = red
 
@@ -302,7 +302,7 @@ class Bombe:
                     try:
                         if self.TG.edges[(first_live_node, second_live_node)]['color'] == grey:
                             self.TG.edges[(first_live_node, second_live_node)]['color'] = red
-                    except BaseException:
+                    except IndexError:
                         if self.TG.edges[(second_live_node, first_live_node)]['color'] == grey:
                             self.TG.edges[(second_live_node, first_live_node)]['color'] = red
 
