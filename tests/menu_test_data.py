@@ -111,3 +111,69 @@ WELCHMAN_1L = {
                M.LINK: 'QQQ',
                M.OUT: 'E',
                M.TEST_CHAR: 'E'}}
+
+
+class BOMBE_TEST1:
+    left_rotor = 'I'
+    middle_rotor = 'II'
+    right_rotor = 'III'
+    reflector = 'B'
+    current_window_3 = 'ABC'
+    ring_settings_3 = 'GHI'
+    crib = "EARTHVENUSMARS"
+    cypher = "AOOOBUMAAJJIDE"
+    menu = {1: {'conxns': {'in': {2: 'out', 3: 'out'},
+                'out': {7: 'out', 8: 'out', 11: 'out'}},
+                'in': 'O',
+                'menu_link': 'ZZA',
+                'out': 'A'},
+            2: {'conxns': {'in': {12: 'out'}, 'out': {1: 'in', 3: 'out'}},
+                'in': 'R',
+                'menu_link': 'ZZB',
+                'out': 'O'},
+            3: {'conxns': {'in': {}, 'out': {1: 'in', 2: 'out'}},
+            'in': 'T',
+                'menu_link': 'ZZC',
+                'out': 'O'},
+            5: {'conxns': {'in': {}, 'out': {8: 'in'}},
+            'in': 'V',
+                'menu_link': 'ZZE',
+                'out': 'U'},
+            6: {'conxns': {'in': {10: 'out'}, 'out': {13: 'in'}},
+            'in': 'M',
+                'menu_link': 'ZZF',
+                'out': 'E'},
+            7: {'conxns': {'in': {}, 'out': {1: 'out', 8: 'out', 11: 'out'}},
+            'in': 'N',
+                'menu_link': 'ZZG',
+                'out': 'A'},
+            8: {'conxns': {'in': {5: 'out'}, 'out': {1: 'out', 7: 'out', 11: 'out'}},
+            'in': 'U',
+                'menu_link': 'ZZH',
+                'out': 'A'},
+            9: {'conxns': {'in': {13: 'out'}, 'out': {10: 'in'}},
+            'in': 'S',
+                'menu_link': 'ZZI',
+                'out': 'J'},
+            10: {'conxns': {'in': {9: 'out'}, 'out': {6: 'in'}},
+                 'in': 'J',
+                 'menu_link': 'ZZJ',
+                 'out': 'M'},
+            11: {'conxns': {'in': {}, 'out': {1: 'out', 7: 'out', 8: 'out'}},
+                 'in': 'I',
+                 'menu_link': 'ZZK',
+                 'out': 'A'},
+            12: {'conxns': {'in': {}, 'out': {2: 'in'}},
+                 'in': 'D',
+                 'menu_link': 'ZZL',
+                 'out': 'R'},
+            13: {'conxns': {'in': {6: 'out'}, 'out': {9: 'in'}},
+                 'in': 'E',
+                 'menu_link': 'ZZM',
+                 'out': 'S'},
+            'config': {'conxns': {'in': {1: 'out', 7: 'out', 8: 'out', 11: 'out'},
+                                  'out': {1: 'out', 7: 'out', 8: 'out', 11: 'out'}},
+                       'in': 'A',
+                       'menu_link': 'QQQ',
+                       'out': 'A',
+                       'test_char': 'A'}}
