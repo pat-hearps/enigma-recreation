@@ -108,7 +108,7 @@ class Bombe:
                 if io == 1:
                     self.scramblers[scr2id].status[side][ch] = 1
 
-    def light_character(self, in_character):
+    def light_character(self):
         """just need a way to put in the initial character input into all of the scramblers"""
         self.register['status'][self.test_char] = 1
 
@@ -135,7 +135,7 @@ class Bombe:
         Loops through pulsing connections between scramblers and syncing back to the test register
         until the sum of live connections at the test register remains unchanged for two successive loops."""
         self.reset_scramblers_and_register()   # first make sure all scrambler inputs/outputs (statuses) are reset to zero
-        self.light_character(self.test_char)   # light up the one test character
+        self.light_character()   # light up the one test character
         self.sync_test_register()              # do the first syncing of test register, sending the signal out to the
         # scramblers which are connected to the test register
 
