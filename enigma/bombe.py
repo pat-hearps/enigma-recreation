@@ -5,7 +5,18 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
-from enigma.design import ENTRY, REFLECTORS_CYPHER, notches
+from enigma.design import (
+    ENTRY,
+    FORWARD_ROTORS,
+    REFLECTORS_CYPHER,
+    REVERSE_ROTORS,
+    grey,
+    invsoutmap,
+    iomap,
+    notches,
+    orange,
+    red,
+)
 
 
 class Bombe:
@@ -161,8 +172,8 @@ class Bombe:
         bigdict = {}
         bigdict['REG'] = {k: ('X' if v == 1 else '') for k, v in self.register['status'].items()}
         for scr_id, scrambler in self.scramblers.items():
-            littledict = {k: {l: (k[0].upper() if r == 1 else '') for l, r in v.items()}
-                          for k, v in scrambler.status.items()}
+            littledict = {inorout: {char: (inorout[0].upper() if io == 1 else '') for char, io in letters.items()}
+                          for inorout, letters in scrambler.status.items()}
             bigdict[scr_id] = {k1: v1 + littledict['out'][k1] for k1, v1 in littledict['in'].items()}
         self.flash_scrambler_statuses = pd.DataFrame(bigdict).T
 
@@ -170,7 +181,7 @@ class Bombe:
         """For creating NetworkX graphs. Setting up base graph (BG), detailed graph (TG), figure and axes for displaying scrambler connections
         Will also effectively reset the nx Graphs"""
         self.BG = nx.Graph()
-        scramblers_in_menu = [k if isinstance(k, int) else 'REG' for k in menu.keys()]
+        scramblers_in_menu = [k if isinstance(k, int) else 'REG' for k in self.menu.keys()]
         self.BG.add_nodes_from(scramblers_in_menu)
 
         base_edges = set()
@@ -232,7 +243,7 @@ class Bombe:
             scr_id, io, ch = node.split('-')
             try:
                 scr_id = int(scr_id)
-            except BaseException:
+            except ValueError:
                 pass
             x, y = self.base_pos_for_nx[scr_id]
 
@@ -279,7 +290,7 @@ class Bombe:
                             try:
                                 if self.TG.edges[(first_live_node, second_live_node)]['color'] == grey:
                                     self.TG.edges[(first_live_node, second_live_node)]['color'] = red
-                            except BaseException:
+                            except IndexError:
                                 if self.TG.edges[(second_live_node, first_live_node)]['color'] == grey:
                                     self.TG.edges[(second_live_node, first_live_node)]['color'] = red
 
@@ -291,7 +302,7 @@ class Bombe:
                     try:
                         if self.TG.edges[(first_live_node, second_live_node)]['color'] == grey:
                             self.TG.edges[(first_live_node, second_live_node)]['color'] = red
-                    except BaseException:
+                    except IndexError:
                         if self.TG.edges[(second_live_node, first_live_node)]['color'] == grey:
                             self.TG.edges[(second_live_node, first_live_node)]['color'] = red
 
@@ -334,9 +345,9 @@ class Scrambler:
         """ start_character must be single ASCII character A-Z
         direction is either 'forward' or 'back' """
         if direction == 'forward':
-            usedict = {k: v for k, v in forward_rotors.items()}
+            usedict = {k: v for k, v in FORWARD_ROTORS.items()}
         elif direction == 'back':
-            usedict = {k: v for k, v in rev_rotors.items()}
+            usedict = {k: v for k, v in REVERSE_ROTORS.items()}
         else:
             print("direction can only be 'forward' or 'back'")
             return 'wtf'
@@ -346,17 +357,17 @@ class Scrambler:
         fst_pos_modifier = (26 + pos1 - 0) % 26
         fst_in = (entry_pos + fst_pos_modifier) % 26
         fst_out = usedict[first_rotor][fst_in]
-        ch1o = ENTRY[fst_out]
+        # ch1o = ENTRY[fst_out]
 
         scd_pos_modifier = (26 + pos2 - pos1) % 26
         scd_in = (fst_out + scd_pos_modifier) % 26
-        ch2i = ENTRY[scd_in]
+        # ch2i = ENTRY[scd_in]
         scd_out = usedict[second_rotor][scd_in]
-        ch2o = ENTRY[scd_out]
+        # ch2o = ENTRY[scd_out]
 
         thd_pos_modifier = (26 + pos3 - pos2) % 26
         thd_in = (scd_out + thd_pos_modifier) % 26
-        ch3i = ENTRY[thd_in]
+        # ch3i = ENTRY[thd_in]
         thd_out = usedict[third_rotor][thd_in]
         ch3o = ENTRY[thd_out]
         return ch3o
