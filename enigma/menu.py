@@ -39,6 +39,14 @@ class MenuMaker:
         self.dead_ends: Dict = {}
         self.pfx: str = ""
         self.menu: dict = {}
+        # positions_in_out = dict mapping for each position, which letter is in (crib), which is out (cypher)
+        self.positions_in_out = {}
+        # pairs_to_positions = dict mapping frozenset of pair of letters, to which position(s) they occur at
+        self.pairs_to_positions = defaultdict(list)
+        for pos, (in_ch, out_ch) in enumerate(zip(crib, encoded_crib)):
+            self.positions_in_out[pos] = {'in': in_ch, 'out': out_ch}
+            pair_key_set = frozenset([in_ch, out_ch])
+            self.pairs_to_positions[pair_key_set].append(pos)
 
     def run(self):
         """MAIN ENTRYPOINT FUNCTION - find all loops & deadends, then add connections to menu"""
