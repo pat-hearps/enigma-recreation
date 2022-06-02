@@ -1,11 +1,11 @@
 from collections import Counter, defaultdict
 from copy import deepcopy
-from functools import cache
 from pprint import pformat
 from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 
 from enigma.constants import MENU as M
 from enigma.design import ENTRY
@@ -20,8 +20,10 @@ def convert_to_ZZ_code(position: int) -> str:
     """Convert a menu link position integer to a 3-letter ZZ code,
     with the 3rd letter equal to the letter prior to the given position index
     in the alphabet"""
+    middle_position = int(np.floor(position / 26))
+    middle_char = ENTRY[middle_position - 1]
     char_before_this_position = ENTRY[position % 26 - 1]
-    return f"ZZ{char_before_this_position}"
+    return f"Z{middle_char}{char_before_this_position}"
 
 
 class MenuMaker:
@@ -39,6 +41,14 @@ class MenuMaker:
         self.dead_ends: Dict = {}
         self.pfx: str = ""
         self.menu: dict = {}
+        # positions_in_out = dict mapping for each position, which letter is in (crib), which is out (cypher), ZZ code
+        self.base_menu_positions = {}
+        # pairs_to_positions = dict mapping frozenset of pair of letters, to which position(s) they occur at
+        self.pairs_to_positions = defaultdict(list)
+        for pos, (in_ch, out_ch) in enumerate(zip(crib, encoded_crib)):
+            self.base_menu_positions[pos] = {M.IN: in_ch, M.OUT: out_ch, M.LINK: convert_to_ZZ_code(pos)}
+            pair_key_set = frozenset([in_ch, out_ch])
+            self.pairs_to_positions[pair_key_set].append(pos)
 
     def run(self):
         """MAIN ENTRYPOINT FUNCTION - find all loops & deadends, then add connections to menu"""
@@ -229,20 +239,13 @@ class MenuMaker:
             for char, next_char in zip(chain[:-1], chain[1:]):
                 self.add_item_to_menu(char, next_char)
 
-    @cache
-    def get_reverse_link_index(self, char):
-        return {_char: pos for pos, _char in self.link_index[char].items()}
-
     def add_item_to_menu(self, char: str, next_char: str):
-        link_idx_rev = self.get_reverse_link_index(char)
-        position_next_char = link_idx_rev[next_char]
-        # note that I'm just picking the first one where there are double (or more) linkages
-        # not sure if this matters for now or if its better to somehow include both linkages in the menu
-        # revisit later depending on bombe methodology
-        if position_next_char not in self.menu.keys():
-            menu_val = {M.IN: char, M.OUT: next_char, M.LINK: convert_to_ZZ_code(position_next_char)}
-            self.menu[position_next_char] = menu_val
-            logger.log(SPAM, f"added item to menu at {position_next_char} : {menu_val}")
+        positions_of_this_pair = self.pairs_to_positions[frozenset([char, next_char])]
+        for position in positions_of_this_pair:
+            if position not in self.menu.keys():
+                menu_data = self.base_menu_positions[position]
+                self.menu[position] = menu_data
+                logger.log(SPAM, f"added item to menu at {position} : {menu_data}")
 
     def configure_menu(self):
         """Adds extra item to menu as the bombe entrypoint, using a character
@@ -257,11 +260,10 @@ class MenuMaker:
         for position, itemdict in self.menu.items():
             in_char = itemdict[M.IN]
             ins = self.define_connections(in_char, position)
-            logger.log(SPAM, f"position={position} in_char ={in_char} ins ={ins}")
 
             out_char = itemdict[M.OUT]
             outs = self.define_connections(out_char, position)
-            logger.log(SPAM, f"position={position} out_char={out_char} outs={outs}")
+            logger.log(SPAM, f"position={position} out_char={out_char} ins={ins} outs={outs}")
 
             self.menu[position][M.CONXNS] = {M.IN: ins, M.OUT: outs}
 
