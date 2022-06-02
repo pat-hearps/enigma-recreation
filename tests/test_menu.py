@@ -4,7 +4,7 @@ from typing import Tuple
 import pytest
 
 from enigma.constants import MENU as M
-from enigma.menu import MenuMaker
+from enigma.menu import MenuMaker, convert_to_ZZ_code
 from tests.menu_test_data import BASIC_3CH, BASIC_4CH, WELCHMAN_1L
 
 CRIBS = {
@@ -183,3 +183,19 @@ def test_menu_prep(crib_set_name: str, expected: dict) -> None:
     print("===easy/non-precise menu checks passed===")
     # hard check - looking for identical dicts
     assert menu_mkr.menu == expected, "menu not identical to expected"
+
+
+zz_data = [
+    (0, 'ZZZ'),
+    (1, 'ZZA'),
+    (17, 'ZZQ'),
+    (25, 'ZZY'),
+    (26, 'ZAZ'),
+    (27, 'ZAA'),
+    (28, 'ZAB')
+]
+
+
+@pytest.mark.parametrize("position, expected", zz_data)
+def test_convert_to_ZZ_code(position: int, expected: str) -> None:
+    assert expected == convert_to_ZZ_code(position)

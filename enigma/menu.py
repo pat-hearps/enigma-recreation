@@ -6,6 +6,7 @@ from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 
 from enigma.constants import MENU as M
 from enigma.design import ENTRY
@@ -20,8 +21,10 @@ def convert_to_ZZ_code(position: int) -> str:
     """Convert a menu link position integer to a 3-letter ZZ code,
     with the 3rd letter equal to the letter prior to the given position index
     in the alphabet"""
+    middle_position = int(np.floor(position / 26))
+    middle_char = ENTRY[middle_position - 1]
     char_before_this_position = ENTRY[position % 26 - 1]
-    return f"ZZ{char_before_this_position}"
+    return f"Z{middle_char}{char_before_this_position}"
 
 
 class MenuMaker:
