@@ -260,11 +260,10 @@ class MenuMaker:
         for position, itemdict in self.menu.items():
             in_char = itemdict[M.IN]
             ins = self.define_connections(in_char, position)
-            logger.log(SPAM, f"position={position} in_char ={in_char} ins ={ins}")
 
             out_char = itemdict[M.OUT]
             outs = self.define_connections(out_char, position)
-            logger.log(SPAM, f"position={position} out_char={out_char} outs={outs}")
+            logger.log(SPAM, f"position={position} out_char={out_char} ins={ins} outs={outs}")
 
             self.menu[position][M.CONXNS] = {M.IN: ins, M.OUT: outs}
 
