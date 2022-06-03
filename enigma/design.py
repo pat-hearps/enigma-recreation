@@ -15,6 +15,8 @@ raw_rotors = {'I': 'EKMFLGDQVZNTOWYHXUSPAIBRCJ', 'II': 'AJDKSIRUXBLHWTMCQGZNPYFV
               'V': 'VZBRGITYUPSDNHLXAWMJQOFECK'}
 notches = {'I': 'Q', 'II': 'E', 'III': 'V', 'IV': 'J', 'V': 'Z'}
 
+OTHER_SIDE = {'in': 'out', 'out': 'in'}
+
 
 @dataclass
 class ROTORS:

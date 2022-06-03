@@ -8,6 +8,7 @@ import pandas as pd
 from enigma.design import (
     ENTRY,
     FORWARD_ROTORS,
+    OTHER_SIDE,
     REFLECTORS_CYPHER,
     REVERSE_ROTORS,
     grey,
@@ -98,15 +99,17 @@ class Bombe:
         """similar to pulse_connections in that it updates terminals of scramblers, but is solely about the
         interconnections between the test register and those scramblers which are connected to it"""
         for scr2id, side in self.register['conxns'].items():  # side = 'in' or 'out'
+            other_scr_side = OTHER_SIDE[side]
             # for each of the scrambler terminals connected to the test register
-            for ch, io in self.scramblers[scr2id].status[side].items():
+            other_scrambler = self.scramblers[scr2id]
+            for ch, io in other_scrambler.status[other_scr_side].items():
                 # first sync any live wires from the scrambler to the test register
                 if io == 1:
                     self.register['status'][ch] = 1
             for ch, io in self.register['status'].items():
                 # but then also sync any live wires from the test register to the scrambler
                 if io == 1:
-                    self.scramblers[scr2id].status[side][ch] = 1
+                    other_scrambler.status[other_scr_side][ch] = 1
 
     def light_character(self):
         """just need a way to put in the initial character input into all of the scramblers"""
