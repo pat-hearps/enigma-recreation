@@ -152,14 +152,16 @@ class Bombe:
                   ) != 1:  # i.e. keep going until the register status is unchanged for 5 iterations
             self.update_all()                      # the 5 is somewhat arbitrary. Testing on one menu found no more than 3 continuous
             # occurrences of an incomplete status but could be different for other menus.
-            # for scr1id, scrambler in self.scramblers.items():
-            #     lit_status = get_lit_status(scrambler)
-            #     logger.log(SPAM, f"update | scrambler {scr1id} status={lit_status}")
+            for scr1id, scrambler in self.scramblers.items():
+                lit_status = get_lit_status(scrambler)
+                logger.log(SPAM, f"update | scrambler {scr1id} status={lit_status}")
             self.pulse_connections()
 #             self.sync_diagonal_board()
             self.sync_test_register()
             self.current_sum = sum(self.register['status'].values())
-            logger.log(SPAM, f"iter={self.lineup_iters} current_sum={self.current_sum}")
+            logger.log(
+                SPAM,
+                f"iter={self.lineup_iters} current_sum={self.current_sum}  register={get_lit_chars(self.register['status'])}")
             self.track_sums.append(self.current_sum)
             self.lineup_iters += 1
 
