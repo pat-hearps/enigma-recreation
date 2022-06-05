@@ -113,7 +113,42 @@ WELCHMAN_1L = {
                M.TEST_CHAR: 'E'}}
 
 
-class BOMBE_TEST1:
+class BOMBE_TEST_EASY1:
+    left_rotor = 'I'
+    middle_rotor = 'II'
+    right_rotor = 'III'
+    reflector = 'B'
+    current_window_3 = 'YRP'
+    ring_settings_3 = 'AAA'
+    crib = "CBAA"
+    cypher = "BACB"
+    menu = {
+        0: {'conxns': {'in': {2: 'out'}, 'out': {1: 'in', 3: 'out'}},
+            'in': 'C',
+            'menu_link': 'ZZZ',
+            'out': 'B'},
+        1: {'conxns': {'in': {0: 'out', 3: 'out'}, 'out': {2: 'in', 3: 'in'}},
+            'in': 'B',
+            'menu_link': 'ZZA',
+            'out': 'A'},
+        2: {'conxns': {'in': {1: 'out', 3: 'in'}, 'out': {0: 'in'}},
+            'in': 'A',
+            'menu_link': 'ZZB',
+            'out': 'C'},
+        3: {'conxns': {'in': {1: 'out', 2: 'in'}, 'out': {0: 'out', 1: 'in'}},
+            'in': 'A',
+            'menu_link': 'ZZC',
+            'out': 'B'},
+        'config': {'conxns': {'in': {1: 'out', 2: 'in', 3: 'in'},
+                              'out': {1: 'out', 2: 'in', 3: 'in'}},
+                   'in': 'A',
+                   'menu_link': 'QQQ',
+                   'out': 'A',
+                   'test_char': 'A'}
+    }
+
+
+class BOMBE_TEST2:
     left_rotor = 'I'
     middle_rotor = 'II'
     right_rotor = 'III'
