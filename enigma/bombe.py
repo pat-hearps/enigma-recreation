@@ -153,19 +153,27 @@ class Bombe:
             # the 5 is somewhat arbitrary. Testing on one menu found no more than 3
             # continuous occurrences of an incomplete status but could be different
             # for other menus.
-            self.update_all()
-            for scr1id, scrambler in self.scramblers.items():
-                lit_status = get_lit_status(scrambler)
-                logger.log(SPAM, f"update | scrambler {scr1id} status={lit_status}")
-            self.pulse_connections()
-#             self.sync_diagonal_board()
-            self.sync_test_register()
-            self.current_sum = sum(self.register['status'].values())
-            logger.log(
-                SPAM,
-                f"iter={self.lineup_iters} current_sum={self.current_sum}  register={get_lit_chars(self.register['status'])}")
-            self.track_sums.append(self.current_sum)
-            self.lineup_iters += 1
+            self.one_step_sync()
+
+    def one_step_sync(self):
+        """One step of the loop to exhaustion that sends an 'electrical pulse' (status=1) from each scrambler to other
+        scramblers through the test register:
+        - all scramblers with lit characters update the corresponding test register connection to also be lit
+        - the test register then resyncs out all its lit characters to also be lit in each scrambler it is connected to
+        """
+        self.update_all()
+        for scr1id, scrambler in self.scramblers.items():
+            lit_status = get_lit_status(scrambler)
+            logger.log(SPAM, f"update | scrambler {scr1id} status={lit_status}")
+        self.pulse_connections()
+#       self.sync_diagonal_board()
+        self.sync_test_register()
+        self.current_sum = sum(self.register['status'].values())
+        logger.log(
+            SPAM,
+            f"iter={self.lineup_iters} current_sum={self.current_sum}  register={get_lit_chars(self.register['status'])}")
+        self.track_sums.append(self.current_sum)
+        self.lineup_iters += 1
 
     def step_and_test(self):
         """the main function to use for looping through all possible combinations of rotor positions,
