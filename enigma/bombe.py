@@ -373,20 +373,6 @@ class Scrambler(BaseEnigma):
         for pos in self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor:
             self.current_position += ENTRY[pos]
 
-    def step_enigma(self):
-        """Just acts on itself, steps all three rotors, stepping either 1,2 or 3 rotors based on the
-        notch position"""
-        if self.pos_rgt_rotor == self.middle_notch and self.pos_mid_rotor == self.left_notch:
-            self.pos_rgt_rotor = self.rotor_step(self.pos_rgt_rotor)
-            self.pos_mid_rotor = self.rotor_step(self.pos_mid_rotor)
-            self.pos_left_rotor = self.rotor_step(self.pos_left_rotor)
-        elif self.pos_rgt_rotor == self.middle_notch:
-            self.pos_rgt_rotor = self.rotor_step(self.pos_rgt_rotor)
-            self.pos_mid_rotor = self.rotor_step(self.pos_mid_rotor)
-        else:
-            self.pos_rgt_rotor = self.rotor_step(self.pos_rgt_rotor)
-        self.translate_current_position()
-
     def update(self):
         """idea here is that the scrambler will check each of the 26 connections to see if they
         are live, and if so pass it through itself to light up the corresponding scramble (i.e. encyphered)
