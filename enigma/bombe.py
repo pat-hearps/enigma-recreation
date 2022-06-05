@@ -166,9 +166,7 @@ class Bombe:
 
         self.track_sums = [0, 1]
         self.check_iters = 0   # this is just to keep track of how many iterations it took to reach a steady status
-        logger.log(
-            SPAM,
-            f"iter={self.check_iters}, current_sum={self.current_sum},  register={self.register_lit_chars}")
+        logger.log(SPAM, f"iter={self.check_iters}, current_sum={self.current_sum}, register={self.register_lit_chars}")
 
     def one_step_sync(self):
         """One step of the loop to exhaustion that sends an 'electrical pulse' (status=1) from each scrambler to other
