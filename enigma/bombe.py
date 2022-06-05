@@ -166,6 +166,9 @@ class Bombe:
 
         self.track_sums = [0, 1]
         self.lineup_iters = 0   # this is just to keep track of how many iterations it took to reach a steady status
+        logger.log(
+            SPAM,
+            f"iter={self.lineup_iters}, current_sum={self.current_sum},  register={self.register_lit_chars}")
 
     def one_step_sync(self):
         """One step of the loop to exhaustion that sends an 'electrical pulse' (status=1) from each scrambler to other
@@ -180,9 +183,11 @@ class Bombe:
         self.pulse_connections()
 #       self.sync_diagonal_board()
         self.sync_test_register()
-        logger.log(SPAM, f"iter={self.lineup_iters} current_sum={self.current_sum}  register={self.register_lit_chars}")
         self.track_sums.append(self.current_sum)
         self.lineup_iters += 1
+        logger.log(
+            SPAM,
+            f"iter={self.lineup_iters}, current_sum={self.current_sum}, register={self.register_lit_chars}")
 
     def step_and_test(self):
         """the main function to use for looping through all possible combinations of rotor positions,
