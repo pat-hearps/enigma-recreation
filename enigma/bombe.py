@@ -18,6 +18,17 @@ from enigma.design import (
     orange,
     red,
 )
+from enigma.utils import SPAM, get_logger
+
+logger = get_logger(__name__)
+
+
+def get_lit_chars(indict: dict) -> str:
+    return ''.join([ch for ch, io in indict.items() if io == 1])
+
+
+def get_lit_status(scrambler) -> str:
+    return ' | '.join([get_lit_chars(s) for s in scrambler.status.values()])
 
 
 class Bombe:
@@ -83,7 +94,7 @@ class Bombe:
                         # look through the scrambler's status for that side (in or out)
                         if io == 1:   # and if it has a live wire
                             scrambler.status[ior][ch] = 1  # set the corresponding character in the conxns dict of the
-
+            # logger.log(SPAM, f"pulse | scrambler {scr1id} status={scrambler.status}")
     # def sync_diagonal_board(self):
     #     """Current theory is ???"""
     #     for scr1id, scrambler in self.scramblers.items():
@@ -118,8 +129,10 @@ class Bombe:
     def update_all(self):
         """For every scrambler, runs update() which passes live terminals through the scrambler - from in to out
         and vice versa, for whatever the current position is"""
-        for scrambler in self.scramblers.values():
-            scrambler.update()
+        for scr1id, scrambler in self.scramblers.items():
+            scrambler.update(scr1id)
+            # lit_status = get_lit_status(scrambler)
+            # logger.log(SPAM, f"scr {scr1id} after update | status={lit_status}")
 
     def spin_scramblers(self):
         """Runs step_enigma for all scramblers, spinning the right rotor once and perhaps the middle and left if
@@ -151,10 +164,14 @@ class Bombe:
                   ) != 1:  # i.e. keep going until the register status is unchanged for 5 iterations
             self.update_all()                      # the 5 is somewhat arbitrary. Testing on one menu found no more than 3 continuous
             # occurrences of an incomplete status but could be different for other menus.
+            # for scr1id, scrambler in self.scramblers.items():
+            #     lit_status = get_lit_status(scrambler)
+            #     logger.log(SPAM, f"update | scrambler {scr1id} status={lit_status}")
             self.pulse_connections()
 #             self.sync_diagonal_board()
             self.sync_test_register()
             self.current_sum = sum(self.register['status'].values())
+            logger.log(SPAM, f"iter={self.lineup_iters} current_sum={self.current_sum}")
             self.track_sums.append(self.current_sum)
             self.lineup_iters += 1
 
