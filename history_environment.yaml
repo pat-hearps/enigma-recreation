@@ -2,7 +2,6 @@ name: enigma
 channels:
   - defaults
 dependencies:
-  - seaborn
   - numpy
   - pandas
   - plotly
@@ -11,8 +10,12 @@ dependencies:
   - jupyterlab
   - python=3.9
   - matplotlib
+  - nomkl
   - dill
   - pytest
   - factory_boy
+  - pip
   - pylint
+  - pip:
+    - pre-commit
 prefix: /opt/miniconda3/envs/enigma
