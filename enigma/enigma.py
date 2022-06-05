@@ -90,7 +90,7 @@ class BaseEnigma:
 
         vprint("stepping right rotor", 2)
         self.right_rotor.step_rotor()
-        self.update_window_letters()
+        self.translate_window_letters()
         vprint(f"enigma position after stepping={self.window_letters}", 1)
 
     def cypher(self, letters: str):
@@ -128,7 +128,7 @@ class Enigma(BaseEnigma):
 
         self.window_letters: str = current_window_3
 
-    def update_window_letters(self):
+    def translate_window_letters(self):
         """Update the enigma's class attribute 'window_letters' to reflect the positions of the rotors"""
         self.window_letters = "".join([r.window_letter for r in (self.left_rotor, self.middle_rotor, self.right_rotor)])
 
