@@ -1,23 +1,9 @@
-from string import ascii_uppercase
-
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import pandas as pd
 
-from enigma.design import (
-    ENTRY,
-    FORWARD_ROTORS,
-    OTHER_SIDE,
-    REFLECTORS_CYPHER,
-    REVERSE_ROTORS,
-    grey,
-    invsoutmap,
-    iomap,
-    notches,
-    orange,
-    red,
-)
+from enigma.design import ENTRY, OTHER_SIDE, grey, invsoutmap, iomap, orange, red
 from enigma.enigma import BaseEnigma, full_scramble
 from enigma.utils import SPAM, get_logger
 
