@@ -113,9 +113,9 @@ class Bombe:
         """just need a way to put in the initial character input into all of the scramblers"""
         self.register['status'][self.test_char] = 1
 
-    def update_all(self):
+    def cypher_signal_thru_all_scramblers(self):
         """For every scrambler, runs update() which passes live terminals through the scrambler - from in to out
-        and vice versa, for whatever the current position is"""
+        and vice versa, for whatever the current position is, scrambling the letters to their corresponding cyphers"""
         for _, scrambler in self.scramblers.items():
             scrambler.update()
             # lit_status = get_lit_status(scrambler)
@@ -174,7 +174,7 @@ class Bombe:
         - all scramblers with lit characters update the corresponding test register connection to also be lit
         - the test register then resyncs out all its lit characters to also be lit in each scrambler it is connected to
         """
-        self.update_all()
+        self.cypher_signal_thru_all_scramblers()
         for scr1id, scrambler in self.scramblers.items():
             lit_status = get_lit_status(scrambler)
             logger.log(SPAM, f"update | scrambler {scr1id} status={lit_status}")
