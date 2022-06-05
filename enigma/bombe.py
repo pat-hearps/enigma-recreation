@@ -143,8 +143,6 @@ class Bombe:
         self.sync_test_register()              # do the first syncing of test register, sending the signal out to the
         # scramblers which are connected to the test register
 
-    # initialise the three sum variables (current_sum, previous_sum and olderer_sum) to keep track of whether
-    # the sum of live connections have remained unchanged
         self.current_sum = sum(self.register['status'].values())
         self.track_sums = [0, 1]
         self.lineup_iters = 0   # this is just to keep track of how many iterations it took to reach a steady status
