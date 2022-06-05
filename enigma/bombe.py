@@ -141,6 +141,20 @@ class Bombe:
         """For running to exhaustion on a particular bombe scrambler lineup.
         Loops through pulsing connections between scramblers and syncing back to the test register
         until the sum of live connections at the test register remains unchanged for two successive loops."""
+        self.set_up_lineup_check()
+        while len(set(self.track_sums[-5:])) != 1:
+            # i.e. keep going until the register status is unchanged for 5 iterations
+            # the 5 is somewhat arbitrary. Testing on one menu found no more than 3
+            # continuous occurrences of an incomplete status but could be different
+            # for other menus.
+            self.one_step_sync()
+
+    def set_up_lineup_check(self):
+        """
+        - Reset all scramblers and register (simulating the moment when no electrical current is passing through the machine
+        as the scrambler electrical brushes move from one position to the next)
+        - Send the first signal out from the register's test character.
+        - Reset tracking variables"""
         self.reset_scramblers_and_register()   # first make sure all scrambler inputs/outputs (statuses) are reset to zero
         self.light_character()   # light up the one test character
         self.sync_test_register()              # do the first syncing of test register, sending the signal out to the
@@ -148,12 +162,6 @@ class Bombe:
 
         self.track_sums = [0, 1]
         self.lineup_iters = 0   # this is just to keep track of how many iterations it took to reach a steady status
-        while len(set(self.track_sums[-5:])) != 1:
-            # i.e. keep going until the register status is unchanged for 5 iterations
-            # the 5 is somewhat arbitrary. Testing on one menu found no more than 3
-            # continuous occurrences of an incomplete status but could be different
-            # for other menus.
-            self.one_step_sync()
 
     def one_step_sync(self):
         """One step of the loop to exhaustion that sends an 'electrical pulse' (status=1) from each scrambler to other
