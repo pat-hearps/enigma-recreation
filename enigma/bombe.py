@@ -130,8 +130,8 @@ class Bombe:
     def update_all(self):
         """For every scrambler, runs update() which passes live terminals through the scrambler - from in to out
         and vice versa, for whatever the current position is"""
-        for scr1id, scrambler in self.scramblers.items():
-            scrambler.update(scr1id)
+        for _, scrambler in self.scramblers.items():
+            scrambler.update()
             # lit_status = get_lit_status(scrambler)
             # logger.log(SPAM, f"scr {scr1id} after update | status={lit_status}")
 
