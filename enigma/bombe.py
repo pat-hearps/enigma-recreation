@@ -348,9 +348,10 @@ class Scrambler(BaseEnigma):
         super().__init__(left_rotor_type=left_rotor_type, middle_rotor_type=middle_rotor_type, right_rotor_type=right_rotor_type, reflector_type=reflector_type,
                  current_window_3=menu_link, ring_settings_3 = "AAA")
         self.menu_link = menu_link
-        self.status = {}
-        self.status['in'] = {char: 0 for char in ENTRY}
-        self.status['out'] = {char: 0 for char in ENTRY}
+        self.status = {
+        'in' : {char: 0 for char in ENTRY},
+        'out' : {char: 0 for char in ENTRY}
+        }
         self.conxns = {'in': conx_in, 'out': conx_out}
 
     def full_scramble(self, in_ch: str):
