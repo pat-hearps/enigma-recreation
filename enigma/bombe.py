@@ -182,11 +182,11 @@ class Bombe:
         testing the connections at each step using check_this_lineup()"""
         self.spin_scramblers()
         self.check_this_lineup()
-        self.run_record[self.identity_scrambler.current_position] = (
+        self.run_record[self.identity_scrambler.window_letters] = (
             self.current_sum, self.lineup_iters, self.track_sums)
         if self.current_sum != 26:
-            print('drop:  ', self.identity_scrambler.current_position, 'livestatus:', self.current_sum)
-            self.drops[self.identity_scrambler.current_position] = self.current_sum
+            print('drop:  ', self.identity_scrambler.window_letters, 'livestatus:', self.current_sum)
+            self.drops[self.identity_scrambler.window_letters] = self.current_sum
 
     def pdf_scrambler_statuses(self):
         """pdf = pandas dataframe
