@@ -14,7 +14,7 @@ def get_lit_chars(indict: dict) -> str:
     return ''.join([ch for ch, io in indict.items() if io == 1])
 
 
-def get_lit_status(scrambler) -> str:
+def get_lit_status(scrambler: BaseEnigma) -> str:
     return ' | '.join([get_lit_chars(s) for s in scrambler.status.values()])
 
 
@@ -137,6 +137,10 @@ class Bombe:
     def current_sum(self) -> int:
         return sum(self.register['status'].values())
 
+    @property
+    def register_lit_chars(self):
+        return get_lit_chars(self.register['status'])
+
     def check_this_lineup(self):
         """For running to exhaustion on a particular bombe scrambler lineup.
         Loops through pulsing connections between scramblers and syncing back to the test register
@@ -176,9 +180,7 @@ class Bombe:
         self.pulse_connections()
 #       self.sync_diagonal_board()
         self.sync_test_register()
-        logger.log(
-            SPAM,
-            f"iter={self.lineup_iters} current_sum={self.current_sum}  register={get_lit_chars(self.register['status'])}")
+        logger.log(SPAM, f"iter={self.lineup_iters} current_sum={self.current_sum}  register={self.register_lit_chars}")
         self.track_sums.append(self.current_sum)
         self.lineup_iters += 1
 
