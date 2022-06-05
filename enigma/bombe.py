@@ -148,10 +148,12 @@ class Bombe:
         self.current_sum = sum(self.register['status'].values())
         self.track_sums = [0, 1]
         self.lineup_iters = 0   # this is just to keep track of how many iterations it took to reach a steady status
-        while len(set(self.track_sums[-5:])
-                  ) != 1:  # i.e. keep going until the register status is unchanged for 5 iterations
-            self.update_all()                      # the 5 is somewhat arbitrary. Testing on one menu found no more than 3 continuous
-            # occurrences of an incomplete status but could be different for other menus.
+        while len(set(self.track_sums[-5:])) != 1:
+            # i.e. keep going until the register status is unchanged for 5 iterations
+            # the 5 is somewhat arbitrary. Testing on one menu found no more than 3
+            # continuous occurrences of an incomplete status but could be different
+            # for other menus.
+            self.update_all()
             for scr1id, scrambler in self.scramblers.items():
                 lit_status = get_lit_status(scrambler)
                 logger.log(SPAM, f"update | scrambler {scr1id} status={lit_status}")
