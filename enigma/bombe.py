@@ -18,6 +18,7 @@ from enigma.design import (
     orange,
     red,
 )
+from enigma.enigma import BaseEnigma
 from enigma.utils import SPAM, get_logger
 
 logger = get_logger(__name__)
@@ -338,25 +339,15 @@ class Bombe:
             nx.draw_networkx_nodes(self.TG, pos=self.manual_pos, node_size=node_size, node_color=self.node_colours)
 
 
-class Scrambler:
+class Scrambler(BaseEnigma):
     """A Scrambler is a slightly adapted ENIGMA cypher, such that it has both an in and out end which are separate"""
 
-    def __init__(self, left_rotor, middle_rotor, right_rotor, reflector, menu_link='ZZZ', conx_in={}, conx_out={}):
+    def __init__(self, left_rotor_type: str, middle_rotor_type: str, right_rotor_type: str, reflector_type: str, menu_link='ZZZ', conx_in={}, conx_out={}):
         """rotors must be strings referring to either ['I','II','III','IV','V']
         reflector must be string, one of either ['B','C']"""
-
-        self.right_rotor = right_rotor
-        self.middle_rotor = middle_rotor
-        self.left_rotor = left_rotor
-        self.reflector = REFLECTORS_CYPHER[reflector]
+        super().__init__(left_rotor_type=left_rotor_type, middle_rotor_type=middle_rotor_type, right_rotor_type=right_rotor_type, reflector_type=reflector_type,
+                 current_window_3=menu_link, ring_settings_3 = "AAA")
         self.menu_link = menu_link
-        # point if right rotor reaches will trigger middle rotor to step
-        self.middle_notch = ENTRY.index(notches[self.middle_rotor])
-        # point if middle rotor reaches will trigger left rotor to step
-        self.left_notch = ENTRY.index(notches[self.left_rotor])
-        self.current_position = menu_link
-        self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor = (
-            ascii_uppercase.index(m) for m in menu_link.upper())
         self.status = {}
         self.status['in'] = {char: 0 for char in ENTRY}
         self.status['out'] = {char: 0 for char in ENTRY}
