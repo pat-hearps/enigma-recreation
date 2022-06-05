@@ -364,15 +364,6 @@ class Scrambler(BaseEnigma):
             rotor_position += 1
         return rotor_position
 
-    def translate_current_position(self):
-        """Reads the numerical position of each of the 3 rotors, and translates into ZZA-style alphabet position
-        That is, for each of the three rotors, it's numerical position from 0-25 is mapped to the letter of the
-        alphabet this corresponds to. Note that this is purely for displaying the setting to the user, it can't
-        do anything to alter the actual rotor position, which is stored as the numerical variable"""
-        self.current_position = ''
-        for pos in self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor:
-            self.current_position += ENTRY[pos]
-
     def update(self):
         """idea here is that the scrambler will check each of the 26 connections to see if they
         are live, and if so pass it through itself to light up the corresponding scramble (i.e. encyphered)
