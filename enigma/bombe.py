@@ -190,12 +190,11 @@ class Bombe:
         """the main function to use for looping through all possible combinations of rotor positions,
         testing the connections at each step using check_this_lineup()"""
         initial_window_letters = self.identity_scrambler.window_letters
-        self.spin_scramblers()
+        self.spin_scramblers()  # represents how Enigma machine first turns rotors, then encyphers the character after
         self.check_this_lineup()
-        self.run_record[self.identity_scrambler.window_letters] = (
-            self.current_sum, self.check_iters, self.track_sums)
+        self.run_record[initial_window_letters] = (self.current_sum, self.check_iters, self.track_sums)
         if self.current_sum != 26:
-            print('drop:  ', self.identity_scrambler.window_letters, 'livestatus:', self.current_sum)
+            print('drop:  ', initial_window_letters, 'livestatus:', self.current_sum)
             self.drops[initial_window_letters] = self.current_sum
 
     def pdf_scrambler_statuses(self):
