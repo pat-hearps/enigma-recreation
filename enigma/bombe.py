@@ -93,7 +93,7 @@ class Bombe:
     #                     for scr2id, side in self.diagonal_board_wiring[character].items():
     #                         self.scramblers[scr2id].status[side][connection_character] = 1
 
-    def sync_test_register(self):
+    def sync_test_register_with_connected_scramblers(self):
         """similar to pulse_connections in that it updates terminals of scramblers, but is solely about the
         interconnections between the test register and those scramblers which are connected to it"""
         for scr2id, side in self.register['conxns'].items():  # side = 'in' or 'out'
@@ -165,8 +165,8 @@ class Bombe:
         - Reset tracking variables"""
         self.reset_scramblers_and_register()   # first make sure all scrambler inputs/outputs (statuses) are reset to zero
         self.light_character()   # light up the one test character
-        self.sync_test_register()              # do the first syncing of test register, sending the signal out to the
-        # scramblers which are connected to the test register
+        # do the first syncing of test register, send signal to the scramblers which are connected to the test register
+        self.sync_test_register_with_connected_scramblers()
 
         self.track_sums = [0, 1]
         self.check_iters = 0   # this is just to keep track of how many iterations it took to reach a steady status
@@ -182,7 +182,7 @@ class Bombe:
         self.log_lit_status(msg='one_step_sync')
         self.sync_scramblers_to_connected_scramblers()
 #       self.sync_diagonal_board()
-        self.sync_test_register()
+        self.sync_test_register_with_connected_scramblers()
         self.track_sums.append(self.current_sum)
         self.check_iters += 1
         logger.log(SPAM, f"iter={self.check_iters}, current_sum={self.current_sum}, register={self.register_lit_chars}")
