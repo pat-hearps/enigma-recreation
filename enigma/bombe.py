@@ -29,7 +29,6 @@ class Bombe:
         self.reflector = reflector
         self.scramblers = {}
         self.register = {'status': {char: 0 for char in ENTRY}}
-        self.current_sum = sum(self.register['status'].values())
         self.run_record = {}
         self.drops = {}
 
@@ -134,6 +133,10 @@ class Bombe:
             scrambler.reset_status()
         self.register['status'] = {char: 0 for char in ENTRY}
 
+    @property
+    def current_sum(self) -> int:
+        return sum(self.register['status'].values())
+
     def check_this_lineup(self):
         """For running to exhaustion on a particular bombe scrambler lineup.
         Loops through pulsing connections between scramblers and syncing back to the test register
@@ -143,7 +146,6 @@ class Bombe:
         self.sync_test_register()              # do the first syncing of test register, sending the signal out to the
         # scramblers which are connected to the test register
 
-        self.current_sum = sum(self.register['status'].values())
         self.track_sums = [0, 1]
         self.lineup_iters = 0   # this is just to keep track of how many iterations it took to reach a steady status
         while len(set(self.track_sums[-5:])) != 1:
@@ -166,7 +168,6 @@ class Bombe:
         self.pulse_connections()
 #       self.sync_diagonal_board()
         self.sync_test_register()
-        self.current_sum = sum(self.register['status'].values())
         logger.log(
             SPAM,
             f"iter={self.lineup_iters} current_sum={self.current_sum}  register={get_lit_chars(self.register['status'])}")
