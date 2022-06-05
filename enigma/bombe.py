@@ -342,15 +342,28 @@ class Bombe:
 class Scrambler(BaseEnigma):
     """A Scrambler is a slightly adapted ENIGMA cypher, such that it has both an in and out end which are separate"""
 
-    def __init__(self, left_rotor_type: str, middle_rotor_type: str, right_rotor_type: str, reflector_type: str, menu_link='ZZZ', conx_in={}, conx_out={}):
+    def __init__(
+            self,
+            left_rotor_type: str,
+            middle_rotor_type: str,
+            right_rotor_type: str,
+            reflector_type: str,
+            menu_link='ZZZ',
+            conx_in={},
+            conx_out={}):
         """rotors must be strings referring to either ['I','II','III','IV','V']
         reflector must be string, one of either ['B','C']"""
-        super().__init__(left_rotor_type=left_rotor_type, middle_rotor_type=middle_rotor_type, right_rotor_type=right_rotor_type, reflector_type=reflector_type,
-                 current_window_3=menu_link, ring_settings_3 = "AAA")
+        super().__init__(
+            left_rotor_type=left_rotor_type,
+            middle_rotor_type=middle_rotor_type,
+            right_rotor_type=right_rotor_type,
+            reflector_type=reflector_type,
+            current_window_3=menu_link,
+            ring_settings_3="AAA")
         self.menu_link = menu_link
         self.status = {
-        'in' : {char: 0 for char in ENTRY},
-        'out' : {char: 0 for char in ENTRY}
+            'in': {char: 0 for char in ENTRY},
+            'out': {char: 0 for char in ENTRY}
         }
         self.conxns = {'in': conx_in, 'out': conx_out}
 
