@@ -66,33 +66,6 @@ class BaseEnigma:
         self.middle_rotor: Rotor = Rotor(rotor_type=middle_rotor_type, ring_setting=ring_settings_3[1])
         self.right_rotor: Rotor = Rotor(rotor_type=right_rotor_type, ring_setting=ring_settings_3[2])
         
-class Enigma(BaseEnigma):
-    def __init__(self, left_rotor_type: str, middle_rotor_type: str, right_rotor_type: str, reflector_type: str,
-                 ring_settings_3: str = "AAA", current_window_3: str = "AAA"):
-        """
-        current_window_3 = initial position of the 3 rotors as defined by the letter visible in the window for each
-        ring_settings_3 = display-vs-cypher offset of the rotor, does not change during an operation"""
-        super().__init__(left_rotor_type=left_rotor_type, middle_rotor_type=middle_rotor_type, right_rotor_type=right_rotor_type, reflector_type=reflector_type, ring_settings_3=ring_settings_3)
-        self.set_window_letters(current_window_3=current_window_3)
-        self.in_status: Dict = {char: 0 for char in ENTRY}
-        self.out_status: Dict = {char: 0 for char in ENTRY}
-        self.record: Dict = {}
-
-    def set_window_letters(self, current_window_3: str):
-        """Given a three-letter menu link (e.g. 'ZAB'), set the current positions of the enigma to correspond to the menu link"""
-        assert all([m in ascii_uppercase for m in current_window_3])
-        assert len(current_window_3) == 3
-        current_window_3 = current_window_3.upper()
-        self.left_rotor.set_window_letter(current_window_3[0])
-        self.middle_rotor.set_window_letter(current_window_3[1])
-        self.right_rotor.set_window_letter(current_window_3[2])
-
-        self.window_letters: str = current_window_3
-
-    def update_window_letters(self):
-        """Update the enigma's class attribute 'window_letters' to reflect the positions of the rotors"""
-        self.window_letters = "".join([r.window_letter for r in (self.left_rotor, self.middle_rotor, self.right_rotor)])
-
     def step_enigma(self):
         """Step the 3 rotors, as occurs when a key is depressed
         - right rotor is always stepped
@@ -131,6 +104,33 @@ class Enigma(BaseEnigma):
             self.step_enigma()
             cypher += full_scramble(self, letter)
         return cypher
+        
+class Enigma(BaseEnigma):
+    def __init__(self, left_rotor_type: str, middle_rotor_type: str, right_rotor_type: str, reflector_type: str,
+                 ring_settings_3: str = "AAA", current_window_3: str = "AAA"):
+        """
+        current_window_3 = initial position of the 3 rotors as defined by the letter visible in the window for each
+        ring_settings_3 = display-vs-cypher offset of the rotor, does not change during an operation"""
+        super().__init__(left_rotor_type=left_rotor_type, middle_rotor_type=middle_rotor_type, right_rotor_type=right_rotor_type, reflector_type=reflector_type, ring_settings_3=ring_settings_3)
+        self.set_window_letters(current_window_3=current_window_3)
+        self.in_status: Dict = {char: 0 for char in ENTRY}
+        self.out_status: Dict = {char: 0 for char in ENTRY}
+        self.record: Dict = {}
+
+    def set_window_letters(self, current_window_3: str):
+        """Given a three-letter menu link (e.g. 'ZAB'), set the current positions of the enigma to correspond to the menu link"""
+        assert all([m in ascii_uppercase for m in current_window_3])
+        assert len(current_window_3) == 3
+        current_window_3 = current_window_3.upper()
+        self.left_rotor.set_window_letter(current_window_3[0])
+        self.middle_rotor.set_window_letter(current_window_3[1])
+        self.right_rotor.set_window_letter(current_window_3[2])
+
+        self.window_letters: str = current_window_3
+
+    def update_window_letters(self):
+        """Update the enigma's class attribute 'window_letters' to reflect the positions of the rotors"""
+        self.window_letters = "".join([r.window_letter for r in (self.left_rotor, self.middle_rotor, self.right_rotor)])
 
 
 def full_scramble(enigma: Enigma, letter_in: str) -> str:
