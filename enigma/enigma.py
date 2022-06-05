@@ -133,7 +133,7 @@ class Enigma(BaseEnigma):
         self.window_letters = "".join([r.window_letter for r in (self.left_rotor, self.middle_rotor, self.right_rotor)])
 
 
-def full_scramble(enigma: Enigma, letter_in: str) -> str:
+def full_scramble(enigma: BaseEnigma, letter_in: str) -> str:
     """Encode a character through the full Enigma, from keyboard to cypher board.
     1. Forwards through the 3 Rotors
     2. Through the Reflector
