@@ -18,7 +18,7 @@ from enigma.design import (
     orange,
     red,
 )
-from enigma.enigma import BaseEnigma
+from enigma.enigma import BaseEnigma, full_scramble
 from enigma.utils import SPAM, get_logger
 
 logger = get_logger(__name__)
@@ -353,78 +353,8 @@ class Scrambler(BaseEnigma):
         self.status['out'] = {char: 0 for char in ENTRY}
         self.conxns = {'in': conx_in, 'out': conx_out}
 
-    def once_thru_scramble(self, start_character, direction, first_rotor, pos1, second_rotor, pos2,
-                           third_rotor, pos3):
-        """ start_character must be single ASCII character A-Z
-        direction is either 'forward' or 'back' """
-        if direction == 'forward':
-            usedict = {k: v for k, v in FORWARD_ROTORS.items()}
-        elif direction == 'back':
-            usedict = {k: v for k, v in REVERSE_ROTORS.items()}
-        else:
-            print("direction can only be 'forward' or 'back'")
-            return 'wtf'
-
-        start_character = start_character.upper()
-        entry_pos = ENTRY.index(start_character)
-        fst_pos_modifier = (26 + pos1 - 0) % 26
-        fst_in = (entry_pos + fst_pos_modifier) % 26
-        fst_out = usedict[first_rotor][fst_in]
-        # ch1o = ENTRY[fst_out]
-
-        scd_pos_modifier = (26 + pos2 - pos1) % 26
-        scd_in = (fst_out + scd_pos_modifier) % 26
-        # ch2i = ENTRY[scd_in]
-        scd_out = usedict[second_rotor][scd_in]
-        # ch2o = ENTRY[scd_out]
-
-        thd_pos_modifier = (26 + pos3 - pos2) % 26
-        thd_in = (scd_out + thd_pos_modifier) % 26
-        # ch3i = ENTRY[thd_in]
-        thd_out = usedict[third_rotor][thd_in]
-        ch3o = ENTRY[thd_out]
-        return ch3o
-
-    def full_scramble(self, in_ch):
-        in_ch = in_ch.upper()
-        left_rotor = self.left_rotor
-        middle_rotor = self.middle_rotor
-        right_rotor = self.right_rotor
-        rflector = self.reflector
-        # first run right to left through scrambler
-        forward_run = self.once_thru_scramble(
-            in_ch,
-            direction='forward',
-            first_rotor=right_rotor,
-            pos1=self.pos_rgt_rotor,
-            second_rotor=middle_rotor,
-            pos2=self.pos_mid_rotor,
-            third_rotor=left_rotor,
-            pos3=self.pos_left_rotor)
-        # reflector back around for return
-        # the '0' is there to matching formatting of other position modifiers -
-        # reflector is not moved so it will always be 0
-        rfi_pos_mod = (26 + 0 - self.pos_left_rotor) % 26
-        rf_in = (ENTRY.index(forward_run) + rfi_pos_mod) % 26
-        chri = ENTRY[rf_in]
-        mirrored = rflector[chri]
-
-        # second run back left to right thru scrambler
-        back_run = self.once_thru_scramble(
-            mirrored,
-            direction='back',
-            first_rotor=left_rotor,
-            pos1=self.pos_left_rotor,
-            second_rotor=middle_rotor,
-            pos2=self.pos_mid_rotor,
-            third_rotor=right_rotor,
-            pos3=self.pos_rgt_rotor)
-        bk_out = ENTRY.index(back_run)
-        # as above, '0' just reflects that the entry interface doesn't move
-        bko_pos_mod = (26 + 0 - self.pos_rgt_rotor) % 26
-        bk_final = (bk_out + bko_pos_mod) % 26
-        final = ENTRY[bk_final]
-        return final
+    def full_scramble(self, in_ch: str):
+        return full_scramble(enigma=self, letter_in=in_ch)
 
     def rotor_step(self, rotor_position):
         """To be used on any single rotor. Steps forward one position, resetting back to 0 after it reaches 25"""
