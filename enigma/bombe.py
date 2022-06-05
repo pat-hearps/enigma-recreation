@@ -44,6 +44,7 @@ class Bombe:
         self.register = {'status': {char: 0 for char in ENTRY}}
         self.current_sum = sum(self.register['status'].values())
         self.run_record = {}
+        self.drops = {}
 
         self.menu = menu
         """Scrambler setup, creating a scrambler corresponding to each menu item"""
@@ -184,6 +185,7 @@ class Bombe:
             self.current_sum, self.lineup_iters, self.track_sums)
         if self.current_sum != 26:
             print('drop:  ', self.identity_scrambler.current_position, 'livestatus:', self.current_sum)
+            self.drops[self.identity_scrambler.current_position] = self.current_sum
 
     def pdf_scrambler_statuses(self):
         """pdf = pandas dataframe
