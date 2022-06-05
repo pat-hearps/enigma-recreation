@@ -141,6 +141,10 @@ class Bombe:
     def register_lit_chars(self):
         return get_lit_chars(self.register['status'])
 
+    def log_lit_status(self, msg: str = None):
+        for scr1id, scrambler in self.scramblers.items():
+            logger.log(SPAM, f"{msg} | scrambler {scr1id} status={scrambler.lit_status}")
+
     def check_this_lineup(self):
         """For running to exhaustion on a particular bombe scrambler lineup.
         Loops through pulsing connections between scramblers and syncing back to the test register
@@ -175,9 +179,7 @@ class Bombe:
         - the test register then resyncs out all its lit characters to also be lit in each scrambler it is connected to
         """
         self.cypher_signal_thru_all_scramblers()
-        for scr1id, scrambler in self.scramblers.items():
-            lit_status = get_lit_status(scrambler)
-            logger.log(SPAM, f"update | scrambler {scr1id} status={lit_status}")
+        self.log_lit_status(msg='one_step_sync')
         self.pulse_connections()
 #       self.sync_diagonal_board()
         self.sync_test_register()
@@ -377,6 +379,10 @@ class Scrambler(BaseEnigma):
 
     def full_scramble(self, in_ch: str):
         return full_scramble(enigma=self, letter_in=in_ch)
+
+    @property
+    def lit_status(self):
+        return get_lit_status(self)
 
     def update(self):
         """idea here is that the scrambler will check each of the 26 connections to see if they
