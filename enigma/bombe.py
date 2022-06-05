@@ -66,7 +66,7 @@ class Bombe:
         # # will probably be 0/ZZZ unless that particular letter pair from the crib/cypher has not been
         # # used in the menu
 
-    def pulse_connections(self):
+    def sync_scramblers_to_connected_scramblers(self):
         """Goes through every scrambler (once only), and updates in and out terminals with live feeds via conx_in and
         conx_out from its connected scramblers. Should be run iteratively to exhaustion."""
         for scr1id, scrambler in self.scramblers.items():
@@ -180,7 +180,7 @@ class Bombe:
         """
         self.cypher_signal_thru_all_scramblers()
         self.log_lit_status(msg='one_step_sync')
-        self.pulse_connections()
+        self.sync_scramblers_to_connected_scramblers()
 #       self.sync_diagonal_board()
         self.sync_test_register()
         self.track_sums.append(self.current_sum)
