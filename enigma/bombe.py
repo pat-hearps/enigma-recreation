@@ -356,14 +356,6 @@ class Scrambler(BaseEnigma):
     def full_scramble(self, in_ch: str):
         return full_scramble(enigma=self, letter_in=in_ch)
 
-    def rotor_step(self, rotor_position):
-        """To be used on any single rotor. Steps forward one position, resetting back to 0 after it reaches 25"""
-        if rotor_position == 25:
-            rotor_position = 0
-        else:
-            rotor_position += 1
-        return rotor_position
-
     def update(self):
         """idea here is that the scrambler will check each of the 26 connections to see if they
         are live, and if so pass it through itself to light up the corresponding scramble (i.e. encyphered)
