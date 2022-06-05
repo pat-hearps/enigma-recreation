@@ -125,8 +125,7 @@ class Enigma(BaseEnigma):
         self.left_rotor.set_window_letter(current_window_3[0])
         self.middle_rotor.set_window_letter(current_window_3[1])
         self.right_rotor.set_window_letter(current_window_3[2])
-
-        self.window_letters: str = current_window_3
+        self.translate_window_letters()
 
     def translate_window_letters(self):
         """Update the enigma's class attribute 'window_letters' to reflect the positions of the rotors"""
