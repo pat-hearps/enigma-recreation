@@ -10,3 +10,4 @@ def test_bombe_init() -> None:
     assert bombe.identity_scrambler.window_letters == "ZZZ"
     bombe.light_character()
     assert bombe.register_lit_chars == test_char
+    assert bombe.current_sum == 1
