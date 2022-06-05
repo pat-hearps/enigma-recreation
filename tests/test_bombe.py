@@ -9,5 +9,4 @@ def test_bombe_init() -> None:
     assert bombe.test_char == test_char
     assert bombe.identity_scrambler.window_letters == "ZZZ"
     bombe.light_character()
-    lit_characters = [char for char, status in bombe.register['status'].items() if status == 1]
-    assert lit_characters == [test_char]
+    assert bombe.register_lit_chars == test_char
