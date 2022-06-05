@@ -15,7 +15,7 @@ def get_lit_chars(indict: dict) -> str:
 
 
 def get_lit_status(scrambler: BaseEnigma) -> str:
-    return ' | '.join([get_lit_chars(s) for s in scrambler.status.values()])
+    return ' | '.join([f"{side}={get_lit_chars(status)}" for side, status in scrambler.status.items()])
 
 
 class Bombe:
@@ -143,7 +143,7 @@ class Bombe:
 
     def log_lit_status(self, msg: str = None):
         for scr1id, scrambler in self.scramblers.items():
-            logger.log(SPAM, f"{msg} | scrambler {scr1id} status={scrambler.lit_status}")
+            logger.log(SPAM, f"{msg} | scrambler {scr1id} status {scrambler.lit_status}")
 
     def check_this_lineup(self):
         """For running to exhaustion on a particular bombe scrambler lineup.
