@@ -140,9 +140,10 @@ class Bombe:
     def register_lit_chars(self):
         return get_lit_chars(self.register['status'])
 
-    def log_lit_status(self, msg: str = None):
+    def log_lit_status(self, msg: str = None, only_reg_connected: bool = False):
         for scr1id, scrambler in self.scramblers.items():
-            logger.log(SPAM, f"{msg} | scrambler {scr1id} status {scrambler.lit_status}")
+            if (not only_reg_connected) or (scr1id in self.register['conxns'].keys()):
+                logger.log(SPAM, f"{msg} | scrambler {scr1id} status {scrambler.lit_status}")
 
     def check_this_lineup(self):
         """For running to exhaustion on a particular bombe scrambler lineup.
