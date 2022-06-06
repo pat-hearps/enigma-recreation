@@ -290,9 +290,13 @@ class MenuMaker:
         connections = {pos: io for pos, node in comparison_dict.items() for io in (M.IN, M.OUT) if node[io] == char}
         return connections
 
-    def network_graph(self, reset_pos=True):
+    def network_graph(self, reset_pos=True, label="", simplified=True):
         """Using networkx package to display connections of menu letters"""
         edges = {k: list(v) for k, v in self.pairs.items()}
+        if simplified:
+            # only keep pairs with both letters in menu, which ignores redundant deadends
+            letters_in_menu = set().union(*({d['in'], d['out']} for d in self.menu.values()))
+            edges = {k: v for k, v in edges.items() if len(letters_in_menu.intersection(v)) == len(v)}
         edges = [(v[0], v[1], {'label': str(k)}) for k, v in edges.items()]
         self.MultiGraph = nx.MultiGraph()
         self.MultiGraph.add_edges_from(edges)
@@ -311,4 +315,4 @@ class MenuMaker:
         #           labels.items()}  # doesnt' seem to be able to deal with labels for multiples edges
         # edge_labels = nx.draw_networkx_edge_labels(self.MultiGraph, pos=self.pos, edge_labels=labels)
         # plt.show(fig)
-        plt.savefig("./images/menu.png")
+        plt.savefig(f"./figures/menu{label}.png")
