@@ -266,7 +266,9 @@ class MenuMaker:
     def configure_menu(self):
         """Adds extra item to menu as the bombe entrypoint, using a character
         that is linked to the most other characters"""
-        test_char = self.best_characters[0]
+        letters_in_menu = ''.join([''.join((data['in'], data['out'])) for data in self.menu.values()])
+        ranked_letters = Counter(letters_in_menu)
+        test_char = ranked_letters.most_common(1)[0][0]
         self.menu[M.CONFIG] = {M.TEST_CHAR: test_char, M.LINK: 'QQQ', M.IN: test_char, M.OUT: test_char}
 
     def connections_add_to_menu(self):

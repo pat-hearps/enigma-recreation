@@ -207,8 +207,9 @@ class BOMBE_TEST2:
                  'in': 'R',
                  'menu_link': 'ZZR',
                  'out': 'N'},
-            'config': {'conxns': {'in': {1: 'in', 11: 'in'}, 'out': {1: 'in', 11: 'in'}},
-                       'in': 'A',
+            'config': {'conxns': {'in': {0: 'in', 6: 'in', 14: 'out', 17: 'out'},
+                                  'out': {0: 'in', 6: 'in', 14: 'out', 17: 'out'}},
+                       'in': 'E',
                        'menu_link': 'QQQ',
-                       'out': 'A',
-                       'test_char': 'A'}}
+                       'out': 'E',
+                       'test_char': 'E'}}
