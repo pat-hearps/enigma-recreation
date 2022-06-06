@@ -231,10 +231,26 @@ class MenuMaker:
         self.connections_add_to_menu()
         logger.log(VERBOSE, f"post connections_add_to_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
 
+    def simplify_deadends(self):
+        """Ignores deadends that are not connected loops in any way. Will preserve straight chains that
+        link together separate loops. Doesn't change MenuMaker attributes, just returns list of simpler ends.
+        Purpose is to reduce unneeded links and scramblers in menu."""
+        simpler_deadends = []
+        all_chars_in_loops = set().union(*self.found_loops.keys())
+        for end, chain in self.dead_ends.items():
+            end_connected_to_loop = set(chain) & all_chars_in_loops  # empty set if no letters in chain link to a loop
+            if len(chain) <= 2 or not end_connected_to_loop:
+                pass
+            else:
+                lopped_chain = chain.replace(end, '')
+                simpler_deadends.append(lopped_chain)
+        return simpler_deadends
+
     def add_characters_to_menu(self):
         """For each character in the menu network (obtained by combining loops and deadends),
         add each character's connections to other characters to the menu"""
-        for chain in list(self.found_loops.values()) + list(self.dead_ends.values()):
+        simpler_deadends = self.simplify_deadends()
+        for chain in list(self.found_loops.values()) + simpler_deadends:
             logger.log(SPAM, f"adding characters from {chain}")
             for char, next_char in zip(chain[:-1], chain[1:]):
                 self.add_item_to_menu(char, next_char)
