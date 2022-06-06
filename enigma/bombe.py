@@ -389,11 +389,13 @@ class Scrambler(BaseEnigma):
         are live, and if so pass it through itself to light up the corresponding scramble (i.e. encyphered)
         character on the other side of  the scrambler"""
         for sides in [['in', 'out'], ['out', 'in']]:
-            for char, io in self.status[sides[0]].items():
+            this_side, other_side = sides
+            for char, io in self.status[this_side].items():
                 if io == 0:
                     pass
                 else:
-                    self.status[sides[1]][self.full_scramble(char)] = 1
+                    cypher = self.full_scramble(char)
+                    self.status[other_side][cypher] = 1
 
     def reset_status(self):
         """As it says on box, resets the status (dictionary of A-Z and 1/0 for each) all back to 0"""
