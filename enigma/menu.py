@@ -53,7 +53,10 @@ class MenuMaker:
     def run(self):
         """MAIN ENTRYPOINT FUNCTION - find all loops & deadends, then add connections to menu"""
         self.search_menu_structure()
-        self.prep_menu()
+        if self.found_loops:
+            self.prep_menu()
+        else:
+            logger.info("No loops found, no menu can be made")
 
     def search_menu_structure(self):
         """First orchestration method, for finding all loops in a given crib"""
@@ -295,7 +298,7 @@ class MenuMaker:
     def network_graph(self, reset_pos=True, label="", simplified=True):
         """Using networkx package to display connections of menu letters"""
         edges = {k: list(v) for k, v in self.pairs.items()}
-        if simplified:
+        if simplified and self.found_loops:
             # only keep pairs with both letters in menu, which ignores redundant deadends
             letters_in_menu = set().union(*({d['in'], d['out']} for d in self.menu.values()))
             edges = {k: v for k, v in edges.items() if len(letters_in_menu.intersection(v)) == len(v)}
