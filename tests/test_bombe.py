@@ -16,7 +16,7 @@ def test_bombe_init() -> None:
     assert bombe.current_sum == 1
 
 
-@pytest.mark.parametrize("bombe_test", (BE, B2))
+@pytest.mark.parametrize("bombe_test_data", (BE, B2))
 def test_bombe_step_and_test(bombe_test_data: Bombe) -> None:
     bombe = Bombe(
         menu=bombe_test_data.menu,
