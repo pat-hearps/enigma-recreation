@@ -69,19 +69,21 @@ class Bombe:
     def sync_scramblers_to_connected_scramblers(self):
         """Goes through every scrambler (once only), and updates in and out terminals with live feeds via conx_in and
         conx_out from its connected scramblers. Should be run iteratively to exhaustion."""
-        for scr1id, scrambler in self.scramblers.items():
-            # i.e for each scrambler in the enigma, we're going to loop through it's conxns['in'] and conxns['out']
-            # dictionaries and check its connected scramblers to match any live wires
-            for ior in ['in', 'out']:
-                for scr2id, side in scrambler.conxns[ior].items():
-                    # for this scrambler, go through the conxns 'in' or 'out' dict. It has the other scrambler you need to
-                    # look at (scr2id, or the number/position label) and whether you're
-                    # looking at the 'in' or 'out' side
-                    for ch, io in self.scramblers[scr2id].status[side].items():
-                        # look through the scrambler's status for that side (in or out)
+        for this_scr_id, this_scrambler in self.scramblers.items():
+            # i.e for each scrambler in the bombe
+            for this_scr_side, this_scr_side_conxns in this_scrambler.conxns.items():
+                # for each side of this scrambler's connections
+                for other_scr_id, other_scr_side in this_scr_side_conxns.items():
+                    other_scrambler = self.scramblers[other_scr_id]
+                    # for each other_scrambler we're connected to (on which side of that other_scrambler)
+                    for ch, io in other_scrambler.status[other_scr_side].items():
+                        # look through the other_scrambler's status for that side (in or out)
                         if io == 1:   # and if it has a live wire
-                            scrambler.status[ior][ch] = 1  # set the corresponding character in the conxns dict of the
-            # logger.log(SPAM, f"pulse | scrambler {scr1id} status={scrambler.status}")
+                            # msg = f"other_scr {other_scr_id} ch {ch}=1 side={other_scr_side} --> this_scr {this_scr_id} side={this_scr_side}"
+                            # logger.log(SPAM, msg)
+                            # set the corresponding character on this_scrambler (on it's side) to live
+                            this_scrambler.status[this_scr_side][ch] = 1
+            # logger.log(SPAM, f"scr-scr-sync | scrambler {this_scr_id} status: {this_scrambler.lit_status}")
     # def sync_diagonal_board(self):
     #     """Current theory is ???"""
     #     for scr1id, scrambler in self.scramblers.items():
