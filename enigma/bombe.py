@@ -152,7 +152,7 @@ class Bombe:
         Loops through pulsing connections between scramblers and syncing back to the test register
         until the sum of live connections at the test register remains unchanged for two successive loops."""
         self.set_up_lineup_check()
-        while len(set(self.track_sums[-5:])) != 1:
+        while len(set(self.track_sums[-10:])) != 1:
             # i.e. keep going until the register status is unchanged for 5 iterations
             # the 5 is somewhat arbitrary. Testing on one menu found no more than 3
             # continuous occurrences of an incomplete status but could be different
