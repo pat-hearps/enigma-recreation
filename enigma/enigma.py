@@ -12,7 +12,7 @@ from enigma.design import (
     ROTORS,
     raw_rotors,
 )
-from enigma.utils import SPAM, VERBOSE, get_logger
+from enigma.utils import BARF, SPAM, get_logger
 
 logger = get_logger(__name__)
 
@@ -94,24 +94,24 @@ class BaseEnigma:
         due to 'double-stepping' of pawl/teeth mechanism.
         Note that notches are not affected by ring position, as the notch is on the moveable outer ring. Rotor will
         always step it's adjacent rotor if its window is displaying it's notch letter."""
-        logger.log(VERBOSE, f"enigma position before stepping={self.window_letters}")
+        logger.log(SPAM, f"enigma position before stepping={self.window_letters}")
 
-        logger.log(SPAM, f"middle rotor notch={self.middle_rotor.notch}")
+        logger.log(BARF, f"middle rotor notch={self.middle_rotor.notch}")
         if self.middle_rotor.notch == self.middle_rotor.window_letter:
-            logger.log(SPAM, "stepping left rotor")
+            logger.log(BARF, "stepping left rotor")
             self.left_rotor.step_rotor()
-            logger.log(SPAM, "stepping middle rotor with left rotor")
+            logger.log(BARF, "stepping middle rotor with left rotor")
             self.middle_rotor.step_rotor()
 
-        logger.log(SPAM, f"right rotor notch={self.right_rotor.notch}")
+        logger.log(BARF, f"right rotor notch={self.right_rotor.notch}")
         if self.right_rotor.notch == self.right_rotor.window_letter:
-            logger.log(SPAM, "stepping middle rotor")
+            logger.log(BARF, "stepping middle rotor")
             self.middle_rotor.step_rotor()
 
-        logger.log(SPAM, "stepping right rotor")
+        logger.log(BARF, "stepping right rotor")
         self.right_rotor.step_rotor()
         self.translate_window_letters()
-        logger.log(VERBOSE, f"enigma position after stepping={self.window_letters}")
+        logger.log(SPAM, f"enigma position after stepping={self.window_letters}")
 
     def cypher(self, letters: str):
         """
@@ -185,10 +185,10 @@ def once_thru_scramble(start_character: str, forward: bool, left_rotor: Rotor, m
 
 
 def encode_thru_reflector(reflector: Reflector, entry_position: int) -> int:
-    logger.log(SPAM, f"---- Rotor type {reflector.reflector_type} ----")
-    logger.log(VERBOSE, f"signal into reflector at position {entry_position}   = {ENTRY[entry_position]}")
+    logger.log(BARF, f"---- Rotor type {reflector.reflector_type} ----")
+    logger.log(SPAM, f"signal into reflector at position {entry_position}   = {ENTRY[entry_position]}")
     position_out = reflector.index_cypher_forward[entry_position]
-    logger.log(VERBOSE, f"signal out of reflector at position {position_out} = {ENTRY[position_out]}")
+    logger.log(SPAM, f"signal out of reflector at position {position_out} = {ENTRY[position_out]}")
     return position_out
 
 
@@ -198,17 +198,17 @@ def encode_thru_rotor(rotor: Rotor, entry_position: int, forward: bool = True) -
     - entry_position = 0-25 index at which signal is entering, relative to the 'A' position of
     the fixed 'entry' or 'reflector' where signal would be coming from"""
     logger.log(
-        SPAM,
+        BARF,
         f"---- Rotor type {rotor.rotor_type} / window {rotor.window_letter} / ring {rotor.ring_setting} ----")
-    logger.log(VERBOSE, f"signal into rotor at position {entry_position} =       {ENTRY[entry_position]}")
+    logger.log(SPAM, f"signal into rotor at position {entry_position} =       {ENTRY[entry_position]}")
     index_cypher = rotor.index_cypher_forward if forward else rotor.index_cypher_reverse
     # which letter on the cypher rotor the signal is entering at - offset based on rotor step and ring setting
     cypher_in = (entry_position + rotor.actual_cypher_position) % 26
-    logger.log(VERBOSE, f"signal into cypher wiring at letter =    {ENTRY[cypher_in]}")
+    logger.log(SPAM, f"signal into cypher wiring at letter =    {ENTRY[cypher_in]}")
     # cypher_out from cypher_in is the actual enigma internal wiring encoding
     cypher_out = index_cypher[cypher_in]
-    logger.log(VERBOSE, f"signal encoded out of cypher at letter = {ENTRY[cypher_out]}")
+    logger.log(SPAM, f"signal encoded out of cypher at letter = {ENTRY[cypher_out]}")
     # where the signal will exit at, offset due same reasons as cypher_in
     position_out = (26 + cypher_out - rotor.actual_cypher_position) % 26
-    logger.log(VERBOSE, f"signal out of rotor at position {position_out} =      {ENTRY[position_out]}")
+    logger.log(SPAM, f"signal out of rotor at position {position_out} =      {ENTRY[position_out]}")
     return position_out

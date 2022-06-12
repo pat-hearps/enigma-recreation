@@ -15,8 +15,10 @@ def vprint(message: str, msg_level: int, v_level: int = None):
 
 VERBOSE = 5
 SPAM = 3
+BARF = 2
 logging.addLevelName(VERBOSE, "VERBOSE")
 logging.addLevelName(SPAM, "SPAM")
+logging.addLevelName(BARF, "BARF")
 LOG_LEVEL = os.environ.get("LOG_LEVEL", default="INFO")
 
 
