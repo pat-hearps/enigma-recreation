@@ -39,6 +39,8 @@ class MenuMaker:
         self.link_index: Dict[str, dict] = {}
         self.found_loops: Dict[frozenset, str] = {}
         self.dead_ends: Dict = {}
+        self.possible_joiners: dict = {}
+        self.joining_chains: Dict[frozenset, str] = {}
         self.pfx: str = ""
         self.menu: dict = {}
         # positions_in_out = dict mapping for each position, which letter is in (crib), which is out (cypher), ZZ code
@@ -70,6 +72,10 @@ class MenuMaker:
         for char in self.best_characters:
             logger.debug(f"finding loops for char {char}")
             self.find_loops(char)
+        # go through possible joiners after finding all loops
+        logger.debug(f"adding joining chains from possibles: {self.possible_joiners}")
+        for joiner_set_key, joiner_chain in self.possible_joiners.items():
+            self.add_joining_chain_to_deadends(joiner_chain)
 
     def count_characters(self):
         """Create two attribute dictionaries:
@@ -199,7 +205,7 @@ class MenuMaker:
             elif occurrence_count == 2:
                 if sum([any(char in loop for char in chain) for loop in self.found_loops]) >= 2:
                     logger.log(SPAM, f"found section {chain} that joins at least two existing loops")
-                    self.dead_ends[chain[0]] = chain  # this chain links two loops so we want to capture it
+                    self.possible_joiners[frozenset(chain)] = chain
                 else:
                     # subselection turns EINTON --> NTON, as we know 2nd occurrence of commonest letter is at the end
                     only_loop_section = chain[chain.index(commonest_letter):]
@@ -209,6 +215,29 @@ class MenuMaker:
                 raise ValueError(f"error parsing chain = {chain}, too many repeated characters: {chain_count}")
 
         return parsed_working_dict
+
+    def add_joining_chain_to_deadends(self, chain: str):
+        """If we find a chain that appears to join two or more loops together, find just the linking section
+        of the chain and add it to deadends"""
+        links = ''
+        loops_joined = set()
+        for a, b in zip(chain[:-1], chain[1:]):
+            loops_with_a, loops_with_b = set(), set()
+            for loop in self.found_loops.keys():
+                if a in loop:
+                    loops_with_a.add(loop)
+                if b in loop:
+                    loops_with_b.add(loop)
+            logger.log(SPAM, f"joiner=|{chain}|, a_loops=|{loops_with_a}|, b_loops=|{loops_with_b}|")
+
+            if (loops_with_a != loops_with_b) and loops_with_a and loops_with_b:
+                loops_joined.update(loops_with_a, loops_with_b)
+                logger.log(SPAM, f"adding {a}")
+                links += f"{a}"  # these characters are part of joining section
+        logger.log(SPAM, f"links={links}, loops_j={loops_joined}")
+        if links:
+            links = "".join(set(links))
+            self.joining_chains[frozenset(loops_joined)] = links
 
     def add_to_found_loops(self, new_loop: str) -> None:
         """Makes sure candidate new loop is genuinely new. Selects only the portion of the chain representing the loop
