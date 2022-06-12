@@ -246,7 +246,8 @@ class MenuMaker:
         simpler_deadends = []
         all_chars_in_loops = set().union(*self.found_loops.keys())
         for end, chain in self.dead_ends.items():
-            end_connected_to_loop = set(chain) & all_chars_in_loops  # empty set if no letters in chain link to a loop
+            # will be empty set if no letters in chain link to a loop
+            end_connected_to_loop = all_chars_in_loops.intersection(set(chain))
             if len(chain) <= 2 or not end_connected_to_loop:
                 pass
             else:
