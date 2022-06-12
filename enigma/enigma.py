@@ -58,7 +58,7 @@ class Rotor:
 
 class BaseEnigma:
     def __init__(self, left_rotor_type: str, middle_rotor_type: str, right_rotor_type: str, reflector_type: str,
-                 ring_settings_3: str = "AAA", current_window_3: str = "AAA"):
+                 ring_settings_3: str = "AAA", current_window_3: str = "AAA", label: str = ""):
         """rotors must be strings referring to either ['I','II','III','IV','V']
         reflector must be string, one of either ['B','C'],
         current_window_3 = initial position of the 3 rotors as defined by the letter visible in the window for each
@@ -70,6 +70,7 @@ class BaseEnigma:
         self.left_rotor: Rotor = Rotor(rotor_type=left_rotor_type, ring_setting=ring_settings_3[0])
         self.middle_rotor: Rotor = Rotor(rotor_type=middle_rotor_type, ring_setting=ring_settings_3[1])
         self.right_rotor: Rotor = Rotor(rotor_type=right_rotor_type, ring_setting=ring_settings_3[2])
+        self.label = label
         self.set_window_letters(current_window_3=current_window_3)
 
     def set_window_letters(self, current_window_3: str):
@@ -111,7 +112,7 @@ class BaseEnigma:
         logger.log(BARF, "stepping right rotor")
         self.right_rotor.step_rotor()
         self.translate_window_letters()
-        logger.log(SPAM, f"enigma position before stepping={letters_before}, after={self.window_letters}")
+        logger.log(SPAM, f"{self.label}enigma position before stepping={letters_before}, after={self.window_letters}")
 
     def cypher(self, letters: str):
         """
