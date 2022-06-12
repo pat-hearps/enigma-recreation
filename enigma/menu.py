@@ -1,11 +1,11 @@
 from collections import Counter, defaultdict
 from copy import deepcopy
-from functools import cache
 from pprint import pformat
 from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 
 from enigma.constants import MENU as M
 from enigma.design import ENTRY
@@ -20,8 +20,10 @@ def convert_to_ZZ_code(position: int) -> str:
     """Convert a menu link position integer to a 3-letter ZZ code,
     with the 3rd letter equal to the letter prior to the given position index
     in the alphabet"""
-    char_before_this_position = ENTRY[position - 1]
-    return f"ZZ{char_before_this_position}"
+    middle_position = int(np.floor(position / 26))
+    middle_char = ENTRY[middle_position - 1]
+    char_before_this_position = ENTRY[position % 26 - 1]
+    return f"Z{middle_char}{char_before_this_position}"
 
 
 class MenuMaker:
@@ -39,11 +41,24 @@ class MenuMaker:
         self.dead_ends: Dict = {}
         self.pfx: str = ""
         self.menu: dict = {}
+        # positions_in_out = dict mapping for each position, which letter is in (crib), which is out (cypher), ZZ code
+        self.base_menu_positions = {}
+        # pairs_to_positions = dict mapping frozenset of pair of letters, to which position(s) they occur at
+        self.pairs_to_positions = defaultdict(list)
+        for pos, (in_ch, out_ch) in enumerate(zip(crib, encoded_crib)):
+            self.base_menu_positions[pos] = {M.IN: in_ch, M.OUT: out_ch, M.LINK: convert_to_ZZ_code(pos)}
+            pair_key_set = frozenset([in_ch, out_ch])
+            self.pairs_to_positions[pair_key_set].append(pos)
 
     def run(self):
         """MAIN ENTRYPOINT FUNCTION - find all loops & deadends, then add connections to menu"""
         self.search_menu_structure()
-        self.prep_menu()
+        logger.debug(f"identified {len(self.found_loops)} loops:\n{self.found_loops}")
+        logger.debug(f"identified {len(self.dead_ends)} dead ends:\n{self.dead_ends}")
+        if self.found_loops:
+            self.prep_menu()
+        else:
+            logger.info("No loops found, no menu can be made")
 
     def search_menu_structure(self):
         """First orchestration method, for finding all loops in a given crib"""
@@ -171,6 +186,7 @@ class MenuMaker:
         """
         parsed_working_dict = {}
         for iD, chain in grown_working_dict.items():
+            logger.log(SPAM, f"parsing chain {chain}")
             chain_count = Counter(chain)
             commonest_letter, occurrence_count = chain_count.most_common(1)[0]
 
@@ -195,7 +211,7 @@ class MenuMaker:
          through a cycle of characters. This loop is converted to a frozenset for comparison against existing found
          loops, and for use as the key in dictionary of found_loops"""
         new_loop_set = frozenset(new_loop)
-
+        logger.log(SPAM, f"checking potential new loop {new_loop}")
         already_found = False
         to_delete = []
         for found_loop in self.found_loops.keys():
@@ -208,7 +224,9 @@ class MenuMaker:
         for old_found_loop in to_delete:
             del self.found_loops[old_found_loop]
 
-        if not already_found:
+        if already_found:
+            logger.log(SPAM, f"not adding {new_loop}")
+        else:
             self.found_loops[new_loop_set] = new_loop
             logger.debug(f"{self.pfx} loop found = {new_loop}")
 
@@ -221,33 +239,47 @@ class MenuMaker:
         self.connections_add_to_menu()
         logger.log(VERBOSE, f"post connections_add_to_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
 
+    def simplify_deadends(self):
+        """Ignores deadends that are not connected loops in any way. Will preserve straight chains that
+        link together separate loops. Doesn't change MenuMaker attributes, just returns list of simpler ends.
+        Purpose is to reduce unneeded links and scramblers in menu."""
+        simpler_deadends = set()
+        all_chars_in_loops = set().union(*self.found_loops.keys())
+        for end, chain in self.dead_ends.items():
+            # will be empty set if no letters in chain link to a loop
+            end_connected_to_loop = all_chars_in_loops.intersection(set(chain))
+            if len(chain) <= 2 or not end_connected_to_loop:
+                pass
+            else:
+                lopped_chain = chain.replace(end, '')
+                logger.log(SPAM, f"simplifying deadend {chain} to {lopped_chain}")
+                simpler_deadends.add(lopped_chain)
+        return list(simpler_deadends)
+
     def add_characters_to_menu(self):
         """For each character in the menu network (obtained by combining loops and deadends),
         add each character's connections to other characters to the menu"""
-        for chain in list(self.found_loops.values()) + list(self.dead_ends.values()):
+        simpler_deadends = self.simplify_deadends()
+        logger.log(VERBOSE, f"adding from found loops {self.found_loops.values()} and deadends {simpler_deadends}")
+        for chain in list(self.found_loops.values()) + simpler_deadends:
             logger.log(SPAM, f"adding characters from {chain}")
             for char, next_char in zip(chain[:-1], chain[1:]):
                 self.add_item_to_menu(char, next_char)
 
-    @cache
-    def get_reverse_link_index(self, char):
-        return {_char: pos for pos, _char in self.link_index[char].items()}
-
     def add_item_to_menu(self, char: str, next_char: str):
-        link_idx_rev = self.get_reverse_link_index(char)
-        position_next_char = link_idx_rev[next_char]
-        # note that I'm just picking the first one where there are double (or more) linkages
-        # not sure if this matters for now or if its better to somehow include both linkages in the menu
-        # revisit later depending on bombe methodology
-        if position_next_char not in self.menu.keys():
-            menu_val = {M.IN: char, M.OUT: next_char, M.LINK: convert_to_ZZ_code(position_next_char)}
-            self.menu[position_next_char] = menu_val
-            logger.log(SPAM, f"added item to menu at {position_next_char} : {menu_val}")
+        positions_of_this_pair = self.pairs_to_positions[frozenset([char, next_char])]
+        for position in positions_of_this_pair:
+            if position not in self.menu.keys():
+                menu_data = self.base_menu_positions[position]
+                self.menu[position] = menu_data
+                logger.log(SPAM, f"added item to menu at {position} : {menu_data}")
 
     def configure_menu(self):
         """Adds extra item to menu as the bombe entrypoint, using a character
         that is linked to the most other characters"""
-        test_char = self.best_characters[0]
+        letters_in_menu = ''.join([''.join((data['in'], data['out'])) for data in self.menu.values()])
+        ranked_letters = Counter(letters_in_menu)
+        test_char = ranked_letters.most_common(1)[0][0]
         self.menu[M.CONFIG] = {M.TEST_CHAR: test_char, M.LINK: 'QQQ', M.IN: test_char, M.OUT: test_char}
 
     def connections_add_to_menu(self):
@@ -257,11 +289,10 @@ class MenuMaker:
         for position, itemdict in self.menu.items():
             in_char = itemdict[M.IN]
             ins = self.define_connections(in_char, position)
-            logger.log(SPAM, f"position={position} in_char ={in_char} ins ={ins}")
 
             out_char = itemdict[M.OUT]
             outs = self.define_connections(out_char, position)
-            logger.log(SPAM, f"position={position} out_char={out_char} outs={outs}")
+            logger.log(SPAM, f"position={position} out_char={out_char} ins={ins} outs={outs}")
 
             self.menu[position][M.CONXNS] = {M.IN: ins, M.OUT: outs}
 
@@ -272,24 +303,47 @@ class MenuMaker:
         connections = {pos: io for pos, node in comparison_dict.items() for io in (M.IN, M.OUT) if node[io] == char}
         return connections
 
-    def network_graph(self, reset_pos=True):
+    def network_graph(self, reset_pos=True, label="", pos_delta=0.15):
         """Using networkx package to display connections of menu letters"""
-        edges = {k: list(v) for k, v in self.pairs.items()}
-        edges = [(v[0], v[1], {'label': str(k)}) for k, v in edges.items()]
-        self.MultiGraph = nx.MultiGraph()
+        # generate nodes and edges directly from menu
+        nodes, edges = set(), []
+        for scr_id, data in self.menu.items():
+            if scr_id == 'config':
+                continue
+            this_scr_in, this_scr_out = data['in'], data['out']
+            nodes.update({this_scr_in, this_scr_out})
+            edges.append((this_scr_in, this_scr_out, {'pos': scr_id, 'menu_link': data['menu_link']}))
+
+        # create Graph (MultiDiGraph = directional with multiple parallel edges)
+        self.MultiGraph = nx.MultiDiGraph()
+        self.MultiGraph.add_nodes_from(nodes)
         self.MultiGraph.add_edges_from(edges)
 
-        fig, ax = plt.subplots(figsize=(8, 8))
+        # create labels for each specific label component
+        in_labels, out_labels, z_labels = dict(), dict(), dict()
+        for u, v, d in self.MultiGraph.edges(data=True):
+            in_labels[(u, v)] = 'in'
+            out_labels[(u, v)] = 'out'
+            z_labels[(u, v)] = f"{d['pos']} / {d['menu_link']}"
+
+        # Draw menu network graph
+        fig, ax = plt.subplots(figsize=(15, 15))
 
         if not reset_pos:
             pass
         else:
-            self.pos = nx.spring_layout(self.MultiGraph, k=0.4, scale=1)
+            self.pos = nx.spring_layout(self.MultiGraph, k=0.99, scale=1)
 
         nx.draw_networkx(self.MultiGraph, pos=self.pos)
-
-        # labels = nx.get_edge_attributes(self.MultiGraph, 'label')
-        # labels = {(k[0], k[1]): v for k, v in
-        #           labels.items()}  # doesnt' seem to be able to deal with labels for multiples edges
-        # edge_labels = nx.draw_networkx_edge_labels(self.MultiGraph, pos=self.pos, edge_labels=labels)
-        plt.show(fig)
+        nx.draw_networkx_edge_labels(
+            self.MultiGraph, pos=self.pos, edge_labels=in_labels, label_pos=1 - pos_delta, rotate=False, ax=ax
+        )
+        nx.draw_networkx_edge_labels(
+            self.MultiGraph, pos=self.pos, edge_labels=out_labels, label_pos=pos_delta, rotate=False, ax=ax
+        )
+        nx.draw_networkx_edge_labels(
+            self.MultiGraph, pos=self.pos, edge_labels=z_labels, label_pos=0.5, rotate=False, ax=ax
+        )
+        filepath = f"./figures/menu{label}.png"
+        plt.savefig(filepath)
+        logger.info(f"menu network diagram saved to {filepath}")

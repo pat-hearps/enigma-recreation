@@ -54,9 +54,9 @@ class Rotor:
         self.update_cypher_position()
 
 
-class Enigma:
+class BaseEnigma:
     def __init__(self, left_rotor_type: str, middle_rotor_type: str, right_rotor_type: str, reflector_type: str,
-                 current_window_3: str = "AAA", ring_settings_3: str = "AAA"):
+                 ring_settings_3: str = "AAA", current_window_3: str = "AAA"):
         """rotors must be strings referring to either ['I','II','III','IV','V']
         reflector must be string, one of either ['B','C'],
         current_window_3 = initial position of the 3 rotors as defined by the letter visible in the window for each
@@ -68,11 +68,7 @@ class Enigma:
         self.left_rotor: Rotor = Rotor(rotor_type=left_rotor_type, ring_setting=ring_settings_3[0])
         self.middle_rotor: Rotor = Rotor(rotor_type=middle_rotor_type, ring_setting=ring_settings_3[1])
         self.right_rotor: Rotor = Rotor(rotor_type=right_rotor_type, ring_setting=ring_settings_3[2])
-
         self.set_window_letters(current_window_3=current_window_3)
-        self.in_status: Dict = {char: 0 for char in ENTRY}
-        self.out_status: Dict = {char: 0 for char in ENTRY}
-        self.record: Dict = {}
 
     def set_window_letters(self, current_window_3: str):
         """Given a three-letter menu link (e.g. 'ZAB'), set the current positions of the enigma to correspond to the menu link"""
@@ -82,10 +78,9 @@ class Enigma:
         self.left_rotor.set_window_letter(current_window_3[0])
         self.middle_rotor.set_window_letter(current_window_3[1])
         self.right_rotor.set_window_letter(current_window_3[2])
+        self.translate_window_letters()
 
-        self.window_letters: str = current_window_3
-
-    def update_window_letters(self):
+    def translate_window_letters(self):
         """Update the enigma's class attribute 'window_letters' to reflect the positions of the rotors"""
         self.window_letters = "".join([r.window_letter for r in (self.left_rotor, self.middle_rotor, self.right_rotor)])
 
@@ -113,7 +108,7 @@ class Enigma:
 
         vprint("stepping right rotor", 2)
         self.right_rotor.step_rotor()
-        self.update_window_letters()
+        self.translate_window_letters()
         vprint(f"enigma position after stepping={self.window_letters}", 1)
 
     def cypher(self, letters: str):
@@ -129,7 +124,23 @@ class Enigma:
         return cypher
 
 
-def full_scramble(enigma: Enigma, letter_in: str) -> str:
+class Enigma(BaseEnigma):
+    def __init__(self, left_rotor_type: str, middle_rotor_type: str, right_rotor_type: str, reflector_type: str,
+                 ring_settings_3: str = "AAA", current_window_3: str = "AAA"):
+        """"""
+        super().__init__(
+            left_rotor_type=left_rotor_type,
+            middle_rotor_type=middle_rotor_type,
+            right_rotor_type=right_rotor_type,
+            reflector_type=reflector_type,
+            ring_settings_3=ring_settings_3,
+            current_window_3=current_window_3)
+        self.in_status: Dict = {char: 0 for char in ENTRY}
+        self.out_status: Dict = {char: 0 for char in ENTRY}
+        self.record: Dict = {}
+
+
+def full_scramble(enigma: BaseEnigma, letter_in: str) -> str:
     """Encode a character through the full Enigma, from keyboard to cypher board.
     1. Forwards through the 3 Rotors
     2. Through the Reflector

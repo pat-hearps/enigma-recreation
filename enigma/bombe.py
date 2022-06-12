@@ -1,22 +1,21 @@
-from string import ascii_uppercase
-
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import pandas as pd
 
-from enigma.design import (
-    ENTRY,
-    FORWARD_ROTORS,
-    REFLECTORS_CYPHER,
-    REVERSE_ROTORS,
-    grey,
-    invsoutmap,
-    iomap,
-    notches,
-    orange,
-    red,
-)
+from enigma.design import ENTRY, grey, invsoutmap, iomap, orange, red
+from enigma.enigma import BaseEnigma, full_scramble
+from enigma.utils import SPAM, get_logger
+
+logger = get_logger(__name__)
+
+
+def get_lit_chars(indict: dict) -> str:
+    return ''.join([ch for ch, io in indict.items() if io == 1])
+
+
+def get_lit_status(scrambler: BaseEnigma) -> str:
+    return ' | '.join([f"{side}={get_lit_chars(status)}" for side, status in scrambler.status.items()])
 
 
 class Bombe:
@@ -30,8 +29,8 @@ class Bombe:
         self.reflector = reflector
         self.scramblers = {}
         self.register = {'status': {char: 0 for char in ENTRY}}
-        self.current_sum = sum(self.register['status'].values())
         self.run_record = {}
+        self.drops = {}
 
         self.menu = menu
         """Scrambler setup, creating a scrambler corresponding to each menu item"""
@@ -51,72 +50,77 @@ class Bombe:
         self.lowest_scrambler_order = min([key for key in self.scramblers.keys()])
         self.identity_scrambler = self.scramblers[self.lowest_scrambler_order]
 
-        """Diagonal Board setup, could possible integrate into Scrambler setup loop above"""
-        self.diagonal_board_wiring = {}
-        for scr_id, descriptor_dict in self.menu.items():
-            if scr_id == 'config':
-                pass
-            else:
-                for inorout in ['in', 'out']:
-                    thisletter = descriptor_dict[inorout]
-                    if thisletter not in self.diagonal_board_wiring.keys():
-                        self.diagonal_board_wiring[thisletter] = {scr_id: inorout}
-                    else:
-                        self.diagonal_board_wiring[thisletter][scr_id] = inorout
-        # identity scrambler is just the first one in the sequence of letters used from the crib.
-        # will probably be 0/ZZZ unless that particular letter pair from the crib/cypher has not been
-        # used in the menu
+        # """Diagonal Board setup, could possible integrate into Scrambler setup loop above"""
+        # self.diagonal_board_wiring = {}
+        # for scr_id, descriptor_dict in self.menu.items():
+        #     if scr_id == 'config':
+        #         pass
+        #     else:
+        #         for inorout in ['in', 'out']:
+        #             thisletter = descriptor_dict[inorout]
+        #             if thisletter not in self.diagonal_board_wiring.keys():
+        #                 self.diagonal_board_wiring[thisletter] = {scr_id: inorout}
+        #             else:
+        #                 self.diagonal_board_wiring[thisletter][scr_id] = inorout
+        # # identity scrambler is just the first one in the sequence of letters used from the crib.
+        # # will probably be 0/ZZZ unless that particular letter pair from the crib/cypher has not been
+        # # used in the menu
 
-    def pulse_connections(self):
+    def sync_scramblers_to_connected_scramblers(self):
         """Goes through every scrambler (once only), and updates in and out terminals with live feeds via conx_in and
         conx_out from its connected scramblers. Should be run iteratively to exhaustion."""
-        for scr1id, scrambler in self.scramblers.items():
-            # i.e for each scrambler in the enigma, we're going to loop through it's conxns['in'] and conxns['out']
-            # dictionaries and check its connected scramblers to match any live wires
-            for ior in ['in', 'out']:
-                for scr2id, side in scrambler.conxns[ior].items():
-                    # for this scrambler, go through the conxns 'in' or 'out' dict. It has the other scrambler you need to
-                    # look at (scr2id, or the number/position label) and whether you're
-                    # looking at the 'in' or 'out' side
-                    for ch, io in self.scramblers[scr2id].status[side].items():
-                        # look through the scrambler's status for that side (in or out)
+        for this_scr_id, this_scrambler in self.scramblers.items():
+            # i.e for each scrambler in the bombe
+            for this_scr_side, this_scr_side_conxns in this_scrambler.conxns.items():
+                # for each side of this scrambler's connections
+                for other_scr_id, other_scr_side in this_scr_side_conxns.items():
+                    other_scrambler = self.scramblers[other_scr_id]
+                    # for each other_scrambler we're connected to (on which side of that other_scrambler)
+                    for ch, io in other_scrambler.status[other_scr_side].items():
+                        # look through the other_scrambler's status for that side (in or out)
                         if io == 1:   # and if it has a live wire
-                            scrambler.status[ior][ch] = 1  # set the corresponding character in the conxns dict of the
+                            # msg = f"other_scr {other_scr_id} ch {ch}=1 side={other_scr_side} --> this_scr {this_scr_id} side={this_scr_side}"
+                            # logger.log(SPAM, msg)
+                            # set the corresponding character on this_scrambler (on it's side) to live
+                            this_scrambler.status[this_scr_side][ch] = 1
+            # logger.log(SPAM, f"scr-scr-sync | scrambler {this_scr_id} status: {this_scrambler.lit_status}")
+    # def sync_diagonal_board(self):
+    #     """Current theory is ???"""
+    #     for scr1id, scrambler in self.scramblers.items():
+    #         for inorout in ['in', 'out']:
+    #             # ie the single letter 'A', 'M' etc that is the menu connection
+    #             connection_character = self.menu[scr1id][inorout]
+    #             for character in self.diagonal_board_wiring.keys():
+    #                 if scrambler.status[inorout][character] == 1:
+    #                     for scr2id, side in self.diagonal_board_wiring[character].items():
+    #                         self.scramblers[scr2id].status[side][connection_character] = 1
 
-    def sync_diagonal_board(self):
-        """Current theory is ???"""
-        for scr1id, scrambler in self.scramblers.items():
-            for inorout in ['in', 'out']:
-                # ie the single letter 'A', 'M' etc that is the menu connection
-                connection_character = self.menu[scr1id][inorout]
-                for character in self.diagonal_board_wiring.keys():
-                    if scrambler.status[inorout][character] == 1:
-                        for scr2id, side in self.diagonal_board_wiring[character].items():
-                            self.scramblers[scr2id].status[side][connection_character] = 1
-
-    def sync_test_register(self):
+    def sync_test_register_with_connected_scramblers(self):
         """similar to pulse_connections in that it updates terminals of scramblers, but is solely about the
         interconnections between the test register and those scramblers which are connected to it"""
-        for scr2id, side in self.register['conxns'].items():  # side = 'in' or 'out'
+        for scr2id, side_of_scrambler in self.register['conxns'].items():  # side = 'in' or 'out'
             # for each of the scrambler terminals connected to the test register
-            for ch, io in self.scramblers[scr2id].status[side].items():
+            other_scrambler = self.scramblers[scr2id]
+            for ch, io in other_scrambler.status[side_of_scrambler].items():
                 # first sync any live wires from the scrambler to the test register
                 if io == 1:
                     self.register['status'][ch] = 1
             for ch, io in self.register['status'].items():
                 # but then also sync any live wires from the test register to the scrambler
                 if io == 1:
-                    self.scramblers[scr2id].status[side][ch] = 1
+                    other_scrambler.status[side_of_scrambler][ch] = 1
 
-    def light_character(self, in_character):
+    def light_character(self):
         """just need a way to put in the initial character input into all of the scramblers"""
         self.register['status'][self.test_char] = 1
 
-    def update_all(self):
+    def cypher_signal_thru_all_scramblers(self):
         """For every scrambler, runs update() which passes live terminals through the scrambler - from in to out
-        and vice versa, for whatever the current position is"""
-        for scrambler in self.scramblers.values():
+        and vice versa, for whatever the current position is, scrambling the letters to their corresponding cyphers"""
+        for _, scrambler in self.scramblers.items():
             scrambler.update()
+            # lit_status = get_lit_status(scrambler)
+            # logger.log(SPAM, f"scr {scr1id} after update | status={lit_status}")
 
     def spin_scramblers(self):
         """Runs step_enigma for all scramblers, spinning the right rotor once and perhaps the middle and left if
@@ -130,40 +134,71 @@ class Bombe:
             scrambler.reset_status()
         self.register['status'] = {char: 0 for char in ENTRY}
 
+    @property
+    def current_sum(self) -> int:
+        return sum(self.register['status'].values())
+
+    @property
+    def register_lit_chars(self):
+        return get_lit_chars(self.register['status'])
+
+    def log_lit_status(self, msg: str = None, only_reg_connected: bool = False):
+        for scr1id, scrambler in self.scramblers.items():
+            if (not only_reg_connected) or (scr1id in self.register['conxns'].keys()):
+                logger.log(SPAM, f"{msg} | scrambler {scr1id} status {scrambler.lit_status}")
+
     def check_this_lineup(self):
         """For running to exhaustion on a particular bombe scrambler lineup.
         Loops through pulsing connections between scramblers and syncing back to the test register
         until the sum of live connections at the test register remains unchanged for two successive loops."""
-        self.reset_scramblers_and_register()   # first make sure all scrambler inputs/outputs (statuses) are reset to zero
-        self.light_character(self.test_char)   # light up the one test character
-        self.sync_test_register()              # do the first syncing of test register, sending the signal out to the
-        # scramblers which are connected to the test register
+        self.set_up_lineup_check()
+        while len(set(self.track_sums[-10:])) != 1:
+            # i.e. keep going until the register status is unchanged for 5 iterations
+            # the 5 is somewhat arbitrary. Testing on one menu found no more than 3
+            # continuous occurrences of an incomplete status but could be different
+            # for other menus.
+            self.one_step_sync()
 
-    # initialise the three sum variables (current_sum, previous_sum and olderer_sum) to keep track of whether
-    # the sum of live connections have remained unchanged
-        self.current_sum = sum(self.register['status'].values())
+    def set_up_lineup_check(self):
+        """
+        - Reset all scramblers and register (simulating the moment when no electrical current is passing through the machine
+        as the scrambler electrical brushes move from one position to the next)
+        - Send the first signal out from the register's test character.
+        - Reset tracking variables"""
+        self.reset_scramblers_and_register()   # first make sure all scrambler inputs/outputs (statuses) are reset to zero
+        self.light_character()   # light up the one test character
+        # do the first syncing of test register, send signal to the scramblers which are connected to the test register
+        self.sync_test_register_with_connected_scramblers()
+
         self.track_sums = [0, 1]
-        self.lineup_iters = 0   # this is just to keep track of how many iterations it took to reach a steady status
-        while len(set(self.track_sums[-5:])
-                  ) != 1:  # i.e. keep going until the register status is unchanged for 5 iterations
-            self.update_all()                      # the 5 is somewhat arbitrary. Testing on one menu found no more than 3 continuous
-            # occurrences of an incomplete status but could be different for other menus.
-            self.pulse_connections()
-#             self.sync_diagonal_board()
-            self.sync_test_register()
-            self.current_sum = sum(self.register['status'].values())
-            self.track_sums.append(self.current_sum)
-            self.lineup_iters += 1
+        self.check_iters = 0   # this is just to keep track of how many iterations it took to reach a steady status
+        logger.log(SPAM, f"iter={self.check_iters}, current_sum={self.current_sum}, register={self.register_lit_chars}")
+
+    def one_step_sync(self):
+        """One step of the loop to exhaustion that sends an 'electrical pulse' (status=1) from each scrambler to other
+        scramblers through the test register:
+        - all scramblers with lit characters update the corresponding test register connection to also be lit
+        - the test register then resyncs out all its lit characters to also be lit in each scrambler it is connected to
+        """
+        self.cypher_signal_thru_all_scramblers()
+        self.log_lit_status(msg='one_step_sync')
+        self.sync_scramblers_to_connected_scramblers()
+#       self.sync_diagonal_board()
+        self.sync_test_register_with_connected_scramblers()
+        self.track_sums.append(self.current_sum)
+        self.check_iters += 1
+        logger.log(SPAM, f"iter={self.check_iters}, current_sum={self.current_sum}, register={self.register_lit_chars}")
 
     def step_and_test(self):
         """the main function to use for looping through all possible combinations of rotor positions,
         testing the connections at each step using check_this_lineup()"""
-        self.spin_scramblers()
+        initial_window_letters = self.identity_scrambler.window_letters
+        self.spin_scramblers()  # represents how Enigma machine first turns rotors, then encyphers the character after
         self.check_this_lineup()
-        self.run_record[self.identity_scrambler.current_position] = (
-            self.current_sum, self.lineup_iters, self.track_sums)
+        self.run_record[initial_window_letters] = (self.current_sum, self.check_iters, self.track_sums)
         if self.current_sum != 26:
-            print('drop:  ', self.identity_scrambler.current_position, 'livestatus:', self.current_sum)
+            print('drop:  ', initial_window_letters, 'livestatus:', self.current_sum)
+            self.drops[initial_window_letters] = self.current_sum
 
     def pdf_scrambler_statuses(self):
         """pdf = pandas dataframe
@@ -316,144 +351,53 @@ class Bombe:
             nx.draw_networkx_nodes(self.TG, pos=self.manual_pos, node_size=node_size, node_color=self.node_colours)
 
 
-class Scrambler:
+class Scrambler(BaseEnigma):
     """A Scrambler is a slightly adapted ENIGMA cypher, such that it has both an in and out end which are separate"""
 
-    def __init__(self, left_rotor, middle_rotor, right_rotor, reflector, menu_link='ZZZ', conx_in={}, conx_out={}):
+    def __init__(
+            self,
+            left_rotor_type: str,
+            middle_rotor_type: str,
+            right_rotor_type: str,
+            reflector_type: str,
+            menu_link='ZZZ',
+            conx_in={},
+            conx_out={}):
         """rotors must be strings referring to either ['I','II','III','IV','V']
         reflector must be string, one of either ['B','C']"""
-
-        self.right_rotor = right_rotor
-        self.middle_rotor = middle_rotor
-        self.left_rotor = left_rotor
-        self.reflector = REFLECTORS_CYPHER[reflector]
+        super().__init__(
+            left_rotor_type=left_rotor_type,
+            middle_rotor_type=middle_rotor_type,
+            right_rotor_type=right_rotor_type,
+            reflector_type=reflector_type,
+            current_window_3=menu_link,
+            ring_settings_3="AAA")
         self.menu_link = menu_link
-        # point if right rotor reaches will trigger middle rotor to step
-        self.middle_notch = ENTRY.index(notches[self.middle_rotor])
-        # point if middle rotor reaches will trigger left rotor to step
-        self.left_notch = ENTRY.index(notches[self.left_rotor])
-        self.current_position = menu_link
-        self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor = (
-            ascii_uppercase.index(m) for m in menu_link.upper())
-        self.status = {}
-        self.status['in'] = {char: 0 for char in ENTRY}
-        self.status['out'] = {char: 0 for char in ENTRY}
+        self.status = {
+            'in': {char: 0 for char in ENTRY},
+            'out': {char: 0 for char in ENTRY}
+        }
         self.conxns = {'in': conx_in, 'out': conx_out}
 
-    def once_thru_scramble(self, start_character, direction, first_rotor, pos1, second_rotor, pos2,
-                           third_rotor, pos3):
-        """ start_character must be single ASCII character A-Z
-        direction is either 'forward' or 'back' """
-        if direction == 'forward':
-            usedict = {k: v for k, v in FORWARD_ROTORS.items()}
-        elif direction == 'back':
-            usedict = {k: v for k, v in REVERSE_ROTORS.items()}
-        else:
-            print("direction can only be 'forward' or 'back'")
-            return 'wtf'
+    def full_scramble(self, in_ch: str):
+        return full_scramble(enigma=self, letter_in=in_ch)
 
-        start_character = start_character.upper()
-        entry_pos = ENTRY.index(start_character)
-        fst_pos_modifier = (26 + pos1 - 0) % 26
-        fst_in = (entry_pos + fst_pos_modifier) % 26
-        fst_out = usedict[first_rotor][fst_in]
-        # ch1o = ENTRY[fst_out]
-
-        scd_pos_modifier = (26 + pos2 - pos1) % 26
-        scd_in = (fst_out + scd_pos_modifier) % 26
-        # ch2i = ENTRY[scd_in]
-        scd_out = usedict[second_rotor][scd_in]
-        # ch2o = ENTRY[scd_out]
-
-        thd_pos_modifier = (26 + pos3 - pos2) % 26
-        thd_in = (scd_out + thd_pos_modifier) % 26
-        # ch3i = ENTRY[thd_in]
-        thd_out = usedict[third_rotor][thd_in]
-        ch3o = ENTRY[thd_out]
-        return ch3o
-
-    def full_scramble(self, in_ch):
-        in_ch = in_ch.upper()
-        left_rotor = self.left_rotor
-        middle_rotor = self.middle_rotor
-        right_rotor = self.right_rotor
-        rflector = self.reflector
-        # first run right to left through scrambler
-        forward_run = self.once_thru_scramble(
-            in_ch,
-            direction='forward',
-            first_rotor=right_rotor,
-            pos1=self.pos_rgt_rotor,
-            second_rotor=middle_rotor,
-            pos2=self.pos_mid_rotor,
-            third_rotor=left_rotor,
-            pos3=self.pos_left_rotor)
-        # reflector back around for return
-        # the '0' is there to matching formatting of other position modifiers -
-        # reflector is not moved so it will always be 0
-        rfi_pos_mod = (26 + 0 - self.pos_left_rotor) % 26
-        rf_in = (ENTRY.index(forward_run) + rfi_pos_mod) % 26
-        chri = ENTRY[rf_in]
-        mirrored = rflector[chri]
-
-        # second run back left to right thru scrambler
-        back_run = self.once_thru_scramble(
-            mirrored,
-            direction='back',
-            first_rotor=left_rotor,
-            pos1=self.pos_left_rotor,
-            second_rotor=middle_rotor,
-            pos2=self.pos_mid_rotor,
-            third_rotor=right_rotor,
-            pos3=self.pos_rgt_rotor)
-        bk_out = ENTRY.index(back_run)
-        # as above, '0' just reflects that the entry interface doesn't move
-        bko_pos_mod = (26 + 0 - self.pos_rgt_rotor) % 26
-        bk_final = (bk_out + bko_pos_mod) % 26
-        final = ENTRY[bk_final]
-        return final
-
-    def rotor_step(self, rotor_position):
-        """To be used on any single rotor. Steps forward one position, resetting back to 0 after it reaches 25"""
-        if rotor_position == 25:
-            rotor_position = 0
-        else:
-            rotor_position += 1
-        return rotor_position
-
-    def translate_current_position(self):
-        """Reads the numerical position of each of the 3 rotors, and translates into ZZA-style alphabet position
-        That is, for each of the three rotors, it's numerical position from 0-25 is mapped to the letter of the
-        alphabet this corresponds to. Note that this is purely for displaying the setting to the user, it can't
-        do anything to alter the actual rotor position, which is stored as the numerical variable"""
-        self.current_position = ''
-        for pos in self.pos_left_rotor, self.pos_mid_rotor, self.pos_rgt_rotor:
-            self.current_position += ENTRY[pos]
-
-    def step_enigma(self):
-        """Just acts on itself, steps all three rotors, stepping either 1,2 or 3 rotors based on the
-        notch position"""
-        if self.pos_rgt_rotor == self.middle_notch and self.pos_mid_rotor == self.left_notch:
-            self.pos_rgt_rotor = self.rotor_step(self.pos_rgt_rotor)
-            self.pos_mid_rotor = self.rotor_step(self.pos_mid_rotor)
-            self.pos_left_rotor = self.rotor_step(self.pos_left_rotor)
-        elif self.pos_rgt_rotor == self.middle_notch:
-            self.pos_rgt_rotor = self.rotor_step(self.pos_rgt_rotor)
-            self.pos_mid_rotor = self.rotor_step(self.pos_mid_rotor)
-        else:
-            self.pos_rgt_rotor = self.rotor_step(self.pos_rgt_rotor)
-        self.translate_current_position()
+    @property
+    def lit_status(self):
+        return get_lit_status(self)
 
     def update(self):
         """idea here is that the scrambler will check each of the 26 connections to see if they
         are live, and if so pass it through itself to light up the corresponding scramble (i.e. encyphered)
         character on the other side of  the scrambler"""
         for sides in [['in', 'out'], ['out', 'in']]:
-            for char, io in self.status[sides[0]].items():
+            this_side, other_side = sides
+            for char, io in self.status[this_side].items():
                 if io == 0:
                     pass
                 else:
-                    self.status[sides[1]][self.full_scramble(char)] = 1
+                    cypher = self.full_scramble(char)
+                    self.status[other_side][cypher] = 1
 
     def reset_status(self):
         """As it says on box, resets the status (dictionary of A-Z and 1/0 for each) all back to 0"""

@@ -111,3 +111,107 @@ WELCHMAN_1L = {
                M.LINK: 'QQQ',
                M.OUT: 'E',
                M.TEST_CHAR: 'E'}}
+
+
+class BOMBE_TEST_EASY1:
+    left_rotor = 'I'
+    middle_rotor = 'II'
+    right_rotor = 'III'
+    reflector = 'B'
+    current_window_3 = 'YRP'
+    ring_settings_3 = 'AAA'
+    crib = "CBAA"
+    cypher = "BACB"
+    menu = {
+        0: {'conxns': {'in': {2: 'out'}, 'out': {1: 'in', 3: 'out'}},
+            'in': 'C',
+            'menu_link': 'ZZZ',
+            'out': 'B'},
+        1: {'conxns': {'in': {0: 'out', 3: 'out'}, 'out': {2: 'in', 3: 'in'}},
+            'in': 'B',
+            'menu_link': 'ZZA',
+            'out': 'A'},
+        2: {'conxns': {'in': {1: 'out', 3: 'in'}, 'out': {0: 'in'}},
+            'in': 'A',
+            'menu_link': 'ZZB',
+            'out': 'C'},
+        3: {'conxns': {'in': {1: 'out', 2: 'in'}, 'out': {0: 'out', 1: 'in'}},
+            'in': 'A',
+            'menu_link': 'ZZC',
+            'out': 'B'},
+        'config': {'conxns': {'in': {1: 'out', 2: 'in', 3: 'in'},
+                              'out': {1: 'out', 2: 'in', 3: 'in'}},
+                   'in': 'A',
+                   'menu_link': 'QQQ',
+                   'out': 'A',
+                   'test_char': 'A'}
+    }
+
+
+class BOMBE_TEST2:
+    left_rotor = 'I'
+    middle_rotor = 'II'
+    right_rotor = 'III'
+    reflector = 'B'
+    current_window_3 = 'BFT'
+    ring_settings_3 = 'AAA'
+    crib = "EARTHVENUSMARSSATURN"
+    cypher = "KBASITMEADEDPQQJMHJT"
+    menu = {2: {'conxns': {'in': {18: 'in'}, 'out': {8: 'out', 11: 'in', 15: 'in'}},
+                'in': 'R',
+                'menu_link': 'ZZB',
+                'out': 'A'},
+            3: {'conxns': {'in': {16: 'in', 19: 'out'}, 'out': {9: 'in'}},
+                'in': 'T',
+                'menu_link': 'ZZC',
+                'out': 'S'},
+            6: {'conxns': {'in': {7: 'out', 10: 'out'}, 'out': {10: 'in', 16: 'out'}},
+            'in': 'E',
+                'menu_link': 'ZZF',
+                'out': 'M'},
+            7: {'conxns': {'in': {19: 'in'}, 'out': {6: 'in', 10: 'out'}},
+            'in': 'N',
+                'menu_link': 'ZZG',
+                'out': 'E'},
+            8: {'conxns': {'in': {17: 'in'}, 'out': {2: 'out', 11: 'in', 15: 'in'}},
+            'in': 'U',
+                'menu_link': 'ZZH',
+                'out': 'A'},
+            9: {'conxns': {'in': {3: 'out'}, 'out': {11: 'out'}},
+            'in': 'S',
+                'menu_link': 'ZZI',
+                'out': 'D'},
+            10: {'conxns': {'in': {6: 'out', 16: 'out'}, 'out': {6: 'in', 7: 'out'}},
+                 'in': 'M',
+                 'menu_link': 'ZZJ',
+                 'out': 'E'},
+            11: {'conxns': {'in': {2: 'out', 8: 'out', 15: 'in'}, 'out': {9: 'out'}},
+                 'in': 'A',
+                 'menu_link': 'ZZK',
+                 'out': 'D'},
+            15: {'conxns': {'in': {2: 'out', 8: 'out', 11: 'in'}, 'out': {18: 'out'}},
+                 'in': 'A',
+                 'menu_link': 'ZZO',
+                 'out': 'J'},
+            16: {'conxns': {'in': {3: 'in', 19: 'out'}, 'out': {6: 'out', 10: 'in'}},
+                 'in': 'T',
+                 'menu_link': 'ZZP',
+                 'out': 'M'},
+            17: {'conxns': {'in': {8: 'in'}, 'out': {}},
+                 'in': 'U',
+                 'menu_link': 'ZZQ',
+                 'out': 'H'},
+            18: {'conxns': {'in': {2: 'in'}, 'out': {15: 'out'}},
+                 'in': 'R',
+                 'menu_link': 'ZZR',
+                 'out': 'J'},
+            19: {'conxns': {'in': {7: 'in'}, 'out': {3: 'in', 16: 'in'}},
+                 'in': 'N',
+                 'menu_link': 'ZZS',
+                 'out': 'T'},
+            'config': {'conxns': {'in': {2: 'out', 8: 'out', 11: 'in', 15: 'in'},
+                                  'out': {2: 'out', 8: 'out', 11: 'in', 15: 'in'}},
+                       'in': 'A',
+                       'menu_link': 'QQQ',
+                       'out': 'A',
+                       'test_char': 'A'}}
