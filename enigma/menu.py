@@ -252,6 +252,7 @@ class MenuMaker:
                 pass
             else:
                 lopped_chain = chain.replace(end, '')
+                logger.log(SPAM, f"simplifying deadend {chain} to {lopped_chain}")
                 simpler_deadends.add(lopped_chain)
         return list(simpler_deadends)
 
@@ -259,6 +260,7 @@ class MenuMaker:
         """For each character in the menu network (obtained by combining loops and deadends),
         add each character's connections to other characters to the menu"""
         simpler_deadends = self.simplify_deadends()
+        logger.log(VERBOSE, f"adding from found loops {self.found_loops.values()} and deadends {simpler_deadends}")
         for chain in list(self.found_loops.values()) + simpler_deadends:
             logger.log(SPAM, f"adding characters from {chain}")
             for char, next_char in zip(chain[:-1], chain[1:]):
