@@ -295,29 +295,47 @@ class MenuMaker:
         connections = {pos: io for pos, node in comparison_dict.items() for io in (M.IN, M.OUT) if node[io] == char}
         return connections
 
-    def network_graph(self, reset_pos=True, label="", simplified=True):
+    def network_graph(self, reset_pos=True, label="", pos_delta=0.15):
         """Using networkx package to display connections of menu letters"""
-        edges = {k: list(v) for k, v in self.pairs.items()}
-        if simplified and self.found_loops:
-            # only keep pairs with both letters in menu, which ignores redundant deadends
-            letters_in_menu = set().union(*({d['in'], d['out']} for d in self.menu.values()))
-            edges = {k: v for k, v in edges.items() if len(letters_in_menu.intersection(v)) == len(v)}
-        edges = [(v[0], v[1], {'label': str(k)}) for k, v in edges.items()]
-        self.MultiGraph = nx.MultiGraph()
+        # generate nodes and edges directly from menu
+        nodes, edges = set(), []
+        for scr_id, data in self.menu.items():
+            if scr_id == 'config':
+                continue
+            this_scr_in, this_scr_out = data['in'], data['out']
+            nodes.update({this_scr_in, this_scr_out})
+            edges.append((this_scr_in, this_scr_out, {'pos': scr_id, 'menu_link': data['menu_link']}))
+
+        # create Graph (MultiDiGraph = directional with multiple parallel edges)
+        self.MultiGraph = nx.MultiDiGraph()
+        self.MultiGraph.add_nodes_from(nodes)
         self.MultiGraph.add_edges_from(edges)
 
-        fig, ax = plt.subplots(figsize=(8, 8))
+        # create labels for each specific label component
+        in_labels, out_labels, z_labels = dict(), dict(), dict()
+        for u, v, d in self.MultiGraph.edges(data=True):
+            in_labels[(u, v)] = 'in'
+            out_labels[(u, v)] = 'out'
+            z_labels[(u, v)] = f"{d['pos']} / {d['menu_link']}"
+
+        # Draw menu network graph
+        fig, ax = plt.subplots(figsize=(15, 15))
 
         if not reset_pos:
             pass
         else:
-            self.pos = nx.spring_layout(self.MultiGraph, k=0.4, scale=1)
+            self.pos = nx.spring_layout(self.MultiGraph, k=0.99, scale=1)
 
         nx.draw_networkx(self.MultiGraph, pos=self.pos)
-
-        # labels = nx.get_edge_attributes(self.MultiGraph, 'label')
-        # labels = {(k[0], k[1]): v for k, v in
-        #           labels.items()}  # doesnt' seem to be able to deal with labels for multiples edges
-        # edge_labels = nx.draw_networkx_edge_labels(self.MultiGraph, pos=self.pos, edge_labels=labels)
-        # plt.show(fig)
-        plt.savefig(f"./figures/menu{label}.png")
+        nx.draw_networkx_edge_labels(
+            self.MultiGraph, pos=self.pos, edge_labels=in_labels, label_pos=1 - pos_delta, rotate=False, ax=ax
+        )
+        nx.draw_networkx_edge_labels(
+            self.MultiGraph, pos=self.pos, edge_labels=out_labels, label_pos=pos_delta, rotate=False, ax=ax
+        )
+        nx.draw_networkx_edge_labels(
+            self.MultiGraph, pos=self.pos, edge_labels=z_labels, label_pos=0.5, rotate=False, ax=ax
+        )
+        filepath = f"./figures/menu{label}.png"
+        plt.savefig(filepath)
+        logger.info(f"menu network diagram saved to {filepath}")
