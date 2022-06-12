@@ -197,10 +197,14 @@ class MenuMaker:
                 parsed_working_dict[iD] = chain
 
             elif occurrence_count == 2:
-                # e.g. turns EINTON --> NTON, with knowledge that 2nd occurrence of commonest letter will be at the end
-                only_loop_section = chain[chain.index(commonest_letter):]
-                if len(only_loop_section) > 3:  # ie we're legit back to the start after a loop
-                    self.add_to_found_loops(only_loop_section)
+                if sum([any(char in loop for char in chain) for loop in self.found_loops]) >= 2:
+                    logger.log(SPAM, f"found section {chain} that joins at least two existing loops")
+                    self.dead_ends[chain[0]] = chain  # this chain links two loops so we want to capture it
+                else:
+                    # subselection turns EINTON --> NTON, as we know 2nd occurrence of commonest letter is at the end
+                    only_loop_section = chain[chain.index(commonest_letter):]
+                    if len(only_loop_section) > 3:  # ie we're legit back to the start after a loop
+                        self.add_to_found_loops(only_loop_section)
             else:
                 raise ValueError(f"error parsing chain = {chain}, too many repeated characters: {chain_count}")
 
