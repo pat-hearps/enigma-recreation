@@ -53,6 +53,8 @@ class MenuMaker:
     def run(self):
         """MAIN ENTRYPOINT FUNCTION - find all loops & deadends, then add connections to menu"""
         self.search_menu_structure()
+        logger.debug(f"identified {len(self.found_loops)} loops:\n{self.found_loops}")
+        logger.debug(f"identified {len(self.dead_ends)} dead ends:\n{self.dead_ends}")
         if self.found_loops:
             self.prep_menu()
         else:
@@ -184,6 +186,7 @@ class MenuMaker:
         """
         parsed_working_dict = {}
         for iD, chain in grown_working_dict.items():
+            logger.log(SPAM, f"parsing chain {chain}")
             chain_count = Counter(chain)
             commonest_letter, occurrence_count = chain_count.most_common(1)[0]
 
@@ -208,7 +211,7 @@ class MenuMaker:
          through a cycle of characters. This loop is converted to a frozenset for comparison against existing found
          loops, and for use as the key in dictionary of found_loops"""
         new_loop_set = frozenset(new_loop)
-
+        logger.log(SPAM, f"checking potential new loop {new_loop}")
         already_found = False
         to_delete = []
         for found_loop in self.found_loops.keys():
@@ -221,7 +224,9 @@ class MenuMaker:
         for old_found_loop in to_delete:
             del self.found_loops[old_found_loop]
 
-        if not already_found:
+        if already_found:
+            logger.log(SPAM, f"not adding {new_loop}")
+        else:
             self.found_loops[new_loop_set] = new_loop
             logger.debug(f"{self.pfx} loop found = {new_loop}")
 
