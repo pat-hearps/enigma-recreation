@@ -243,7 +243,7 @@ class MenuMaker:
         """Ignores deadends that are not connected loops in any way. Will preserve straight chains that
         link together separate loops. Doesn't change MenuMaker attributes, just returns list of simpler ends.
         Purpose is to reduce unneeded links and scramblers in menu."""
-        simpler_deadends = []
+        simpler_deadends = set()
         all_chars_in_loops = set().union(*self.found_loops.keys())
         for end, chain in self.dead_ends.items():
             # will be empty set if no letters in chain link to a loop
@@ -252,8 +252,8 @@ class MenuMaker:
                 pass
             else:
                 lopped_chain = chain.replace(end, '')
-                simpler_deadends.append(lopped_chain)
-        return simpler_deadends
+                simpler_deadends.add(lopped_chain)
+        return list(simpler_deadends)
 
     def add_characters_to_menu(self):
         """For each character in the menu network (obtained by combining loops and deadends),
