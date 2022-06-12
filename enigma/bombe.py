@@ -123,11 +123,11 @@ class Bombe:
             # lit_status = get_lit_status(scrambler)
             # logger.log(SPAM, f"scr {scr1id} after update | status={lit_status}")
 
-    def spin_scramblers(self):
+    def spin_scramblers(self, log=True):
         """Runs step_enigma for all scramblers, spinning the right rotor once and perhaps the middle and left if
         they are in their notch positions"""
         for scrambler in self.scramblers.values():
-            scrambler.step_enigma()
+            scrambler.step_enigma(log=log)
 
     def reset_scramblers_and_register(self):
         """ resets all scrambler statuses and test register to 0 for all alphabet characters"""

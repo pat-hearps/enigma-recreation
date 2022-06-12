@@ -1,3 +1,4 @@
+import logging
 from string import ascii_uppercase
 from typing import Dict, List
 
@@ -87,7 +88,7 @@ class BaseEnigma:
         """Update the enigma's class attribute 'window_letters' to reflect the positions of the rotors"""
         self.window_letters = "".join([r.window_letter for r in (self.left_rotor, self.middle_rotor, self.right_rotor)])
 
-    def step_enigma(self):
+    def step_enigma(self, log=True):
         """Step the 3 rotors, as occurs when a key is depressed
         - right rotor is always stepped
         - middle rotor steps if right rotor has reached its notch point
@@ -95,6 +96,10 @@ class BaseEnigma:
         due to 'double-stepping' of pawl/teeth mechanism.
         Note that notches are not affected by ring position, as the notch is on the moveable outer ring. Rotor will
         always step it's adjacent rotor if its window is displaying it's notch letter."""
+        if not log:
+            original_log_level = logger.getEffectiveLevel()
+            logger.setLevel(logging.ERROR)
+
         letters_before = self.window_letters
 
         logger.log(BARF, f"middle rotor notch={self.middle_rotor.notch}")
@@ -113,6 +118,8 @@ class BaseEnigma:
         self.right_rotor.step_rotor()
         self.translate_window_letters()
         logger.log(SPAM, f"{self.label}enigma position before stepping={letters_before}, after={self.window_letters}")
+        if not log:
+            logger.setLevel(original_log_level)
 
     def cypher(self, letters: str):
         """
