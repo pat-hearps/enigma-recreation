@@ -12,7 +12,7 @@ from enigma.design import (
     ROTORS,
     raw_rotors,
 )
-from enigma.utils import VERBOSE, get_logger, vprint
+from enigma.utils import SPAM, VERBOSE, get_logger
 
 logger = get_logger(__name__)
 
@@ -96,19 +96,19 @@ class BaseEnigma:
         always step it's adjacent rotor if its window is displaying it's notch letter."""
         logger.log(VERBOSE, f"enigma position before stepping={self.window_letters}")
 
-        vprint(f"middle rotor notch={self.middle_rotor.notch}", 2)
+        logger.log(SPAM, f"middle rotor notch={self.middle_rotor.notch}")
         if self.middle_rotor.notch == self.middle_rotor.window_letter:
-            vprint("stepping left rotor", 2)
+            logger.log(SPAM, "stepping left rotor")
             self.left_rotor.step_rotor()
-            vprint("stepping middle rotor with left rotor", 2)
+            logger.log(SPAM, "stepping middle rotor with left rotor")
             self.middle_rotor.step_rotor()
 
-        vprint(f"right rotor notch={self.right_rotor.notch}", 2)
+        logger.log(SPAM, f"right rotor notch={self.right_rotor.notch}")
         if self.right_rotor.notch == self.right_rotor.window_letter:
-            vprint("stepping middle rotor", 2)
+            logger.log(SPAM, "stepping middle rotor")
             self.middle_rotor.step_rotor()
 
-        vprint("stepping right rotor", 2)
+        logger.log(SPAM, "stepping right rotor")
         self.right_rotor.step_rotor()
         self.translate_window_letters()
         logger.log(VERBOSE, f"enigma position after stepping={self.window_letters}")
@@ -185,7 +185,7 @@ def once_thru_scramble(start_character: str, forward: bool, left_rotor: Rotor, m
 
 
 def encode_thru_reflector(reflector: Reflector, entry_position: int) -> int:
-    vprint(f"---- Rotor type {reflector.reflector_type} ----", 2)
+    logger.log(SPAM, f"---- Rotor type {reflector.reflector_type} ----")
     logger.log(VERBOSE, f"signal into reflector at position {entry_position}   = {ENTRY[entry_position]}")
     position_out = reflector.index_cypher_forward[entry_position]
     logger.log(VERBOSE, f"signal out of reflector at position {position_out} = {ENTRY[position_out]}")
@@ -197,7 +197,9 @@ def encode_thru_rotor(rotor: Rotor, entry_position: int, forward: bool = True) -
     state of given Rotor class instance should define the current settings / position etc.
     - entry_position = 0-25 index at which signal is entering, relative to the 'A' position of
     the fixed 'entry' or 'reflector' where signal would be coming from"""
-    vprint(f"---- Rotor type {rotor.rotor_type} / window {rotor.window_letter} / ring {rotor.ring_setting} ----", 2)
+    logger.log(
+        SPAM,
+        f"---- Rotor type {rotor.rotor_type} / window {rotor.window_letter} / ring {rotor.ring_setting} ----")
     logger.log(VERBOSE, f"signal into rotor at position {entry_position} =       {ENTRY[entry_position]}")
     index_cypher = rotor.index_cypher_forward if forward else rotor.index_cypher_reverse
     # which letter on the cypher rotor the signal is entering at - offset based on rotor step and ring setting
