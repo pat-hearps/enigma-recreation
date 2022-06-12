@@ -12,7 +12,9 @@ from enigma.design import (
     ROTORS,
     raw_rotors,
 )
-from enigma.utils import vprint
+from enigma.utils import VERBOSE, get_logger, vprint
+
+logger = get_logger(__name__)
 
 
 class Reflector:
@@ -92,7 +94,7 @@ class BaseEnigma:
         due to 'double-stepping' of pawl/teeth mechanism.
         Note that notches are not affected by ring position, as the notch is on the moveable outer ring. Rotor will
         always step it's adjacent rotor if its window is displaying it's notch letter."""
-        vprint(f"enigma position before stepping={self.window_letters}", 1)
+        logger.log(VERBOSE, f"enigma position before stepping={self.window_letters}")
 
         vprint(f"middle rotor notch={self.middle_rotor.notch}", 2)
         if self.middle_rotor.notch == self.middle_rotor.window_letter:
@@ -109,7 +111,7 @@ class BaseEnigma:
         vprint("stepping right rotor", 2)
         self.right_rotor.step_rotor()
         self.translate_window_letters()
-        vprint(f"enigma position after stepping={self.window_letters}", 1)
+        logger.log(VERBOSE, f"enigma position after stepping={self.window_letters}")
 
     def cypher(self, letters: str):
         """
@@ -184,9 +186,9 @@ def once_thru_scramble(start_character: str, forward: bool, left_rotor: Rotor, m
 
 def encode_thru_reflector(reflector: Reflector, entry_position: int) -> int:
     vprint(f"---- Rotor type {reflector.reflector_type} ----", 2)
-    vprint(f"signal into reflector at position {entry_position}   = {ENTRY[entry_position]}", 1)
+    logger.log(VERBOSE, f"signal into reflector at position {entry_position}   = {ENTRY[entry_position]}")
     position_out = reflector.index_cypher_forward[entry_position]
-    vprint(f"signal out of reflector at position {position_out} = {ENTRY[position_out]}", 1)
+    logger.log(VERBOSE, f"signal out of reflector at position {position_out} = {ENTRY[position_out]}")
     return position_out
 
 
@@ -196,15 +198,15 @@ def encode_thru_rotor(rotor: Rotor, entry_position: int, forward: bool = True) -
     - entry_position = 0-25 index at which signal is entering, relative to the 'A' position of
     the fixed 'entry' or 'reflector' where signal would be coming from"""
     vprint(f"---- Rotor type {rotor.rotor_type} / window {rotor.window_letter} / ring {rotor.ring_setting} ----", 2)
-    vprint(f"signal into rotor at position {entry_position} =       {ENTRY[entry_position]}", 1)
+    logger.log(VERBOSE, f"signal into rotor at position {entry_position} =       {ENTRY[entry_position]}")
     index_cypher = rotor.index_cypher_forward if forward else rotor.index_cypher_reverse
     # which letter on the cypher rotor the signal is entering at - offset based on rotor step and ring setting
     cypher_in = (entry_position + rotor.actual_cypher_position) % 26
-    vprint(f"signal into cypher wiring at letter =    {ENTRY[cypher_in]}", 1)
+    logger.log(VERBOSE, f"signal into cypher wiring at letter =    {ENTRY[cypher_in]}")
     # cypher_out from cypher_in is the actual enigma internal wiring encoding
     cypher_out = index_cypher[cypher_in]
-    vprint(f"signal encoded out of cypher at letter = {ENTRY[cypher_out]}", 1)
+    logger.log(VERBOSE, f"signal encoded out of cypher at letter = {ENTRY[cypher_out]}")
     # where the signal will exit at, offset due same reasons as cypher_in
     position_out = (26 + cypher_out - rotor.actual_cypher_position) % 26
-    vprint(f"signal out of rotor at position {position_out} =      {ENTRY[position_out]}", 1)
+    logger.log(VERBOSE, f"signal out of rotor at position {position_out} =      {ENTRY[position_out]}")
     return position_out
