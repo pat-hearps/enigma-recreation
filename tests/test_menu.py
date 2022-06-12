@@ -168,6 +168,7 @@ def test_menu_prep(crib_set_name: str, expected: dict) -> None:
     crib_guess, crib_cypher = get_crib_cypher(crib_set_name)
     menu_mkr = MenuMaker(crib=crib_guess, encoded_crib=crib_cypher)
     menu_mkr.run()
+    menu_mkr.network_graph(label=f"_{crib_set_name}")
     print("===start of menu test===")
     # easy check - not looking for identical ordering of in/out pairs, keys
     for key, exp_val in expected.items():
