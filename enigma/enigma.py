@@ -1,3 +1,4 @@
+import logging
 from string import ascii_uppercase
 from typing import Dict, List
 
@@ -12,7 +13,9 @@ from enigma.design import (
     ROTORS,
     raw_rotors,
 )
-from enigma.utils import vprint
+from enigma.utils import BARF, SPAM, get_logger
+
+logger = get_logger(__name__)
 
 
 class Reflector:
@@ -56,7 +59,7 @@ class Rotor:
 
 class BaseEnigma:
     def __init__(self, left_rotor_type: str, middle_rotor_type: str, right_rotor_type: str, reflector_type: str,
-                 ring_settings_3: str = "AAA", current_window_3: str = "AAA"):
+                 ring_settings_3: str = "AAA", current_window_3: str = "AAA", label: str = ""):
         """rotors must be strings referring to either ['I','II','III','IV','V']
         reflector must be string, one of either ['B','C'],
         current_window_3 = initial position of the 3 rotors as defined by the letter visible in the window for each
@@ -68,6 +71,7 @@ class BaseEnigma:
         self.left_rotor: Rotor = Rotor(rotor_type=left_rotor_type, ring_setting=ring_settings_3[0])
         self.middle_rotor: Rotor = Rotor(rotor_type=middle_rotor_type, ring_setting=ring_settings_3[1])
         self.right_rotor: Rotor = Rotor(rotor_type=right_rotor_type, ring_setting=ring_settings_3[2])
+        self.label = label
         self.set_window_letters(current_window_3=current_window_3)
 
     def set_window_letters(self, current_window_3: str):
@@ -84,7 +88,7 @@ class BaseEnigma:
         """Update the enigma's class attribute 'window_letters' to reflect the positions of the rotors"""
         self.window_letters = "".join([r.window_letter for r in (self.left_rotor, self.middle_rotor, self.right_rotor)])
 
-    def step_enigma(self):
+    def step_enigma(self, log=True):
         """Step the 3 rotors, as occurs when a key is depressed
         - right rotor is always stepped
         - middle rotor steps if right rotor has reached its notch point
@@ -92,24 +96,30 @@ class BaseEnigma:
         due to 'double-stepping' of pawl/teeth mechanism.
         Note that notches are not affected by ring position, as the notch is on the moveable outer ring. Rotor will
         always step it's adjacent rotor if its window is displaying it's notch letter."""
-        vprint(f"enigma position before stepping={self.window_letters}", 1)
+        if not log:
+            original_log_level = logger.getEffectiveLevel()
+            logger.setLevel(logging.ERROR)
 
-        vprint(f"middle rotor notch={self.middle_rotor.notch}", 2)
+        letters_before = self.window_letters
+
+        logger.log(BARF, f"middle rotor notch={self.middle_rotor.notch}")
         if self.middle_rotor.notch == self.middle_rotor.window_letter:
-            vprint("stepping left rotor", 2)
+            logger.log(BARF, "stepping left rotor")
             self.left_rotor.step_rotor()
-            vprint("stepping middle rotor with left rotor", 2)
+            logger.log(BARF, "stepping middle rotor with left rotor")
             self.middle_rotor.step_rotor()
 
-        vprint(f"right rotor notch={self.right_rotor.notch}", 2)
+        logger.log(BARF, f"right rotor notch={self.right_rotor.notch}")
         if self.right_rotor.notch == self.right_rotor.window_letter:
-            vprint("stepping middle rotor", 2)
+            logger.log(BARF, "stepping middle rotor")
             self.middle_rotor.step_rotor()
 
-        vprint("stepping right rotor", 2)
+        logger.log(BARF, "stepping right rotor")
         self.right_rotor.step_rotor()
         self.translate_window_letters()
-        vprint(f"enigma position after stepping={self.window_letters}", 1)
+        logger.log(SPAM, f"{self.label}enigma position before stepping={letters_before}, after={self.window_letters}")
+        if not log:
+            logger.setLevel(original_log_level)
 
     def cypher(self, letters: str):
         """
@@ -183,10 +193,10 @@ def once_thru_scramble(start_character: str, forward: bool, left_rotor: Rotor, m
 
 
 def encode_thru_reflector(reflector: Reflector, entry_position: int) -> int:
-    vprint(f"---- Rotor type {reflector.reflector_type} ----", 2)
-    vprint(f"signal into reflector at position {entry_position}   = {ENTRY[entry_position]}", 1)
+    logger.log(BARF, f"---- Rotor type {reflector.reflector_type} ----")
+    logger.log(BARF, f"signal into reflector at position {entry_position}   = {ENTRY[entry_position]}")
     position_out = reflector.index_cypher_forward[entry_position]
-    vprint(f"signal out of reflector at position {position_out} = {ENTRY[position_out]}", 1)
+    logger.log(BARF, f"signal out of reflector at position {position_out} = {ENTRY[position_out]}")
     return position_out
 
 
@@ -195,16 +205,18 @@ def encode_thru_rotor(rotor: Rotor, entry_position: int, forward: bool = True) -
     state of given Rotor class instance should define the current settings / position etc.
     - entry_position = 0-25 index at which signal is entering, relative to the 'A' position of
     the fixed 'entry' or 'reflector' where signal would be coming from"""
-    vprint(f"---- Rotor type {rotor.rotor_type} / window {rotor.window_letter} / ring {rotor.ring_setting} ----", 2)
-    vprint(f"signal into rotor at position {entry_position} =       {ENTRY[entry_position]}", 1)
+    logger.log(
+        BARF,
+        f"---- Rotor type {rotor.rotor_type} / window {rotor.window_letter} / ring {rotor.ring_setting} ----")
+    logger.log(BARF, f"signal into rotor at position {entry_position} =       {ENTRY[entry_position]}")
     index_cypher = rotor.index_cypher_forward if forward else rotor.index_cypher_reverse
     # which letter on the cypher rotor the signal is entering at - offset based on rotor step and ring setting
     cypher_in = (entry_position + rotor.actual_cypher_position) % 26
-    vprint(f"signal into cypher wiring at letter =    {ENTRY[cypher_in]}", 1)
+    logger.log(BARF, f"signal into cypher wiring at letter =    {ENTRY[cypher_in]}")
     # cypher_out from cypher_in is the actual enigma internal wiring encoding
     cypher_out = index_cypher[cypher_in]
-    vprint(f"signal encoded out of cypher at letter = {ENTRY[cypher_out]}", 1)
+    logger.log(BARF, f"signal encoded out of cypher at letter = {ENTRY[cypher_out]}")
     # where the signal will exit at, offset due same reasons as cypher_in
     position_out = (26 + cypher_out - rotor.actual_cypher_position) % 26
-    vprint(f"signal out of rotor at position {position_out} =      {ENTRY[position_out]}", 1)
+    logger.log(BARF, f"signal out of rotor at position {position_out} =      {ENTRY[position_out]}")
     return position_out

@@ -27,7 +27,7 @@ def test_bombe_step_and_test(bombe_test_data: Bombe) -> None:
 
     # set identity scrambler to the known enigma starting position
     while bombe.identity_scrambler.window_letters != bombe_test_data.current_window_3:
-        bombe.spin_scramblers()
+        bombe.spin_scramblers(log=False)  # don't log all the setup steps
 
     # we should get a drop straight away, and not get another in the next random position
     for i in range(2):

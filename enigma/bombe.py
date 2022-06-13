@@ -46,7 +46,8 @@ class Bombe:
                     self.reflector,
                     menu_link=descriptor_dict['menu_link'],
                     conx_in=descriptor_dict['conxns']['in'],
-                    conx_out=descriptor_dict['conxns']['out'])
+                    conx_out=descriptor_dict['conxns']['out'],
+                    scrambler_id=scr_id)
         self.lowest_scrambler_order = min([key for key in self.scramblers.keys()])
         self.identity_scrambler = self.scramblers[self.lowest_scrambler_order]
 
@@ -122,11 +123,11 @@ class Bombe:
             # lit_status = get_lit_status(scrambler)
             # logger.log(SPAM, f"scr {scr1id} after update | status={lit_status}")
 
-    def spin_scramblers(self):
+    def spin_scramblers(self, log=True):
         """Runs step_enigma for all scramblers, spinning the right rotor once and perhaps the middle and left if
         they are in their notch positions"""
         for scrambler in self.scramblers.values():
-            scrambler.step_enigma()
+            scrambler.step_enigma(log=log)
 
     def reset_scramblers_and_register(self):
         """ resets all scrambler statuses and test register to 0 for all alphabet characters"""
@@ -362,7 +363,8 @@ class Scrambler(BaseEnigma):
             reflector_type: str,
             menu_link='ZZZ',
             conx_in={},
-            conx_out={}):
+            conx_out={},
+            scrambler_id: int = None):
         """rotors must be strings referring to either ['I','II','III','IV','V']
         reflector must be string, one of either ['B','C']"""
         super().__init__(
@@ -371,13 +373,15 @@ class Scrambler(BaseEnigma):
             right_rotor_type=right_rotor_type,
             reflector_type=reflector_type,
             current_window_3=menu_link,
-            ring_settings_3="AAA")
+            ring_settings_3="AAA",
+            label=f"{scrambler_id}-{menu_link} ")
         self.menu_link = menu_link
         self.status = {
             'in': {char: 0 for char in ENTRY},
             'out': {char: 0 for char in ENTRY}
         }
         self.conxns = {'in': conx_in, 'out': conx_out}
+        self.scr_id = scrambler_id
 
     def full_scramble(self, in_ch: str):
         return full_scramble(enigma=self, letter_in=in_ch)
