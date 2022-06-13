@@ -10,7 +10,7 @@ def test_bombe_init() -> None:
                   right_rotor=B2.right_rotor, reflector=B2.reflector)
     test_char = B2.menu['config']['in']
     assert bombe.test_char == test_char
-    assert bombe.identity_scrambler.window_letters == "ZZB"  # B2 doesn't use 1st or 2nd menu positions
+    assert bombe.identity_scrambler.window_letters == "ZZZ"  # we should always include scrambler 0 / ZZZ in menu
     bombe.light_character()
     assert bombe.register_lit_chars == test_char
     assert bombe.current_sum == 1
