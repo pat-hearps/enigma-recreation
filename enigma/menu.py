@@ -233,6 +233,7 @@ class MenuMaker:
     def prep_menu(self):
         """Second main orchestration method, creates menu from found loops and deadends"""
         self.add_characters_to_menu()
+        self.include_crib_start()  # always include scrambler 0 / ZZZ to avoid confusion with start of run
         logger.log(VERBOSE, f"post adding characters to menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
         self.configure_menu()
         logger.log(VERBOSE, f"post configure_menu,\nlen={len(self.menu)} menu=\n{pformat(self.menu)}")
@@ -273,6 +274,12 @@ class MenuMaker:
                 menu_data = self.base_menu_positions[position]
                 self.menu[position] = menu_data
                 logger.log(SPAM, f"added item to menu at {position} : {menu_data}")
+
+    def include_crib_start(self):
+        """Things get confusing if the identity scrambler is not the start of the crib-cypher pair (the
+        one we assign 'ZZZ'. Simplest just to always add scrambler 0"""
+        first_crib, first_cypher = self.crib[0], self.encoded_crib[0]
+        self.add_item_to_menu(first_crib, first_cypher)
 
     def configure_menu(self):
         """Adds extra item to menu as the bombe entrypoint, using a character
