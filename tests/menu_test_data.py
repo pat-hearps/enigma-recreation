@@ -157,7 +157,11 @@ class BOMBE_TEST2:
     ring_settings_3 = 'AAA'
     crib = "EARTHVENUSMARSSATURN"
     cypher = "KBASITMEADEDPQQJMHJT"
-    menu = {2: {'conxns': {'in': {18: 'in'}, 'out': {8: 'out', 11: 'in', 15: 'in'}},
+    menu = {0: {'conxns': {'in': {6: 'in', 7: 'out', 10: 'out'}, 'out': {}},
+                'in': 'E',
+                'menu_link': 'ZZZ',
+                'out': 'K'},
+            2: {'conxns': {'in': {18: 'in'}, 'out': {8: 'out', 11: 'in', 15: 'in'}},
                 'in': 'R',
                 'menu_link': 'ZZB',
                 'out': 'A'},
