@@ -1,5 +1,6 @@
 import time
 
+import numpy as np
 import streamlit as st
 
 from enigma.bombe import Bombe
@@ -10,6 +11,27 @@ WAIT_SLEEP_SEC = 0.1
 POSITION = "position"
 
 bombe_test_data = BOMBE_TEST2
+
+crib_cypher = np.array([np.array(list(BOMBE_TEST2.crib)),
+                        np.array(list(BOMBE_TEST2.cypher))])
+f"""## Menu
+Crib  =  {BOMBE_TEST2.crib}\n
+Cypher = {BOMBE_TEST2.cypher}"""
+st.table(crib_cypher)
+
+# from enigma.menu import MenuMaker
+# @st.cache(allow_output_mutation=True)
+# def get_menu(crib=BOMBE_TEST2.crib, cypher=BOMBE_TEST2.cypher):
+#     mm = MenuMaker(crib, cypher)
+#     mm.run()
+#     return mm
+
+# "Graph of interconnected letters:"
+# mm = get_menu()
+# menu_graph = mm.network_graph(reset_pos=False)
+# st.pyplot(menu_graph)
+
+"""## Bombe"""
 
 bombe = Bombe(
     menu=bombe_test_data.menu,
