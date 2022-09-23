@@ -32,9 +32,10 @@ while bombe.identity_scrambler.window_letters != position:
 
 step = st.button("Step")
 if step:
-    bombe.step_and_test()
+    bombe.spin_scramblers()
     position = bombe.identity_scrambler.window_letters
     st.session_state[POSITION] = position
+    bombe.set_up_lineup_check()
 
 st.write(f"Position = {position}")
 graph = st.empty()
@@ -43,13 +44,9 @@ register_sum = st.empty()
 fig = bombe.nx_setup()
 graph.pyplot(fig)
 
-progress = []
-while len(progress) < CONVERGENCE or len(set(progress[-CONVERGENCE:])) > 1:
-    bombe.cypher_signal_thru_all_scramblers()
-    bombe.sync_scramblers_to_connected_scramblers()
-    bombe.sync_test_register_with_connected_scramblers()
-    progress.append(bombe.current_sum)
+while len(bombe.track_sums) - 1 < CONVERGENCE or len(set(bombe.track_sums[-CONVERGENCE:])) > 1:
+    bombe.one_step_sync()
     fig = bombe.graph_nx()
     graph.pyplot(fig)
-    register_sum.write(f"current sum = {bombe.current_sum} / step {len(progress)}")
+    register_sum.write(f"current sum = {bombe.current_sum} / step {bombe.check_iters}")
     time.sleep(WAIT_SLEEP_SEC)
