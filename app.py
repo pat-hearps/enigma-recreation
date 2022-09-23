@@ -31,6 +31,8 @@ while bombe.identity_scrambler.window_letters != position:
 
 
 step = st.button("Step")
+sleep = st.slider(label="Sleep Time (sec)", min_value=0.0, max_value=0.4, step=0.001, value=WAIT_SLEEP_SEC)
+
 if step:
     bombe.spin_scramblers()
     position = bombe.identity_scrambler.window_letters
@@ -51,4 +53,4 @@ while len(bombe.track_sums) - 1 < BOMBE_CONVERGENCE or len(set(bombe.track_sums[
     register_sum.write(f"current sum = {bombe.current_sum} / step {bombe.check_iters}\n{bombe.track_sums}")
     if bombe.current_sum == 26:
         break
-    time.sleep(WAIT_SLEEP_SEC)
+    time.sleep(sleep)
