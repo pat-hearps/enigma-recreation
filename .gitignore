@@ -11,6 +11,7 @@ menu_transfer\.pickle
 
 research/*
 images/*
+figures/*
 
 */_pycache_
 *.pyc
