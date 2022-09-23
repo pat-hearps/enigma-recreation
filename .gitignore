@@ -1,3 +1,7 @@
+
+.venv*
+venv*
+
 ~$*.xlsx
 ~\$rotor-ring-map\.xlsx
 
