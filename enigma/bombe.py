@@ -3,7 +3,7 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
-from enigma.design import ENTRY, grey, invsoutmap, iomap, orange, red
+from enigma.design import BOMBE_CONVERGENCE, ENTRY, grey, invsoutmap, iomap, orange, red
 from enigma.enigma import BaseEnigma, full_scramble
 from enigma.utils import SPAM, get_logger
 
@@ -31,6 +31,8 @@ class Bombe:
         self.register = {'status': {char: 0 for char in ENTRY}}
         self.run_record = {}
         self.drops = {}
+        self.track_sums = [0, 1]
+        self.check_iters = 0
 
         self.menu = menu
         """Scrambler setup, creating a scrambler corresponding to each menu item"""
@@ -153,7 +155,7 @@ class Bombe:
         Loops through pulsing connections between scramblers and syncing back to the test register
         until the sum of live connections at the test register remains unchanged for two successive loops."""
         self.set_up_lineup_check()
-        while len(set(self.track_sums[-10:])) != 1:
+        while len(set(self.track_sums[-BOMBE_CONVERGENCE:])) != 1:
             # i.e. keep going until the register status is unchanged for 5 iterations
             # the 5 is somewhat arbitrary. Testing on one menu found no more than 3
             # continuous occurrences of an incomplete status but could be different
@@ -171,7 +173,7 @@ class Bombe:
         # do the first syncing of test register, send signal to the scramblers which are connected to the test register
         self.sync_test_register_with_connected_scramblers()
 
-        self.track_sums = [0, 1]
+        self.track_sums = [0, 1]  # reset to default value
         self.check_iters = 0   # this is just to keep track of how many iterations it took to reach a steady status
         logger.log(SPAM, f"iter={self.check_iters}, current_sum={self.current_sum}, register={self.register_lit_chars}")
 

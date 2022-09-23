@@ -3,9 +3,9 @@ import time
 import streamlit as st
 
 from enigma.bombe import Bombe
+from enigma.design import BOMBE_CONVERGENCE
 from tests.menu_test_data import BOMBE_TEST2
 
-CONVERGENCE = 4
 WAIT_SLEEP_SEC = 0.1
 POSITION = "position"
 
@@ -44,9 +44,11 @@ register_sum = st.empty()
 fig = bombe.nx_setup()
 graph.pyplot(fig)
 
-while len(bombe.track_sums) - 1 < CONVERGENCE or len(set(bombe.track_sums[-CONVERGENCE:])) > 1:
+while len(bombe.track_sums) - 1 < BOMBE_CONVERGENCE or len(set(bombe.track_sums[-BOMBE_CONVERGENCE:])) > 1:
     bombe.one_step_sync()
     fig = bombe.graph_nx()
     graph.pyplot(fig)
-    register_sum.write(f"current sum = {bombe.current_sum} / step {bombe.check_iters}")
+    register_sum.write(f"current sum = {bombe.current_sum} / step {bombe.check_iters}\n{bombe.track_sums}")
+    if bombe.current_sum == 26:
+        break
     time.sleep(WAIT_SLEEP_SEC)
