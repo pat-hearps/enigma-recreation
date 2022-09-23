@@ -53,10 +53,11 @@ class MenuMaker:
     def run(self):
         """MAIN ENTRYPOINT FUNCTION - find all loops & deadends, then add connections to menu"""
         self.search_menu_structure()
-        logger.debug(f"identified {len(self.found_loops)} loops:\n{self.found_loops}")
-        logger.debug(f"identified {len(self.dead_ends)} dead ends:\n{self.dead_ends}")
+        logger.info(f"identified {len(self.found_loops)} loops:\n{self.found_loops}")
+        logger.info(f"identified {len(self.dead_ends)} dead ends:\n{self.dead_ends}")
         if self.found_loops:
             self.prep_menu()
+            logger.debug(f"Menu: {self.menu}")
         else:
             logger.info("No loops found, no menu can be made")
 
@@ -354,3 +355,4 @@ class MenuMaker:
         filepath = f"./figures/menu{label}.png"
         plt.savefig(filepath)
         logger.info(f"menu network diagram saved to {filepath}")
+        return fig

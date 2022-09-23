@@ -11,7 +11,7 @@
 #     - isort, which automatically sorts imports to PEP8 standard
 
 # globally exclude all venv files from any hooks
-exclude: ^(.venv*|venv*)
+exclude: ^(.venv*|venv*|scratch)
 # specific hooks defined under repos
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
