@@ -35,7 +35,7 @@ if step:
     bombe.spin_scramblers()
     position = bombe.identity_scrambler.window_letters
     st.session_state[POSITION] = position
-    bombe.set_up_lineup_check()
+bombe.set_up_lineup_check()
 
 st.write(f"Position = {position}")
 graph = st.empty()
