@@ -294,9 +294,10 @@ class Bombe:
         self.colors = [self.TG[u][v]['color'] for u, v in self.TG.edges()]
 
         fig, ax = plt.subplots(figsize=figsize)
-        nx.draw_networkx_nodes(self.BG, pos=self.base_pos_for_nx)
-        nx.draw_networkx_labels(self.BG, pos=self.base_pos_for_nx)
-        nx.draw_networkx_edges(self.TG, pos=self.manual_pos, edge_color=self.colors)
+        nx.draw_networkx_nodes(self.BG, pos=self.base_pos_for_nx, ax=ax)
+        nx.draw_networkx_labels(self.BG, pos=self.base_pos_for_nx, ax=ax)
+        nx.draw_networkx_edges(self.TG, pos=self.manual_pos, edge_color=self.colors, ax=ax)
+        return fig
 
     def graph_nx(self, figsize=(15, 10), node_size=3):
         """First updates nx_graph edge colors based on current scrambler statuses,
@@ -345,11 +346,17 @@ class Bombe:
         self.edge_colours = [self.TG[u][v]['color'] for u, v in self.TG.edges()]
         self.node_colours = [v['color'] for u, v in self.TG.nodes.items()]
         fig, ax = plt.subplots(figsize=figsize)
-        nx.draw_networkx_nodes(self.BG, pos=self.base_pos_for_nx)
-        nx.draw_networkx_labels(self.BG, pos=self.base_pos_for_nx)
-        nx.draw_networkx_edges(self.TG, pos=self.manual_pos, edge_color=self.edge_colours)
+        nx.draw_networkx_nodes(self.BG, pos=self.base_pos_for_nx, ax=ax)
+        nx.draw_networkx_labels(self.BG, pos=self.base_pos_for_nx, ax=ax)
+        nx.draw_networkx_edges(self.TG, pos=self.manual_pos, edge_color=self.edge_colours, ax=ax)
         if node_size > 0:
-            nx.draw_networkx_nodes(self.TG, pos=self.manual_pos, node_size=node_size, node_color=self.node_colours)
+            nx.draw_networkx_nodes(
+                self.TG,
+                pos=self.manual_pos,
+                node_size=node_size,
+                node_color=self.node_colours,
+                ax=ax)
+        return fig
 
 
 class Scrambler(BaseEnigma):
