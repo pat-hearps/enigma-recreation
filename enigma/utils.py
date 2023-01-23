@@ -6,13 +6,6 @@ LOG_FORMAT = "%(levelname)-5s | %(asctime)s | %(module)s:%(funcName)s:%(lineno)-
 DT_FORMAT = "%H:%M:%S"
 
 
-def vprint(message: str, msg_level: int, v_level: int = None):
-    if v_level is None:
-        v_level = int(os.getenv("verbosity", default="0"))
-    if msg_level <= v_level:
-        print(message)
-
-
 VERBOSE = 5
 SPAM = 3
 BARF = 2
