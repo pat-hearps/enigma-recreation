@@ -90,6 +90,9 @@ while bombe.check_iters < BOMBE_CONVERGENCE or len(last_n_sums) > 1:
         status.write(f"-- Test register full, enigma position {position} eliminated from possibility --")
         break
     elif len(last_n_sums) == 1 and bombe.check_iters >= BOMBE_CONVERGENCE and (n_reg := list(last_n_sums)[0]) in (1, 25):
-        status.write("-- DROP -- test register isolated possible cypher candidate --")
+        drop_status_to_fetch = 1 if n_reg == 1 else 0
+        drop_char = [char for char, status in bombe.register['status'].items() if status == drop_status_to_fetch][0]
+        status.write(
+            f"-- DROP -- test register isolated possible cypher candidate [ {bombe.test_char} => {drop_char} ] --")
         break
     time.sleep(sleep)
