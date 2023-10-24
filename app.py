@@ -40,6 +40,7 @@ bombe = Bombe(
     right_rotor=bombe_test_data.right_rotor,
     reflector=bombe_test_data.reflector)
 
+register_keys = np.array(list(bombe.register['status'].keys()))  # should just be letters A-Z
 
 if POSITION in st.session_state:
     position = st.session_state[POSITION]
@@ -64,6 +65,7 @@ bombe.set_up_lineup_check()
 st.write(f"Position = {position}")
 graph = st.empty()
 register_sum = st.empty()
+register = st.empty()
 status = st.empty()
 
 fig = bombe.nx_setup()
@@ -79,6 +81,10 @@ while bombe.check_iters < BOMBE_CONVERGENCE or len(last_n_sums) > 1:
     register_sum.write(f"""Step = {bombe.check_iters}
                        \nSum of live letters at test register = {bombe.current_sum}
                        \nRegister sum history:  {bombe.track_sums}""")
+
+    current_register = np.array([register_keys, np.array(
+        ["X" if v else "" for v in bombe.register['status'].values()])])
+    register.table(current_register)
 
     if bombe.current_sum == 26:
         status.write(f"-- Test register full, enigma position {position} eliminated from possibility --")
