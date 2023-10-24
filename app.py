@@ -64,6 +64,7 @@ bombe.set_up_lineup_check()
 st.write(f"Position = {position}")
 graph = st.empty()
 register_sum = st.empty()
+status = st.empty()
 
 fig = bombe.nx_setup()
 graph.pyplot(fig)
@@ -72,7 +73,10 @@ while len(bombe.track_sums) - 1 < BOMBE_CONVERGENCE or len(set(bombe.track_sums[
     bombe.one_step_sync()
     fig = bombe.graph_nx()
     graph.pyplot(fig)
-    register_sum.write(f"current sum = {bombe.current_sum} / step {bombe.check_iters}\n{bombe.track_sums}")
+    register_sum.write(f"""Step = {bombe.check_iters}
+                       \nSum of live letters at test register = {bombe.current_sum}
+                       \nRegister sum history:  {bombe.track_sums}""")
     if bombe.current_sum == 26:
+        status.write(f"-- Test register full, enigma position {position} eliminated from possibility --")
         break
     time.sleep(sleep)
