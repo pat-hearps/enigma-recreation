@@ -156,7 +156,7 @@ class Bombe:
         until the sum of live connections at the test register remains unchanged for two successive loops."""
         self.set_up_lineup_check()
         while len(set(self.track_sums[-BOMBE_CONVERGENCE:])) != 1:
-            # i.e. keep going until the register status is unchanged for 5 iterations
+            # i.e. keep going until the register status is unchanged for BOMBE_CONVERGENCE number of iterations
             # the 5 is somewhat arbitrary. Testing on one menu found no more than 3
             # continuous occurrences of an incomplete status but could be different
             # for other menus.

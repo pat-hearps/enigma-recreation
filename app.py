@@ -69,14 +69,21 @@ status = st.empty()
 fig = bombe.nx_setup()
 graph.pyplot(fig)
 
-while len(bombe.track_sums) - 1 < BOMBE_CONVERGENCE or len(set(bombe.track_sums[-BOMBE_CONVERGENCE:])) > 1:
+# need to try looping for at least BOMBE_CONVERGENCE times, and only stop once we reach 26, or plateau at 1 or 25
+last_n_sums = {1, }
+while bombe.check_iters < BOMBE_CONVERGENCE or len(last_n_sums) > 1:
     bombe.one_step_sync()
+    last_n_sums = set(bombe.track_sums[1:][-BOMBE_CONVERGENCE:])
     fig = bombe.graph_nx()
     graph.pyplot(fig)
     register_sum.write(f"""Step = {bombe.check_iters}
                        \nSum of live letters at test register = {bombe.current_sum}
                        \nRegister sum history:  {bombe.track_sums}""")
+
     if bombe.current_sum == 26:
         status.write(f"-- Test register full, enigma position {position} eliminated from possibility --")
+        break
+    elif len(last_n_sums) == 1 and bombe.check_iters >= BOMBE_CONVERGENCE and (n_reg := list(last_n_sums)[0]) in (1, 25):
+        status.write("-- DROP -- test register isolated possible cypher candidate --")
         break
     time.sleep(sleep)

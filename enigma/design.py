@@ -82,4 +82,6 @@ red = mclr.to_rgba('firebrick', 0.9)
 orange = mclr.to_rgba('lightsalmon', 0.8)
 transparent = mclr.to_rgba('white', alpha=0)
 
-BOMBE_CONVERGENCE = 10
+# to call it converged, bombe must be stepped this many times, and needs
+# to be no change in number of letters lit at test register for this many steps
+BOMBE_CONVERGENCE = 6
