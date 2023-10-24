@@ -1,0 +1,14 @@
+dill
+factory_boy
+jupyterlab
+matplotlib
+networkx
+numpy
+nx_altair
+pandas
+pre-commit
+plotly
+pytest
+pylint
+seaborn
+streamlit

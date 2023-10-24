@@ -7,7 +7,7 @@ from enigma.design import ENTRY
 from enigma.enigma import Enigma
 from enigma.bombe import Bombe
 from enigma.menu import MenuMaker
-from tests.menu_test_data import BASIC_3CH as B3, BOMBE_TEST1 as B1
+from tests.menu_test_data import BASIC_3CH as B3, BOMBE_TEST2 as B2
 
 def main():
     # ring settings should always be 'AAA' for a bombe, as we ignore them
